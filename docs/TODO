@@ -204,19 +204,6 @@ TEMPLATE CLASSES
         -   Notice if the source file (or Class::MakeMethods modules) has
             been updated more recently than the generated file.
 
-EMULATOR CLASSES
-    These emulator classes are currently considered stable, but they may
-    need to be kept up to date as the core MakeMethods distribution changes,
-    or as new versions of the emulated classes are released.
-
-  Tests
-
-    *   Expunge old custom Test module in favor of standard version (except
-        for emulation compatibility tests, which should remain untouched).
-
-    *   Use Devel::Coverage to measure test coverage, and fill in missing
-        cases.
-
 SEE ALSO
     See the Class::MakeMethods manpage for general information about this
     distribution.

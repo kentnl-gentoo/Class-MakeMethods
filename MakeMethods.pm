@@ -1,5 +1,5 @@
 ### Class::MakeMethods
-  # Copyright 2002 Matthew Simon Cavalletto
+  # Copyright 2002, 2003 Matthew Simon Cavalletto
   # See documentation, license, and other information after _END_.
 
 package Class::MakeMethods;
@@ -9,7 +9,7 @@ use strict;
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = 1.006;
+$VERSION = 1.007;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 
@@ -978,14 +978,46 @@ Class::MakeMethods can be extended by creating subclasses that
 define additional meta-method types. Callers then select your
 subclass using any of the several techniques described above.
 
-You can give your meta-method type any name that is a legal subroutine
-identifier. Names begining with an underscore, and the names
-C<import> and C<make>, are reserved for internal use by
-Class::MakeMethods.
+=head2 Creating A Subclass
+
+The begining of a typical extension might look like the below:
+
+  package My::UpperCaseMethods;
+  use strict;
+  use Class::MakeMethods '-isasubclass';
+  
+  sub my_method_type { ... }
+
+You can name your subclass anything you want; it does not need to
+begin with Class::MakeMethods.
+
+The '-isasubclass' flag is a shortcut that automatically puts
+Class::MakeMethods into your package's @ISA array so that it will
+inherit the import() and make() class methods. If you omit this
+flag, you will need to place the superclass in your @ISA explicitly.
+
+Typically, the subclass should B<not> inherit from Exporter; both
+Class::MakeMethods and Exporter are based on inheriting an import
+class method, and getting a subclass to support both would require
+additional effort.
+
+=head2 Naming Method Types
+
+Each type of method that can be generated is defined in a subroutine
+of the same name. You can give your meta-method type any name that
+is a legal subroutine identifier.
+
+(Names begining with an underscore, and the names C<import> and
+C<make>, are reserved for internal use by Class::MakeMethods.)
+
+If you plan on distributing your extension, you may wish to follow
+the "Naming Convention for Generated Method Types" described above
+to facilitate reuse by others.
 
 =head2 Implementation Options
 
-Your meta-method subroutine should provide one of the following types of functionality:
+Each method generation subroutine can be implemented in any one of
+the following ways:
 
 =over 4
 
@@ -1236,10 +1268,14 @@ It does not appear to be possible to assign subroutine names to closures within 
 
 See L<Class::MakeMethods::Docs::ToDo> for other outstanding issues.
 
+To report bugs via the CPAN web tracking system, go to 
+C<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-MakeMethods> or send mail 
+to C<Dist=Class-MakeMethods#rt.cpan.org>, replacing C<#> with C<@>.
+
 
 =head1 VERSION
 
-This is Class::MakeMethods v1.006.
+This is Class::MakeMethods v1.007.
 
 =head2 Distribution Summary
 
@@ -1389,8 +1425,10 @@ See L<perlref/"Making References">, point 4 for more information on closures. (F
 
 =head2 Author
 
-  M. Simon Cavalletto, simonm@cavalletto.org
-  Evolution Softworks, www.evoscript.org
+Developed by Matthew Simon Cavalletto at Evolution Softworks. 
+More free Perl software is available at C<www.evoscript.org>.
+
+You may contact the author directly at C<evo@cpan.org> or C<simonm@cavalletto.org>. 
 
 =head2 Feedback and Suggestions 
 
@@ -1420,7 +1458,7 @@ this module were extracted from the following CPAN modules:
 
 =head2 Copyright
 
-Copyright 2002 Matthew Simon Cavalletto. 
+Copyright 2002, 2003 Matthew Simon Cavalletto. 
 
 Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
 

@@ -7,7 +7,7 @@ WriteMakefile(
       ABSTRACT_FROM     => 'MakeMethods.pm', 
       AUTHOR            => 'Matthew Simon Cavalletto <simonm@cavalletto.org>',
     ) : ()),
-    test                => { 'TESTS' => 't/*/*.t', },
+    test                => { 'TESTS' => 't/*.t t-mm/*.t', },
 );
 sub MY::postamble { q{
 

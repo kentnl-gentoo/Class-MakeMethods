@@ -1,6 +1,6 @@
 =head1 NAME
 
-Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 1.006
+Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 1.007
 
 
 =head1 DESCRIPTION

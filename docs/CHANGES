@@ -6,6 +6,36 @@ SYNOPSIS
     Revision history for Class::MakeMethods.
 
 CHANGES
+  Version 1.007
+
+    2003/09/01
+        Made Template definitions automatically import their class's generic
+        definitions, if present. This eliminates the need for Generic
+        subclasses to explicitly redeclare every method it inherits, and
+        should obviate the "missing declaration" problems referenced below.
+
+        Updated the names of several Template subclasses, with stubs at the
+        old names for backwards compatibility: Flyweight becomes InsideOut,
+        Static becomes Global, and Struct becomes Array.
+
+        Added Template::Inheritable and basic tests for it.
+
+        Eliminated use of legacy Test.pm from remaining tests, except for
+        MethodMaker emulation.
+
+        Rearranged test directories in an effort to avoid a reported bug
+        with the test path of t/*/*.t under Windows.
+
+        Released to CPAN as Class-MakeMethods-1.007.tar.gz.
+
+    2003/08/27
+        Added section to Class::MakeMethods/EXTENDING documentation based on
+        question from Terrence Brannon.
+
+    2003/02/07
+        Fixed missing declaration of Template::Hash:instance, reported via
+        RT.
+
   Version 1.006
 
     2003/01/26

@@ -7,6 +7,33 @@ use strict;
 require 5.00;
 use Carp;
 
+=head1 NAME
+
+B<Class::MakeMethods::Template::ExternalData> - Method interfaces for external data storage
+
+=head1 SYNOPSIS
+
+  package MyObject;
+  use Class::MakeMethods::Template::ExternalData (
+    new             => 'new',
+    scalar          => 'foo',
+  );
+  
+  package main;
+
+  my $obj = MyObject->new( foo => "Foozle" );
+  print $obj->foo();		# Prints Foozle
+  $obj->foo("Bamboozle"); 	# Sets $$obj
+  print $obj->foo();		# Prints Bamboozle
+
+=head1 DESCRIPTION
+
+Supports the Generic object constructor and accessors meta-method
+types, but uses scalar refs as the underlying implementation type,
+so only one accessor method can be used effectively.
+
+=cut
+
 sub generic {
   {
     '-import' => { 
@@ -14,101 +41,40 @@ sub generic {
     },
     'code_expr' => { 
       _VALUE_ => '(${_SELF_})',
+      _EMPTY_NEW_INSTANCE_ => 'bless \( my $scalar = undef ), _SELF_CLASS_',
     },
     'params' => {
     }
   }
 }
 
-sub new {
-  {
-    '-import' => { 
-      'Template::Scalar:generic' => '*',
-    },
-    'interface' => {
-      default		=> 'with_methods',
-      with_values	=> 'with_values',
-      with_methods	=> 'with_methods', 	
-      with_init		=> 'with_init',
-      instance_with_methods => 'instance_with_methods', 	
-      new_and_method_init   => { '*'=>'new_with_init', 'init'=>'method_init'},
-      copy	    	=> 'shallow_copy',
-    },
-    'behavior' => {
-      'with_methods' => q{
-	  my $scalar = undef;
-	  $self = bless \$scalar, _SELF_CLASS_;
-          
-	  _CALL_METHODS_FROM_HASH_
-	  
-	  return $self;
-	},
-      'with_init' => q{
-	  my $scalar = undef;
-	  $self = bless \$scalar, _SELF_CLASS_;
-          
-	  my $init_method = $m_info->{'init_method'} || 'init';
-	  $self->$init_method( @_ );
-          
-	  return $self;
-	},
-    }
-  }
-}
+########################################################################
 
-sub scalar {
-  {
-    '-import' => { 
-      'Template::Scalar:generic' => '*',
-      'Template::Generic:scalar' => '*', 
-    },
-  }
-}
+=head2 Standard Methods
 
-sub string {
-  {
-    '-import' => { 
-      'Template::Scalar:generic' => '*',
-      'Template::Generic:string' => '*',
-    },
-  }
-}
+The following methods from Generic are all supported:
 
-sub number {
-  {
-    '-import' => { 
-      'Template::Scalar:generic' => '*',
-      'Template::Generic:number' => '*',
-    },
-  }
-}
+  new 
+  scalar
+  string
+  string_index 
+  number 
+  boolean
+  bits 
+  array
+  hash
+  tiedhash
+  hash_of_arrays
+  object
+  instance
+  array_of_objects
+  code
+  code_or_scalar
 
-sub boolean {
-  {
-    '-import' => { 
-      'Template::Scalar:generic' => '*',
-      'Template::Generic:boolean' => '*',
-    },
-  }
-}
+See L<Class::MakeMethods::Template::Generic> for the interfaces and behaviors of these method types.
 
+However, note that due to special nature of this package, all accessor methods reference the same scalar value, so setting a value with one method will overwrite the value retrieved by another.
 
-sub code {
-  {
-    '-import' => { 
-      'Template::Scalar:generic' => '*',
-      'Template::Generic:code' => '*', 
-    },
-  }
-}
-
-sub bits {
-  {
-    '-import' => { 
-      'Template::Scalar:generic' => '*',
-      'Template::Generic:bits' => '*', 
-    },
-  }
-}
+=cut
 
 1;

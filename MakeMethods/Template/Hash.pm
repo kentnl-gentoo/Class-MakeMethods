@@ -61,6 +61,8 @@ sub generic {
     'code_expr' => { 
       _VALUE_ => '_SELF_->{_STATIC_ATTR_{hash_key}}',
       '-import' => { 'Template::Generic:generic' => '*' },
+      _EMPTY_NEW_INSTANCE_ => 'bless {}, _SELF_CLASS_',
+      _SET_VALUES_FROM_HASH_ => 'while ( scalar @_ ) { local $_ = shift(); $self->{ $_ } = shift() }'
     },
     'behavior' => {
       'hash_delete' => q{ delete _VALUE_ },
@@ -69,140 +71,43 @@ sub generic {
   }
 }
 
-=head2 new
+########################################################################
 
-There are several types of hash-based object constructors to choose from.
+=head2 Standard Methods
 
-Each of these methods creates a new blessed hash and returns a reference to it. They differ in how their (optional) arguments are interpreted to set initial values within the hash, and in how they operate when called as class or instance methods.
+The following methods from Generic are all supported:
 
-See the documentation on C<Generic:new> for interfaces and behaviors.
+  new
+  scalar
+  string
+  string_index
+  number 
+  boolean
+  bits (*)
+  array
+  hash
+  tiedhash
+  hash_of_arrays
+  object
+  instance
+  array_of_objects
+  code
+  code_or_scalar
+
+See L<Class::MakeMethods::Template::Generic> for the interfaces and behaviors of these method types.
+
+The items marked with a * above are specifically defined in this package, whereas the others are formed automatically by the interaction of this package's generic settings with the code templates provided by the Generic superclass. 
 
 =cut
 
-sub new {
-  { 
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:new' => '*',
-    },
-    'code_expr' => {
-      _EMPTY_NEW_INSTANCE_ => 'bless {}, _SELF_CLASS_',
-      _SET_VALUES_FROM_HASH_ => 'while ( scalar @_ ) { local $_ = shift(); $self->{ $_ } = shift() }'
+# This is the only one that needs to be specifically defined.
+sub bits {
+  {
+    '-import' => { 'Template::Generic:bits' => '*' },
+    'params' => {
+      'hash_key' => '*{target_class}__*{template_name}',
     },
   }
-}
-
-########################################################################
-
-=head2 scalar
-
-Creates hash-key accessor methods for scalar values.
-
-See the documentation on C<Generic:scalar> for interfaces and behaviors.
-
-=cut
-
-sub scalar {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:scalar' => '*',
-    },
-  }
-}
-
-sub string {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:string' => '*',
-    },
-  }
-}
-
-########################################################################
-
-=head2 string_index
-
-  string_index => [ qw / foo bar baz / ]
-
-Creates string accessor methods for hash objects, like Hash:string
-above, but also maintains a static hash index in which each object
-is stored under the value of the field when the slot is set. If an
-object has a slot set to a value which another object is already
-set to the object currently set to that value has that slot set to
-undef and the new object will be put into the hash under that value.
-(I.e.  only one object can have a given key.)
-
-The method find_x is defined which if called with any arguments
-returns a list of the objects stored under those values in the
-hash. Called with no arguments, it returns a reference to the hash.
-
-Objects with undefined values are not stored in the index.
-
-Note that to free items from memory, you must clear these values!
-
-=head2 find_or_new
-
-  'string_index -find_or_new' => [ qw / foo bar baz / ]
-
-Just like string_index except the find_x method is defined to call the new
-method to create an object if there is no object already stored under
-any of the keys you give as arguments.
-
-=cut
-
-sub string_index {
-  {
-    '-import' => { 'Template::Generic:string_index' => '*' },
-    'params' => { 
-      'hash_key' => '*',
-    },
-    'code_expr' => { 
-      _VALUE_ => '_SELF_->{_ATTR_{hash_key}}',
-    },
-  } 
-}
-
-########################################################################
-
-sub number {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:number' => '*',
-    },
-  }
-}
-
-########################################################################
-
-sub boolean {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:boolean' => '*',
-    },
-  }
-}
-
-########################################################################
-
-=head2 array
-
-Creates hash-key accessor methods for array-ref values.
-
-See the documentation on C<Generic:array> for interfaces and behaviors.
-
-=cut
-
-sub array {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:array' => '*',
-    },
-  } 
 }
 
 ########################################################################
@@ -230,7 +135,6 @@ the slot-name/slot-value pairs.
 
 sub struct {
   ( {
-    'params' => { 'hash_key' => '*' },
     'interface' => {
       default => { 
 	  '*'=>'get_set', 'clear_*'=>'clear',
@@ -238,15 +142,17 @@ sub struct {
 	  'struct'=>'struct', 'struct_dump'=>'struct_dump' 
       },
     },
+    'params' => {
+      'hash_key' => '*{target_class}__*{template_name}',
+    },
     'behavior' => {
       '-init' => sub {
 	my $m_info = $_[0]; 
 	
 	$m_info->{class} ||= $m_info->{target_class};
-	$m_info->{bstore} ||= $m_info->{class} . '__boolean';
 	
 	my $class_info = 
-	  ( $Class::MakeMethods::Template::Hash::struct{$m_info->{class}} ||= [] );
+	 ($Class::MakeMethods::Template::Hash::struct{$m_info->{class}} ||= []);
 	if ( ! defined $m_info->{sfp} ) {
 	  foreach ( 0..$#$class_info ) { 
 	    if ( $class_info->[$_] eq $m_info->{'name'} ) {
@@ -269,9 +175,9 @@ sub struct {
 	}},
       'struct' => sub { my $m_info = $_[0]; sub {
 	  my $self = shift;
-	  $self->{'struct'} ||= [];
-	  if ( @_ ) { @{$self->{'struct'}} = @_ }
-	  @{$self->{'struct'}};
+	  $self->{$m_info->{hash_key}} ||= [];
+	  if ( @_ ) { @{$self->{$m_info->{hash_key}}} = @_ }
+	  @{$self->{$m_info->{hash_key}}};
 	}},
       'struct_dump' => sub { my $m_info = $_[0]; sub {
 	  my $self = shift;
@@ -282,172 +188,23 @@ sub struct {
       
       'get_set' => sub { my $m_info = $_[0]; sub {
 	  my $self = shift;
-	  $self->{'struct'} ||= [];
+	  $self->{$m_info->{hash_key}} ||= [];
 	
 	  if ( @_ ) {
-	    $self->{'struct'}->[ $m_info->{sfp} ] = shift;
+	    $self->{$m_info->{hash_key}}->[ $m_info->{sfp} ] = shift;
 	  }
-	  $self->{'struct'}->[ $m_info->{sfp} ];
+	  $self->{$m_info->{hash_key}}->[ $m_info->{sfp} ];
 	}},
       'clear' => sub { my $m_info = $_[0]; sub {
 	  my $self = shift;
-	  $self->{'struct'} ||= [];
-	  $self->{'struct'}->[ $m_info->{sfp} ] = undef;
+	  $self->{$m_info->{hash_key}} ||= [];
+	  $self->{$m_info->{hash_key}}->[ $m_info->{sfp} ] = undef;
 	}},
     },
   } )
 }
 
-
 ########################################################################
-
-=head2 hash
-
-Creates hash-key accessor methods for hash-ref values.
-
-See the documentation on C<Generic:hash> for interfaces and behaviors.
-
-=cut
-
-sub hash {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:hash' => '*',
-    },
-  } 
-}
-
-########################################################################
-
-=head2 tiedhash
-
-A variant of Hash:hash which initializes the hash by tieing it to a caller-specified package.
-
-See the documentation on C<Generic:tiedhash> for interfaces and behaviors, and for I<required> additional parameters.
-
-=cut
-
-sub tiedhash {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:tiedhash' => '*',
-    },
-  } 
-}
-
-########################################################################
-
-=head2 hash_of_arrays
-
-Creates hash-key accessor methods for references to hashes of array-refs.
-
-See the documentation on C<Generic:hash_of_arrays> for interfaces and behaviors.
-
-=cut
-
-sub hash_of_arrays {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:hash_of_arrays' => '*',
-    },
-  }
-}
-
-########################################################################
-
-=head2 object
-
-Creates meta-methods for hash objects which contain references to other objects.
-
-See the documentation on C<Generic:object> for interfaces, behaviors, and parameters.
-
-=cut
-
-sub object {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:object' => '*',
-    },
-  }
-}
-
-########################################################################
-
-=head2 array_of_objects
-
-Creates meta-methods for hash objects which contain an array of object references. 
-
-See the documentation on C<Generic:array_of_objects> for interfaces, behaviors, and parameters.
-
-=cut
-
-sub array_of_objects {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:array_of_objects' => '*',
-    },
-  }
-}
-
-########################################################################
-
-=head2 code
-
-Creates meta-methods for hash objects which contain an subroutine reference. 
-
-See the documentation on C<Generic:code> for interfaces, behaviors, and parameters.
-
-=cut
-
-sub code {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:code' => '*',
-    },
-  }
-}
-
-########################################################################
-
-=head2 bits
-
-Creates hash-key accessor methods for bit-field values.
-
-See the documentation on C<Generic:bits> for interfaces and behaviors.
-
-The difference between 'Hash:bits' and 'Hash:boolean' is
-that all flags created with this meta-method are stored in a single
-vector for space efficiency.
-
-B<Parameters>:
-
-=over 4
-
-=item hash_key
-
-Initialized to '*{target_class}__boolean'. 
-
-=back
-
-=cut
-
-sub bits {
-  {
-    '-import' => { 
-      'Template::Hash:generic' => '*',
-      'Template::Generic:bits' => '*',
-    },
-    'params' => {
-      'hash_key' => '*{target_class}__boolean',
-    },
-  }
-}
 
 =head1  SEE ALSO
 

@@ -592,14 +592,46 @@ EXTENDING
     additional meta-method types. Callers then select your subclass using
     any of the several techniques described above.
 
-    You can give your meta-method type any name that is a legal subroutine
-    identifier. Names begining with an underscore, and the names "import"
-    and "make", are reserved for internal use by Class::MakeMethods.
+  Creating A Subclass
+
+    The begining of a typical extension might look like the below:
+
+      package My::UpperCaseMethods;
+      use strict;
+      use Class::MakeMethods '-isasubclass';
+  
+      sub my_method_type { ... }
+
+    You can name your subclass anything you want; it does not need to begin
+    with Class::MakeMethods.
+
+    The '-isasubclass' flag is a shortcut that automatically puts
+    Class::MakeMethods into your package's @ISA array so that it will
+    inherit the import() and make() class methods. If you omit this flag,
+    you will need to place the superclass in your @ISA explicitly.
+
+    Typically, the subclass should not inherit from Exporter; both
+    Class::MakeMethods and Exporter are based on inheriting an import class
+    method, and getting a subclass to support both would require additional
+    effort.
+
+  Naming Method Types
+
+    Each type of method that can be generated is defined in a subroutine of
+    the same name. You can give your meta-method type any name that is a
+    legal subroutine identifier.
+
+    (Names begining with an underscore, and the names "import" and "make",
+    are reserved for internal use by Class::MakeMethods.)
+
+    If you plan on distributing your extension, you may wish to follow the
+    "Naming Convention for Generated Method Types" described above to
+    facilitate reuse by others.
 
   Implementation Options
 
-    Your meta-method subroutine should provide one of the following types of
-    functionality:
+    Each method generation subroutine can be implemented in any one of the
+    following ways:
 
     *   Subroutine Generation
 
@@ -804,8 +836,12 @@ BUGS
     See the Class::MakeMethods::Docs::ToDo manpage for other outstanding
     issues.
 
+    To report bugs via the CPAN web tracking system, go to
+    "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-MakeMethods" or send
+    mail to "Dist=Class-MakeMethods#rt.cpan.org", replacing "#" with "@".
+
 VERSION
-    This is Class::MakeMethods v1.006.
+    This is Class::MakeMethods v1.007.
 
   Distribution Summary
 
@@ -946,8 +982,11 @@ SEE ALSO
 CREDITS AND COPYRIGHT
   Author
 
-      M. Simon Cavalletto, simonm@cavalletto.org
-      Evolution Softworks, www.evoscript.org
+    Developed by Matthew Simon Cavalletto at Evolution Softworks. More free
+    Perl software is available at "www.evoscript.org".
+
+    You may contact the author directly at "evo@cpan.org" or
+    "simonm@cavalletto.org".
 
   Feedback and Suggestions
 
@@ -978,7 +1017,7 @@ CREDITS AND COPYRIGHT
 
   Copyright
 
-    Copyright 2002 Matthew Simon Cavalletto.
+    Copyright 2002, 2003 Matthew Simon Cavalletto.
 
     Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
 

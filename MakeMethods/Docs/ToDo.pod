@@ -319,27 +319,6 @@ been updated more recently than the generated file.
 =back
 
 
-=head1 EMULATOR CLASSES
-
-These emulator classes are currently considered stable, but they may need to be kept up to date as the core MakeMethods distribution changes, or as new versions of the emulated classes are released.
-
-=head2 Tests
-
-=over 4
-
-=item *
-
-Expunge old custom Test module in favor of standard version (except for emulation compatibility tests, which should remain untouched).
-
-=item *
-
-Use Devel::Coverage to measure test coverage, and fill in missing
-cases.
-
-=back
-
-
-
 =head1 SEE ALSO
 
 See L<Class::MakeMethods> for general information about this distribution. 

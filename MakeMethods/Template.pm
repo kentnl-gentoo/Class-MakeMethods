@@ -32,8 +32,7 @@ sub named_method {
     # If this is a hash-definition format, cache the results for speed.
     my $def = $results[0];
     $TemplateCache{"$class\::$name"} = $def;
-    require Class::MakeMethods::Template;
-    Class::MakeMethods::Template::_expand_definition($class, $name, $def);
+    _expand_definition($class, $name, $def);
     return $def;
   }
   
@@ -75,28 +74,27 @@ sub _expand_definition {
   my $importer;
   foreach $importer ( qw( interface params behavior code_expr modifier ) ) {
     my $rules = $mm_def->{$importer}->{'-import'} || $mm_def->{'-import'};
-    if ( ref $rules ) {
-      my @rules = ( ref $rules eq 'HASH' ? %$rules : @$rules );
-      while ( 
-	my ($source, $names) = splice @rules, 0, 2
-      ) {
-	my $mmi = _definition($class, $source);
-	foreach ( ( $names eq '*' ) ? keys %{ $mmi->{$importer} } 
-			  : ( ref $names ) ? @{ $names } : ( $names ) ) {
-	  my $current = $mm_def->{$importer}{$_};
-	  my $import = $mmi->{$importer}{$_};
-	  if ( ! $current ) {
-	    $mm_def->{$importer}{$_} = $import;
-	  } elsif ( ref($current) eq 'ARRAY' ) {
-	    my @imports = ref($import) ? @$import : $import;
-	    foreach my $imp ( @imports ) {
-	      push @$current, $imp unless ( grep { $_ eq $imp } @$current );
-	    }
+    my @rules = ( ref $rules eq 'HASH' ? %$rules : ref $rules eq 'ARRAY' ? @$rules : () );
+    unshift @rules, '::' . $class . ':generic' => '*' if $class->can('generic');
+    while ( 
+      my ($source, $names) = splice @rules, 0, 2
+    ) {
+      my $mmi = _definition($class, $source);
+      foreach ( ( $names eq '*' ) ? keys %{ $mmi->{$importer} } 
+			: ( ref $names ) ? @{ $names } : ( $names ) ) {
+	my $current = $mm_def->{$importer}{$_};
+	my $import = $mmi->{$importer}{$_};
+	if ( ! $current ) {
+	  $mm_def->{$importer}{$_} = $import;
+	} elsif ( ref($current) eq 'ARRAY' ) {
+	  my @imports = ref($import) ? @$import : $import;
+	  foreach my $imp ( @imports ) {
+	    push @$current, $imp unless ( grep { $_ eq $imp } @$current );
 	  }
 	}
       }
-      delete $mm_def->{$importer}->{'-import'};
     }
+    delete $mm_def->{$importer}->{'-import'};
   }
   delete $mm_def->{'-import'};
   

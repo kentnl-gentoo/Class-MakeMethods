@@ -54,10 +54,10 @@ sub generic {
     'params' => {
     },
     'modifier' => {
-      '-import' => {  'Template::Universal:universal' => '*' },
+      '-import' => {  'Template::Universal:generic' => '*' },
     },
     'code_expr' => { 
-      '-import' => {  'Template::Universal:universal' => '*'  },
+      '-import' => {  'Template::Universal:generic' => '*'  },
       '_VALUE_' => undef,
       '_REF_VALUE_' => q{ _VALUE_ },
       '_GET_VALUE_' => q{ _VALUE_ },
@@ -232,7 +232,7 @@ The name of the method to call after creating a new instance. Defaults to 'init'
 sub new {
   {
     '-import' => { 
-      'Template::Generic:generic' => '*',
+      # 'Template::Generic:generic' => '*',
     },
     'interface' => {
       default		=> 'with_methods',
@@ -912,9 +912,9 @@ sub boolean {
 
 A generic accessor for bit-field values.
 
-The difference between 'Template::Generic:bits' and 'Template::Generic:boolean' is
-that all flags created with this meta-method are stored in a single
-vector for space efficiency.
+The difference between 'Template::Generic:bits' and
+'Template::Generic:boolean' is that all flags created with this
+meta-method are stored in a single vector for space efficiency.
 
 B<Interfaces>: The following calling interfaces are available.
 
@@ -1001,7 +1001,7 @@ Returns a list of all the flags by name.
 sub bits {
   {
     '-import' => { 
-      'Template::Generic:generic' => '*',
+      # 'Template::Generic:generic' => '*',
     },
     'interface' => {
       default => { 
@@ -1113,7 +1113,7 @@ B<Interfaces>: The following calling interfaces are available.
 
 =item default
 
-Provides get_push behavior for I<*>, and I<verb>_I<*> methods for the non-get behaviors below.
+Provides get_set behavior for I<*>, and I<verb>_I<*> methods for the non-get behaviors below.
 
 =item minimal
 
@@ -1895,7 +1895,7 @@ names.
 sub object {
   {
     '-import' => { 
-      'Template::Generic:generic' => '*',
+      # 'Template::Generic:generic' => '*',
     },
     'interface' => {
       default => { '*'=>'get_set', 'clear_*'=>'clear' },
@@ -2043,7 +2043,7 @@ sub instance {
       'Template::Generic:object' => '*',
     },
     'interface' => {
-      default => 'get_and_set',
+      default => 'get_set',
     },
     'code_expr' => {
       '_CALL_NEW_AND_STORE_' => q{
@@ -2177,7 +2177,7 @@ different for each object.
 sub code {
   {
     '-import' => { 
-      'Template::Generic:generic' => '*',
+      # 'Template::Generic:generic' => '*',
     },
     'interface' => {
       default => 'call_set',

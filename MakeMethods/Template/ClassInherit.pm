@@ -69,64 +69,37 @@ sub generic {
 
 ########################################################################
 
-=head2 ClassInherit:scalar
+=head2 Standard Methods
 
-Creates methods to handle a scalar variable in the declaring package.
+The following methods from Generic should all be supported:
 
-See the documentation on C<Generic:scalar> for interfaces and behaviors.
+  scalar
+  string
+  string_index (?)
+  number 
+  boolean
+  bits (?)
+  array (*)
+  hash (*)
+  tiedhash (?)
+  hash_of_arrays (?)
+  object (?)
+  instance (?)
+  array_of_objects (?)
+  code (?)
+  code_or_scalar (?)
 
-=cut
+See L<Class::MakeMethods::Template::Generic> for the interfaces and behaviors of these method types.
 
-sub scalar {
-  {
-    '-import' => [
-      'Template::ClassInherit:generic' => '*',
-      'Template::Generic:scalar' => '*',
-    ],
-  }
-}
+The items marked with a * above are specifically defined in this package, whereas the others are formed automatically by the interaction of this package's generic settings with the code templates provided by the Generic superclass. 
 
-sub string {
-  {
-    '-import' => [
-      'Template::ClassInherit:generic' => '*',
-      'Template::Generic:string' => '*',
-    ],
-  }
-}
-
-sub number {
-  {
-    '-import' => [
-      'Template::ClassInherit:generic' => '*',
-      'Template::Generic:number' => '*',
-    ],
-  }
-}
-
-sub boolean {
-  {
-    '-import' => [
-      'Template::ClassInherit:generic' => '*',
-      'Template::Generic:boolean' => '*',
-    ],
-  }
-}
-
-########################################################################
-
-=head2 ClassInherit:array
-
-Creates methods to handle a array variable in the declaring package.
-
-See the documentation on C<Generic:array> for interfaces and behaviors.
+The items marked with a ? above have not been tested sufficiently; please inform the author if they do not function as you would expect.
 
 =cut
 
 sub array {
   {
     '-import' => { 
-      'Template::ClassInherit:generic' => '*',
       'Template::Generic:array' => '*',
     },
     'modifier' => {
@@ -138,20 +111,9 @@ sub array {
   } 
 }
 
-########################################################################
-
-=head2 ClassInherit:hash
-
-Creates methods to handle a hash variable in the declaring package.
-
-See the documentation on C<Generic:hash> for interfaces and behaviors.
-
-=cut
-
 sub hash {
   {
     '-import' => { 
-      'Template::ClassInherit:generic' => '*',
       'Template::Generic:hash' => '*',
     },
     'modifier' => {
@@ -161,17 +123,6 @@ sub hash {
       '_VALUE_' => '\%{_ATTR_{data}->{_SELF_CLASS_}}',
     },
   } 
-}
-
-########################################################################
-
-sub object {
-  {
-    '-import' => [
-      'Template::ClassInherit:generic' => '*',
-      'Template::Generic:object' => '*',
-    ],
-  }
 }
 
 ########################################################################

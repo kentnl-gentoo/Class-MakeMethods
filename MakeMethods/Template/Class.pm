@@ -36,6 +36,9 @@ sub generic {
     },
     'modifier' => {
     },
+    'code_expr' => {
+      '_VALUE_' => '_ATTR_{data}->{_SELF_CLASS_}',
+    },
   }
 }
 
@@ -48,54 +51,6 @@ Creates methods to handle a scalar variable in the declaring package.
 See the documentation on C<Generic:scalar> for interfaces and behaviors.
 
 =cut
-
-sub scalar {
-  {
-    '-import' => { 
-      'Template::Class:generic' => '*',
-      'Template::Generic:scalar' => '*',
-    },
-    'code_expr' => {
-      '_VALUE_' => '_ATTR_{data}->{_SELF_CLASS_}',
-    },
-  }
-}
-
-sub string {
-  {
-    '-import' => { 
-      'Template::Class:generic' => '*',
-      'Template::Generic:string' => '*',
-    },
-    'code_expr' => {
-      '_VALUE_' => '_ATTR_{data}->{_SELF_CLASS_}',
-    },
-  }
-}
-
-sub number {
-  {
-    '-import' => { 
-      'Template::Class:generic' => '*',
-      'Template::Generic:number' => '*',
-    },
-    'code_expr' => {
-      '_VALUE_' => '_ATTR_{data}->{_SELF_CLASS_}',
-    },
-  }
-}
-
-sub boolean {
-  {
-    '-import' => { 
-      'Template::Class:generic' => '*',
-      'Template::Generic:boolean' => '*',
-    },
-    'code_expr' => {
-      '_VALUE_' => '_ATTR_{data}->{_SELF_CLASS_}',
-    },
-  }
-}
 
 ########################################################################
 
@@ -110,7 +65,6 @@ See the documentation on C<Generic:array> for interfaces and behaviors.
 sub array {
   {
     '-import' => { 
-      'Template::Class:generic' => '*',
       'Template::Generic:array' => '*',
     },
     'modifier' => {
@@ -135,7 +89,6 @@ See the documentation on C<Generic:hash> for interfaces and behaviors.
 sub hash {
   {
     '-import' => { 
-      'Template::Class:generic' => '*',
       'Template::Generic:hash' => '*',
     },
     'modifier' => {

@@ -30,7 +30,7 @@ B<Class::MakeMethods::Template::Universal> - Meta-methods for any type of object
 The following meta-methods and behaviors are applicable across
 multiple types of classes and objects.
 
-=head2 Universal:universal
+=head2 Universal:generic
 
 This is not a directly-invokable method type, but instead provides code expressions for use in other method-generators.
 
@@ -106,7 +106,7 @@ method_init -- See below.
 
 =cut
 
-sub universal { 
+sub generic { 
   {
     'code_expr' => { 
       '_SELF_' => '$self',
@@ -299,7 +299,7 @@ sub method_init {
       'method_init' => 'method_init' 
     },
     'code_expr' => { 
-      '-import' => {  'Template::Universal:universal' => '*'  },
+      '-import' => {  'Template::Universal:generic' => '*'  },
     },
     'behavior' => { 
       method_init => q{
