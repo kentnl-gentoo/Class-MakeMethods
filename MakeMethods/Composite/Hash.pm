@@ -709,11 +709,9 @@ sub object {
 
 =head1 SEE ALSO
 
-See L<Class::MakeMethods> and L<Class::MakeMethods::Composite> for
-an overview of the method-generation framework this is based on.
+See L<Class::MakeMethods> for general information about this distribution. 
 
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
+See L<Class::MakeMethods::Composite> for more about this family of subclasses.
 
 =cut
 

@@ -138,7 +138,6 @@ You called C<:MakeMethod()> without the required method-type argument.
 
 See L<Attribute::Handlers> by Damian Conway.
 
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information. 
+See L<Class::MakeMethods> for general information about this distribution. 
 
 =cut

@@ -341,10 +341,14 @@ sub array {
 	if ( $init and ! defined $self->[$index] ) {
 	  $self->[$index] = [];
 	}
-	wantarray ? @{ $self->[$index] } : $self->[$index];
+	( ! $self->[$index] ) ? () : 
+	( wantarray            ) ? @{ $self->[$index] } :
+				   $self->[$index]
       } elsif ( scalar(@_) == 1 and ref $_[0] eq 'ARRAY' ) {
 	$self->[$index] = [ @{ $_[0] } ];
-	wantarray ? @{ $self->[$index] } : $self->[$index];
+	( ! $self->[$index] ) ? () : 
+	( wantarray            ) ? @{ $self->[$index] } :
+				   $self->[$index]
       } else {
 	$self->[$index] ||= [];
 	array_splicer( $self->[$index], @_ );
@@ -429,8 +433,9 @@ sub hash {
 	if ( $init and ! defined $self->[$index] ) {
 	  $self->[$index] = {};
 	}
-	! wantarray ? $self->[$index] : 
-	$self->[$index] ? %{ $self->[$index] } : ();
+	( ! $self->[$index] ) ? () : 
+	( wantarray            ) ? %{ $self->[$index] } :
+				   $self->[$index]
       } elsif ( scalar(@_) == 1 ) {
 	if ( ref($_[0]) eq 'HASH' ) {
 	  my $hash = shift;
@@ -447,7 +452,8 @@ sub hash {
 	  my $key = shift();
 	  $self->[$index]->{ $key } = shift();
 	}
-	wantarray ? %{$self->[$index]} : $self->[$index];
+	( wantarray            ) ? %{ $self->[$index] } :
+				   $self->[$index]
       }
     }
   } $class->get_declarations(@_)
@@ -534,16 +540,14 @@ sub object {
 
 =head1 SEE ALSO
 
+See L<Class::MakeMethods> for general information about this distribution. 
+
+See L<Class::MakeMethods::Standard> for more about this family of subclasses.
+
 See L<Class::MakeMethods::Standard::Hash> for equivalent functionality
 based on blessed hashes. If your module will be extensively
 subclassed, consider switching to Standard::Hash to avoid the
 subclassing concerns described above.
-
-See L<Class::MakeMethods> and L<Class::MakeMethods::Standard> for
-an overview of the method-generation framework this is based on.
-
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
 
 =cut
 

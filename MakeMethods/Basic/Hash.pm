@@ -347,17 +347,15 @@ sub hash {
 
 =head1 SEE ALSO
 
-See L<Class::MakeMethods> and L<Class::MakeMethods::Basic> for an
-overview of the method-generation framework this is based on.
+See L<Class::MakeMethods> for general information about this distribution. 
+
+See L<Class::MakeMethods::Basic> for more about this family of subclasses.
 
 See L<Class::MakeMethods::Basic::Array> for equivalent functionality
 based on blessed arrays. If all access to your object is through
 constructors and accessors declared using this package, and your
 class will not be extensively subclassed, consider switching to
 Basic::Array to minimize resource consumption.
-
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
 
 =cut
 

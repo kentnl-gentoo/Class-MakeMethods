@@ -9,7 +9,7 @@ use strict;
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = 1.005;
+$VERSION = 1.006;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 
@@ -319,7 +319,7 @@ BEGIN { %DIAGNOSTICS = (
   make_unsupported => q|(F) Can't parse meta-method declaration: unsupported declaration type '%s'|,
   
   ### TEMPLATE SUBCLASS DIAGNOSTICS 
-    # ToDo: Should be moved to the Class::MakeMethods::Template distribution
+    # ToDo: Should be moved to the Class::MakeMethods::Template package
   
   debug_declaration => q|(Q) Meta-method declaration parsed: %s|,
   debug_make_behave => q|(Q) Building meta-method behavior %s: %s(%s)|,
@@ -352,6 +352,7 @@ Class::MakeMethods - Generate common types of methods
 
 =head1 SYNOPSIS
 
+  # Generates methods for your object when you "use" it.
   package MyObject;
   use Class::MakeMethods::Standard::Hash (
     'new'       => 'new',
@@ -359,8 +360,7 @@ Class::MakeMethods - Generate common types of methods
     'scalar'    => 'bar',
   );
   
-  package main;   
- 
+  # The resulting methods can be called exactly as normal ones
   my $obj = MyObject->new( foo => "Foozle", bar => "Bozzle" );
   print $obj->foo();
   $obj->bar("Barbados");
@@ -386,18 +386,6 @@ generates several types of methods, with some supporting their own
 open-eneded extension syntax, for hundreds of possible combinations
 of method types.
 
-=head2 Getting Started
-
-The remainder of this document focuses on points of usage that are
-common across all subclasses, and describes how to create your own
-subclasses.
-
-If this is your first exposure to Class::MakeMethods, you may want
-to jump to the documentation for a few of the included subclasses,
-perhaps starting with L<Class::MakeMethods::Standard::Hash> and
-L<Class::MakeMethods::Standard::Universal>, before returning to
-the details presented below.
-
 
 =head1 MOTIVATION
 
@@ -406,6 +394,18 @@ the details presented below.
 This module addresses a problem encountered in object-oriented
 development wherein numerous methods are defined which differ only
 slightly from each other.
+
+A common example is accessor methods for hash-based object attributes,
+which allow you to get and set the value $self-E<gt>{'foo'} by
+calling a method $self-E<gt>foo().
+
+These methods are generally quite simple, requiring only a couple
+of lines of Perl, but in sufficient bulk, they can cut down on the
+maintainability of large classes.
+
+Class::MakeMethods allows you to simply declare those methods to
+be of a predefined type, and it generates and installs the necessary
+methods in your package at compile-time.
 
 =head2 A Contrived Example
 
@@ -463,8 +463,9 @@ shown above:
     join(', ', map { "\u$_: " . $self->$_() } qw( foo bar ) )
   }
 
-Note in particular that the foo and bar methods are almost identical;
-this is precisely the type of redundancy Class::MakeMethods addresses.
+Note in particular that the foo and bar methods are almost identical,
+and that the new method could be used for almost any class; this
+is precisely the type of redundancy Class::MakeMethods addresses.
 
 Class::MakeMethods allows you to simply declare those methods to
 be of a predefined type, and it generates and installs the necessary
@@ -488,27 +489,79 @@ This is the basic purpose of Class::MakeMethods: The "boring" pieces
 of code have been replaced by succinct declarations, placing the
 focus on the "unique" or "custom" pieces.
 
-=head2 There's Many Ways To Do It
 
-The remaining complexity described in this document basically boils
-down to figuring out which arguments to pass to generate the specific
-methods you want.
+=head1 GETTING STARTED
 
-This is not a trivial task, as there are dozens of different types of methods that can be generated, each with a variety of options, and several alternative ways to write each method declaration. You may prefer to start by just finding a few examples that you can modify to accomplish your immediate needs, and defer investigating all of the extras until you're ready to take a closer look.
+Once you've grasped the basic idea -- simplifying repetitive code
+by generating and installing methods on demand -- the remaining
+complexity basically boils down to figuring out which arguments to
+pass to generate the specific methods you want.
 
+Unfortunately, this is not a trivial task, as there are dozens of
+different types of methods that can be generated, each with a
+variety of options, and several alternative ways to write each
+method declaration. You may prefer to start by just finding a few
+examples that you can modify to accomplish your immediate needs,
+and defer investigating all of the extras until you're ready to
+take a closer look.
 
-=head1 ARCHITECTURE
+=head2 Other Documentation
+
+The remainder of this document focuses on points of usage that are
+common across all subclasses, and describes how to create your own
+subclasses.
+
+If this is your first exposure to Class::MakeMethods, you may want
+to skim over the rest of this document, then take a look at the
+examples and one or two of the method-generating subclasses to get
+a more concrete sense of typical usage, before returning to the
+details presented below.
+
+=over 4
+
+=item *
+
+A collection of sample uses is available in
+L<Class::MakeMethods::Docs::Examples>.
+
+=item *
+
+Some of the most common object and class methods are available from 
+L<Class::MakeMethods::Standard::Hash>,
+L<Class::MakeMethods::Standard::Global> and
+L<Class::MakeMethods::Standard::Universal>.
+
+=item *
+
+If you need a bit more flexibility, see L<Class::MakeMethods::Composite>
+for method generators which offer more customization options,
+including pre- and post-method callback hooks.
+
+=item *
+
+For the largest collection of methods and options, see
+L<Class::MakeMethods::Template>, which uses a system of dynamic
+code generation to allow endless variation.
+
+=item *
+
+A listing of available method types from each of the different
+subclasses is provided in L<Class::MakeMethods::Docs::Catalog>.
+
+=back
+
+=head1 CLASS ARCHITECTURE
 
 Because there are so many common types of methods one might wish
 to generate, the Class::MakeMethods framework provides an extensible
 system based on subclasses.
 
-When your class requests a method, the base class performs some
-standard argument parsing, delegates the construction of the actual
-method to the appropriate subclass, and then installs whatever
+When your code requests a method, the MakeMethods base class performs
+some standard argument parsing, delegates the construction of the
+actual method to the appropriate subclass, and then installs whatever
 method the subclass returns.
 
-=head2 What the Base Class Does
+=head2 The MakeMethods Base Class
 
 The Class::MakeMethods package defines a superclass for method-generating
 modules, and provides a calling convention, on-the-fly subclass
@@ -519,15 +572,18 @@ The superclass also lets you generate several different types of
 methods in a single call, and will automatically load named subclasses
 the first time they're used.
 
-=head2 What the Subclasses Do
+=head2 The MakeMethods Subclasses
 
 The type of method that gets created is controlled by the specific
 subclass and generator function you request. For example,
-C<Class::MakeMethods::Standard::Hash> has a generator function C<scalar()>,
-which is responsible for generating simple scalar-accessor methods
-for blessed-hash objects.
+C<Class::MakeMethods::Standard::Hash> has a generator function
+C<scalar()>, which is responsible for generating simple scalar-accessor
+methods for blessed-hash objects.
 
-Each generator function specified is passed the arguments specifying the method the caller wants, and produces a closure or eval-able sequence of Perl statements representing the ready-to-install function.
+Each generator function specified is passed the arguments specifying
+the method the caller wants, and produces a closure or eval-able
+sequence of Perl statements representing the ready-to-install
+function.
 
 =head2 Included Subclasses
 
@@ -537,32 +593,25 @@ appropriate subclasses.
 
 =over 4 
 
-=item Standard
+=item Standard (See L<Class::MakeMethods::Standard>.)
 
-Generally you will want to begin with the Standard::Hash subclass, to
-create constructor and accessor methods for working with blessed-hash
-objects (or you might choose the Standard::Array subclass instead).
-The Standard::Global subclass provides methods for class data shared
-by all objects in a class. 
+Generally you will want to begin with the Standard::Hash subclass,
+to create constructor and accessor methods for working with
+blessed-hash objects (or you might choose the Standard::Array
+subclass instead).  The Standard::Global subclass provides methods
+for class data shared by all objects in a class.
 
-Each Standard method declaration can optionally include a hash of associated parameters, which allows you to tweak some of the characteristics of the methods. Subroutines are bound as closures to a hash of each method's name and parameters. Standard::Hash and Standard::Array provide object constructor and
-accessors. The Standard::Global provides for static data shared by
-all instances and subclasses, while the data for Standard::Inheritable
-methods trace the inheritance tree to find values, and can be
-overriden for any subclass or instance. 
+Each Standard method declaration can optionally include a hash of
+associated parameters, which allows you to tweak some of the
+characteristics of the methods. Subroutines are bound as closures
+to a hash of each method's name and parameters. Standard::Hash and
+Standard::Array provide object constructor and accessors. The
+Standard::Global provides for static data shared by all instances
+and subclasses, while the data for Standard::Inheritable methods
+trace the inheritance tree to find values, and can be overriden
+for any subclass or instance.
 
-See L<Class::MakeMethods::Standard> for more. A listing of available
-method types is provided in L<Class::MakeMethods::Standard/"SUBCLASS CATALOG">.
-
-=item Basic
-
-The Basic subclasses provide stripped down method generators with no configurable options, for minimal functionality (and minimum overhead). 
-
-Subroutines are bound as closures to the name of each method. Basic::Hash and Basic::Array provide simple object constructors and accessors. Basic::Global provides basic global-data accessors. 
-
-See L<Class::MakeMethods::Basic> for more. A listing of available method types is provided in L<Class::MakeMethods::Basic/"SUBCLASS CATALOG">.
-
-=item Composite
+=item Composite (See L<Class::MakeMethods::Composite>.)
 
 For additional customization options, check out the Composite
 subclasses, which allow you to select from a more varied set of
@@ -577,18 +626,7 @@ Composite::Global provides for static data shared by all instances
 and subclasses, while the data for Composite::Inheritable methods
 can be overriden for any subclass or instance.
 
-See L<Class::MakeMethods::Composite> for more. A listing of available method types is provided in  L<Class::MakeMethods::Composite/"SUBCLASS CATALOG">.
-
-=back
-
-=head2 Additional Subclasses
-
-Other subclasses are available separately, or you can define
-your own for future use. 
-
-=over 4
-
-=item Template
+=item Template (See L<Class::MakeMethods::Template>.)
 
 The Template subclasses provide an open-ended structure for objects
 that assemble Perl code on the fly into cachable closure-generating
@@ -608,23 +646,26 @@ and value accessors for hash and array slots) to the esoteric
 (inheritable class data and "flyweight" accessors with external
 indexes).
 
-Class::MakeMethods::Template is available as a separate distribution
-from CPAN.  See L<Class::MakeMethods::Template> for more information.
-A listing is provided in L<Class::MakeMethods::Template/"SUBCLASS
-CATALOG">.
+=item Basic (See L<Class::MakeMethods::Basic>.)
 
-=item Emulators
+The Basic subclasses provide stripped down method generators with
+no configurable options, for minimal functionality (and minimum
+overhead).
+
+Subroutines are bound as closures to the name of each method.
+Basic::Hash and Basic::Array provide simple object constructors
+and accessors. Basic::Global provides basic global-data accessors.
+
+=item Emulators (See L<Class::MakeMethods::Emulator>.)
 
 In several cases, Class::MakeMethods provides functionality closely
 equivalent to that of an existing module, and it is simple to map
 the existing module's interface to that of Class::MakeMethods.
 
-Class::MakeMethods::Emulator is available as a separate distribution
-from CPAN.  See L<Class::MakeMethods::Emulator> for more
-information. Emulators are included for Class::MethodMaker,
-Class::Accessor::Fast, Class::Data::Inheritable, Class::Singleton,
-and Class::Struct, each of which passes the original module's test
-suite, usually requiring only a single-line change.
+Emulators are included for Class::MethodMaker, Class::Accessor::Fast,
+Class::Data::Inheritable, Class::Singleton, and Class::Struct, each
+of which passes the original module's test suite, usually requiring
+only that the name of the module be changed.
 
 =item Extending
 
@@ -632,9 +673,36 @@ Class::MakeMethods can be extended by creating subclasses that
 define additional method-generation functions. Callers can then
 specify the name of your subclass and generator function in their
 C<use Call::MakeMethods ...> statements and your function will be
-invoked to produce the required closures. See L</EXTENDING> for more information.
+invoked to produce the required closures. See L</EXTENDING> for
+more information.
 
 =back
+
+=head2 Naming Convention for Generated Method Types
+
+Method generation functions in this document are often referred to using the 'I<MakerClass>:I<MethodType>' or 'I<MakerGroup>::I<MakerSubclass>:I<MethodType>' naming conventions. As you will see, these are simply the names of Perl packages and the names of functions that are contained in those packages.
+
+The included subclasses are grouped into several major groups, so the names used by the included subclasses and method types reflect three axes of variation, "I<Group>::I<Subclass>:I<Type>":
+
+=over 4
+
+=item MakerGroup
+
+Each group shares a similar style of technical implementation and level of complexity. For example, the C<Standard::*> packages are all simple, while the C<Composite::*> packages all support pre- and post-conditions.
+
+(For a listing of the four main groups of included subclasses, see L<"/Included Subclasses">.)
+
+=item MakerSubclass
+
+Each subclass generates methods for a similar level of scoping or underlying object type. For example, the C<*::Hash> packages all make methods for objects based on blessed hashes, while the C<*::Global> packages make methods that access class-wide data that will be shared between all objects in a class.
+
+=item Method Type
+
+Each method type produces a similar type of constructor or accessor. For examples, the C<*:new> methods are all constructors, while the C<::scalar> methods are all accessors that allow you to get and set a single scalar value.
+
+=back
+
+Bearing that in mind, you should be able to guess the intent of many of the method types based on their names alone; when you see "Standard::Array:list" you can read it as "a type of method to access a I<list> of data stored in an I<array> object, with a I<"standard"> implementation style" and know that it's going to call the list() function in the Class::MakeMethods::Standard::Array package to generate the requested method.
 
 
 =head1 USAGE
@@ -691,9 +759,22 @@ Class::MakeMethods->make (
 
 The difference between C<use> and C<make> is primarily one of precedence; the C<use> keyword acts as a BEGIN block, and is thus evaluated before C<make> would be. (See L</"About Precedence"> for additional discussion of this issue.)
 
-I<Note:> If you are using Perl version 5.6 or later, see
-L<Class::MakeMethods::Attribute> for an additional declaration syntax
-for generated methods.
+=head2 Alternative Invocation
+
+If you want methods to be declared at run-time when a previously-unknown
+method is invoked, see L<Class::MakeMethods::Autoload>.
+
+=over 4
+
+=item *
+
+use Class::MakeMethods::Autoload 'I<MakerClass>:I<MethodType>';
+
+=back
+
+If you are using Perl version 5.6 or later, see
+L<Class::MakeMethods::Attribute> for an additional declaration
+syntax for generated methods.
 
 =over 4
 
@@ -705,46 +786,17 @@ sub I<name> :MakeMethod('I<MethodType>' => I<Arguments>);
 
 =back
 
-=head2 Subclass Naming Convention
-
-Method generation functions in this document are often referred to using the 'I<MakerClass>:I<MethodType>' or 'I<MakerGroup>::I<MakerSubclass>:I<MethodType>' naming conventions. As you will see, these are simply the names of Perl packages and the names of functions that are contained in those packages.
-
-The included subclasses are grouped into several major groups, so the names used by the included subclasses and method types reflect three axes of variation, "I<Group>::I<Subclass>:I<Type>":
-
-=over 4
-
-=item MakerGroup
-
-Each group shares a similar style of technical implementation and level of complexity. For example, the C<Standard::*> packages are all simple, while the C<Composite::*> packages all support pre- and post-conditions.
-
-(For a listing of the four main groups of included subclasses, see L<"/Included Subclasses">.)
-
-=item MakerSubclass
-
-Each subclass generates methods for a similar level of scoping or underlying object type. For example, the C<*::Hash> packages all make methods for objects based on blessed hashes, while the C<*::Global> packages make methods that access class-wide data that will be shared between all objects in a class.
-
-=item Method Type
-
-Each method type produces a similar type of constructor or accessor. For examples, the C<*:new> methods are all constructors, while the C<::scalar> methods are all accessors that allow you to get and set a single scalar value.
-
-=back
-
-Bearing that in mind, you should be able to guess the intent of many of the method types based on their names alone; when you see "Standard::Array:list" you can read it as "a type of method to access a I<list> of data stored in an I<array> object, with a I<"standard"> implementation style" and know that it's going to call the list() function in the Class::MakeMethods::Standard::Array package to generate the requested method.
-
-
 =head2 Mixing Method Types
 
 A single calling class can combine generated methods from different MakeMethods subclasses. In general, the only mixing that's problematic is combinations of methods which depend on different underlying object types, like using *::Hash and *::Array methods together -- the methods will be generated, but some of them  are guaranteed to fail when called, depending on whether your object happens to be a blessed hashref or arrayref. 
 
-It's common to mix and match various *::Hash methods, with a scattering of Global or Inheritable methods:
+For example, it's common to mix and match various *::Hash methods, with a scattering of Global or Inheritable methods:
 
   use Class::MakeMethods (
     'Basic::Hash:scalar'      => 'foo',
     'Composite::Hash:scalar'  => [ 'bar' => { post_rules => [] } ],
     'Standard::Global:scalar' => 'our_shared_baz'
   );
-
-
 
 =head2 Argument Normalization
 
@@ -794,9 +846,9 @@ declaring a pair of Basic::Hash scalar methods named 'foo' and 'bar':
 (The last of these is clearly a bit peculiar and potentially misleading if used as shown, but it enables advanced subclasses to provide convenient formatting for declarations with  defaults or modifiers, such as C<'Template::Hash:scalar --private' =E<gt> 'foo'>, discussed elsewhere.)
 
 
-=head2 Global Options
+=head2 Global Parameters
 
-Global parameters may be specified as an argument pair with a leading hyphen. (Type names must be valid Perl subroutine names, and thus will never begin with a hyphen.) 
+Global parameters may be specified as an argument pair with a leading hyphen. (This distinguishes them from type names, which must be valid Perl subroutine names, and thus will never begin with a hyphen.) 
 
 use Class::MakeMethods::I<MakerClass> ( 
     '-I<Param>' => I<ParamValue>,
@@ -809,7 +861,7 @@ The below parameters allow you to control generation and installation of the req
 
 =over 4 
 
-=item TargetClass
+=item -TargetClass
 
 By default, the methods are installed in the first package in the caller() stack that is not a Class::MakeMethods subclass; this is generally the package in which your use or make statement was issued. To override this you can pass C<-TargetClass =E<gt> I<package>> as initial arguments to C<use> or C<make>. 
 
@@ -826,7 +878,7 @@ This allows you to construct or modify classes "from the outside":
   $o = MyWidget->new( foo => 'Foozle' );
   print $o->foo();
 
-=item MakerClass
+=item -MakerClass
 
 By default, meta-methods are looked up in the package you called
 use or make on.
@@ -865,7 +917,7 @@ declaring a Basic::Hash scalar method named 'foo':
     'scalar' =>  [ 'foo' ] 
   );
 
-=item ForceInstall
+=item -ForceInstall
 
 By default, Class::MakeMethods will not install generated methods over any pre-existing methods in the target class. To override this you can pass C<-ForceInstall =E<gt> 1> as initial arguments to C<use> or C<make>. 
 
@@ -887,110 +939,37 @@ call, later declarations superceed earlier ones.
 
 Here are some examples of the results of these precedence rules:
 
-  # 1
+# 1 - use, before
   use Class::MakeMethods::Standard::Hash (
     'scalar'=>['baz'] # baz() not seen yet, so we generate, install
   );
   sub baz { 1 } # Subsequent declaration overwrites it, with warning
   
-  # 2
+  # 2 - use, after
   sub foo { 1 }
   use Class::MakeMethods::Standard::Hash (
     'scalar'=>['foo'] # foo() is already declared, so has no effect
   );
   
-  # 3
+  # 3 - use, after, Force
   sub bar { 1 }
   use Class::MakeMethods::Standard::Hash ( 
       -ForceInstall => 1, # Set flag for following methods...
     'scalar' => ['bar']   # ... now overwrites pre-existing bar()
   );
   
-  # 4
+  # 4 - make, before
   Class::MakeMethods::Standard::Hash->make(
     'scalar'=>['blip'] # blip() is already declared, so has no effect
   );
   sub blip { 1 } # Although lower than make(), this "happens" first
   
-  # 5
+  # 5 - make, after, Force
   sub ping { 1 } 
   Class::MakeMethods::Standard::Hash->make(
       -ForceInstall => 1, # Set flag for following methods...
     'scalar' => ['ping']  # ... now overwrites pre-existing ping()
   );
-
-
-=head1 EXAMPLES
-
-The following examples indicate some of the capabilities of
-Class::MakeMethods. 
-
-=head2 Adding Custom Initialization to Constructors
-
-Frequently you'll want to provide some custom code to initialize new objects of your class. Most of the C<*:new> constructor methods provides a way to ensure that this code is consistently called every time a new instance is created.
-
-The Composite classes allow you to add pre- and post-operations to any method, so you can pass in a code-ref to be executed after the new() method.
-
-  package MyClass;
-  
-  sub new_post_init {
-    my $self = ${(pop)->{result}}; # get result of original new()
-    length($self->foo) or $self->foo('FooBar');   # default value
-    warn "Initialized new object '$self'";       
-  }
-  
-  use Class::MakeMethods (
-    'Composite::Hash:new' => [
-	'new' => { post_rules=>[ \&new_post_init ] } 
-    ],
-    'Composite::Hash:scalar' => 'foo;,
-  );
-  ... 
-  package main;
-  my $self = MyClass->new( foo => 'Foozle' )
-
-
-=head2 Access Control Example
-
-The following defines a secret_password method, which will croak
-if it is called from outside of the declaring package.
-
-  use Class::MakeMethods::Composite::Hash
-    'scalar' => [ 'secret_password' => { permit => 'pp' } ];
-
-(See L<Class::MakeMethods::Composite> for information
-about the C<permit> modifier.)
-
-
-=head2 Mixing Object and Global Methods
-
-Here's a package declaration using two of the included subclasses, C<Standard::Hash>, for creating and accessing hash-based objects, and C<Basic::Global>, for simple global-value accessors:
-
-  package MyQueueItem;
-  
-  use Class::MakeMethods::Standard::Hash (
-    new => { name => 'new', defaults=>{ foo => 'Foozle' } },
-    scalar => [ 'foo', 'bar' ],
-    hash => 'history'
-  );
-  
-  use Class::MakeMethods::Basic::Global (
-    scalar => 'Debug',
-    array  => 'InQueue',
-  );
-  
-  sub AddQueueItem {
-    my $class = shift;
-    my $instance = shift;
-    $instance->history('AddQueueItem' => time());
-    $class->InQueue([0, 0], $instance);    
-  }
-  
-  sub GetQueueItem {
-    my $class = shift;
-    $class->InQueue([0, 1], []) or $class->new
-  }
-
 
 
 =head1 EXTENDING
@@ -1255,30 +1234,149 @@ other than than the code ref we expect.
 
 It does not appear to be possible to assign subroutine names to closures within Perl. As a result, debugging output from Carp and similar sources will show all generated methods as "ANON()" rather than "YourClass::methodname()".
 
-See L<Class::MakeMethods::ToDo> for other outstanding issues.
+See L<Class::MakeMethods::Docs::ToDo> for other outstanding issues.
+
+
+=head1 VERSION
+
+This is Class::MakeMethods v1.006.
+
+=head2 Distribution Summary
+
+This module's summary in the CPAN DSLIP is intended to read:
+
+  Name            DSLIP  Description
+  --------------  -----  ---------------------------------------------
+  Class::
+  ::MakeMethods   RdpOp  Generate common types of methods
+
+=head2 Release Status
+
+This module has been used in a variety of production contexts, has
+been available on CPAN for over a year, and several other CPAN
+modules depend on it for their own operation, so it would be fair
+to say that it is no longer in "beta test" but rather fully released.
+
+However, while some portions are well tested, others are not, and
+new bug reports do trickle in occasionally. If you do encounter
+any problems, please inform the author and I'll endeavor to patch
+them promptly.
+
+While numerous additional features have been outlined for future
+development, the intent is support these by adding more options to
+the declaration interface, while maintaining backward compatibility.
+
+=head2 Discussion and Support
+
+There is not currently any offical discussion and support forum for this pacakage. 
+
+If you have questions or feedback about this module, please feel
+free to contact the author at the below address.
+
+I would be particularly interested in any suggestions towards
+improving the documentation, correcting any Perl-version or platform
+dependencies, as well as general feedback and suggested additions.
+
+
+=head1 INSTALLATION
+
+You should be able to install this module using the CPAN shell interface:
+
+  perl -MCPAN -e 'install Class::MakeMethods'
+
+If this module has not yet been posted to your local CPAN mirror,
+you may also retrieve the current distribution from the below
+address and follow the normal "gunzip", "tar xf", "cd", "perl Makefile.PL && make test && sudo make install" procedure or your local equivalent:
+
+  http://www.evoscript.org/Class-MakeMethods/
+
+=head2 Prerequisites
+
+In general, this module should work with Perl 5.003 or later,
+without requring any modules beyond the core Perl distribution.
+
+Certain features may be available only on some platforms, as noted below:
+
+=over 4
+
+=item *
+
+Class::MakeMethods::Attribute
+
+The C<:MakeMethod> subroutine attribute requires Perl version 5.6 and the Attribute::Handlers module (from CPAN).
+
+=back
+
+=head2 Tested Platforms
+
+This release has been tested succesfully on the following platforms:
+
+  5.6.1 on darwin
+
+Earlier releases have also tested on the following platforms:
+
+  5.005_02 on Rhapsody
+  5.005_03 on sun4-solaris: PASS as of 1.0.13
+  v5.6.0 on sun4-solaris: PASS as of 1.0.13
+  v5.6.1 on WinNT: PASS as of 1.0.14.a (was TEST FAILURE as of 1.0.13)
+  v5.6.? on RedHat 7.1 i386: TEST FAILURE as of 1.0.13
+  v5.6.1 on ppc-linux-64all: FAIL as of 1.0.12
+  5.004 on MacOS (MacPerl 520r4): PASS as of 1.0.6
+  5.005 on WinNT (ActivePerl 618): PASS as of 1.0.6
+
+You may also review the current test results from CPAN-Testers:
+
+  http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
 
 
 =head1 SEE ALSO
 
 =head2 Package Documentation
 
-See L<Class::MakeMethods::Basic>, L<Class::MakeMethods::Standard>, L<Class::MakeMethods::Composite>, and L<Class::MakeMethods::Template> for information about each family of subclasses.
+A collection of sample uses is available in
+L<Class::MakeMethods::Docs::Examples>.
 
-See L<Class::MakeMethods::ReadMe> for distribution, installation, version and support information.
+See the documentation for each family of subclasses:
+
+=over 4
+
+=item *
+
+L<Class::MakeMethods::Basic>
+
+=item *
+
+L<Class::MakeMethods::Standard>
+
+=item *
+
+L<Class::MakeMethods::Composite>
+
+=item *
+
+L<Class::MakeMethods::Template>
+
+=back
+
+A listing of available method types from each of the different
+subclasses is provided in L<Class::MakeMethods::Docs::Catalog>.
+
+=head2 Related Modules
 
 For a brief survey of the numerous modules on CPAN which offer some
-type of method generation, see L<Class::MakeMethods::RelatedModules>.
+type of method generation, see L<Class::MakeMethods::Docs::RelatedModules>.
 
-=head2 Getting-Started Resources
+If you have used Class::MethodMaker, you will note numerous
+similarities.  Class::MakeMethods is based on Class::MethodMaker,
+but has been substantially revised in order to provide a range of
+new features.  Backward compatibility and conversion documentation
+is provded in L<Class::MakeMethods::Emulator::MethodMaker>.
 
-Ron Savage has posted a pair of annotated examples, linked to below.
-Each demonstrates building a class with MakeMethods, and each
-includes scads of comments that walk you through the logic and
-demonstrate how the various methods work together.
-
-  http://savage.net.au/Perl-tutorials.html
-  http://savage.net.au/Perl-tutorials/tut-33.tgz
-  http://savage.net.au/Perl-tutorials/tut-34.tgz
+In several cases, Class::MakeMethods provides functionality closely
+equivalent to that of an existing module, and emulator modules are
+provided to map the existing module's interface to that of
+Class::MakeMethods.  See L<Class::MakeMethods::Emulator> for more
+information.
 
 =head2 Perl Docs
 
@@ -1287,27 +1385,12 @@ See L<perlboot> for a quick introduction to objects for beginners. For an extens
 See L<perlref/"Making References">, point 4 for more information on closures. (FWIW, I think there's a big opportunity for a "perltfun" podfile bundled with Perl in the tradition of "perlboot" and "perltoot", exploring the utility of function references, callbacks, closures, and continuations... There are a bunch of useful references out there, but not a good overview of how they all interact in a Perlish way.)
 
 
-=head1 VERSION
-
-This is Class::MakeMethods v1.005.
-
-
 =head1 CREDITS AND COPYRIGHT
 
-=head2 Developed By
+=head2 Author
 
   M. Simon Cavalletto, simonm@cavalletto.org
   Evolution Softworks, www.evoscript.org
-
-=head2 Source Material
-
-Inspiration, cool tricks, and blocks of useful code for this module
-were extracted from the following CPAN modules:
-
-  Class::MethodMaker, by Peter Seibel.
-  Class::Accessor, by Michael G Schwern 
-  Class::Contract, by Damian Conway
-  Class::SelfMethods, by Toby Everett
 
 =head2 Feedback and Suggestions 
 
@@ -1319,6 +1402,21 @@ Thanks to:
   Jay Lawrence
   Adam Spiers
   Malcolm Cook
+  Terrence Brannon
+  Jared Rhine
+
+=head2 Source Material
+
+This package was inspired by the ground-breaking original closure-generating method maker module:
+
+  Class::MethodMaker, by Peter Seibel.
+
+Additional inspiration, cool tricks, and blocks of useful code for
+this module were extracted from the following CPAN modules:
+
+  Class::Accessor, by Michael G Schwern 
+  Class::Contract, by Damian Conway
+  Class::SelfMethods, by Toby Everett
 
 =head2 Copyright
 
@@ -1326,9 +1424,15 @@ Copyright 2002 Matthew Simon Cavalletto.
 
 Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
 
-Portions copyright 1996 Organic Online.
+Based in part on Class::MethodMaker, originally developed by Peter Seibel. Portions Copyright 1996 Organic Online. Portions Copyright 2000 Martyn J. Pearce. 
 
-Portions copyright 2000 Martyn J. Pearce.
+Emulator::AccessorFast is based on Class::Accessor::Fast. Portions Copyright 2000 Michael G Schwern.
+
+Emulator::Inheritable is based on Class::Data::Inheritable. Portions Copyright 2000 Damian Conway and Michael G Schwern.
+
+Emulator::Singleton is based on Class::Singleton, by Andy Wardley. Portions Copyright 1998 Canon Research Centre Europe Ltd. 
+
+Utility::Ref is based on Ref.pm. Portions Copyright 1994 David Muir Sharnoff.
 
 =head2 License
 

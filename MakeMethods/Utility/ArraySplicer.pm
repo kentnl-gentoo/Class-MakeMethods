@@ -233,11 +233,10 @@ use constant array_shift => ( [0, 1], undef );
 
 =head1 SEE ALSO
 
+See L<Class::MakeMethods> for general information about this distribution. 
+
 See L<Class::MakeMethods::Standard::Hash> and numerous other classes for
 examples of usage.
-
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
 
 =cut
 

@@ -1,0 +1,64 @@
+=head1 NAME
+
+Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 1.006
+
+
+=head1 DESCRIPTION
+
+This is an updated release of Class::MakeMethods, for distribution
+through CPAN. This release includes the Class::MakeMethods::Template
+and Class::MakeMethods::Emulator modules which were previously
+distributed separately.
+
+
+=head1 MOTIVATION
+
+Here's the "elevator pitch" for the module:
+
+  By passing arguments to "use Class::MakeMethods ..." statements,
+  you can select from a library of hundreds of common types of
+  methods, which are dynamically generated and installed as
+  subroutines in your module, simplifying the code for your class.
+
+
+=head1 SEE ALSO
+
+Documentation is available in POD format throughout the distribution;
+L<Class::MakeMethods> is a good starting place. Plain-text versions
+of some kew documentation are also available in the docs/ directory.
+
+You may browse the latest distribution online here:
+
+  http://search.cpan.org/author/EVO/Class-MakeMethods/
+
+Further information and module documentation is available here: 
+
+  http://www.evoscript.org/Class-MakeMethods/
+
+
+=head1 INSTALLATION
+
+You should be able to install this module using the CPAN shell
+interface:
+
+  perl -MCPAN -e 'install Class::MakeMethods'
+
+If this module has not yet been posted to your local CPAN mirror, you
+may also retrieve the current distribution from the above web address and
+follow the normal "gunzip", "tar xf", "cd", "perl Makefile.PL && make
+test && sudo make install" procedure or your local equivalent.
+
+
+=head1 FEEDBACK
+
+Suggestions and comments would be much appreciated. You may send 
+feedback, bug reports, and support requests to the author:
+
+  M. Simon Cavalletto, simonm@cavalletto.org.
+
+
+=head1 LICENSE
+
+You may use, modify, and distribute this software under the same terms as Perl.
+
+=cut

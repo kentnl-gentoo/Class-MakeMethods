@@ -290,10 +290,14 @@ sub array {
 	if ( $init and ! defined $self->{$hash_key} ) {
 	  $self->{$hash_key} = [];
 	}
-	wantarray ? @{ $self->{$hash_key} } : $self->{$hash_key}
+	( ! $self->{$hash_key} ) ? () : 
+	( wantarray            ) ? @{ $self->{$hash_key} } :
+				   $self->{$hash_key}
       } elsif ( scalar(@_) == 1 and ref $_[0] eq 'ARRAY' ) {
 	$self->{$hash_key} = [ @{ $_[0] } ];
-	wantarray ? @{ $self->{$hash_key} } : $self->{$hash_key}
+	( ! $self->{$hash_key} ) ? () : 
+	( wantarray            ) ? @{ $self->{$hash_key} } :
+				   $self->{$hash_key}
       } else {
 	$self->{$hash_key} ||= [];
 	return array_splicer( $self->{$hash_key}, @_ );
@@ -369,7 +373,7 @@ Sample declaration and usage:
   print keys %{ $obj->baz() };
   
   # Reset the hash contents to empty
-  @{ $obj->baz() } = ();
+  %{ $obj->baz() } = ();
 
 =cut
 
@@ -384,8 +388,9 @@ sub hash {
 	if ( $init and ! defined $self->{$hash_key} ) {
 	  $self->{$hash_key} = {};
 	}
-	! wantarray ? $self->{$hash_key} : 
-	$self->{$hash_key} ? %{ $self->{$hash_key} } : ();
+	( ! $self->{$hash_key} ) ? () : 
+	( wantarray            ) ? %{ $self->{$hash_key} } :
+				   $self->{$hash_key}
       } elsif ( scalar(@_) == 1 ) {
 	if ( ref($_[0]) eq 'HASH' ) {
 	  $self->{$hash_key} = { %{$_[0]} };
@@ -486,11 +491,9 @@ sub object {
 
 =head1 SEE ALSO
 
-See L<Class::MakeMethods> and L<Class::MakeMethods::Standard> for
-an overview of the method-generation framework this is based on.
+See L<Class::MakeMethods> for general information about this distribution. 
 
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
+See L<Class::MakeMethods::Standard> for more about this family of subclasses.
 
 =cut
 

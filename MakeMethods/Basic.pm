@@ -34,7 +34,7 @@ This document describes the various subclasses of Class::MakeMethods
 included under the Basic::* namespace, and the method types each
 one provides.
 
-The Basic subclasses provide stripped-down method-generation implementations.
+The Basic subclasses provide stripped-down method-generation implementations. 
 
 Subroutines are generated as closures bound to each method name.
 
@@ -75,7 +75,9 @@ I<generator_type> => [ 'I<name_1>', 'I<name_2>', ...]
 
 =back
 
-For a list of the supported values of I<generator_type>, see L<"SUBCLASS CATALOG"> below, or the documentation for each subclass.
+For a list of the supported values of I<generator_type>, see
+L<Class::MakeMethods::Docs::Catalog/"BASIC CLASSES">, or the documentation
+for each subclass.
 
 For each method name you provide, a subroutine of the indicated
 type will be generated and installed under that name in your module.
@@ -84,86 +86,8 @@ Method names should start with a letter, followed by zero or more
 letters, numbers, or underscores.
 
 
-=head1 SUBCLASS CATALOG
-
-=head2 Basic::Hash (Instances)
-
-Methods for objects based on blessed hashes. See L<Class::MakeMethods::Basic::Hash> for details.
-
-=over 4
-
-=item *
-
-new: create and copy instances
-
-=item *
-
-scalar: get and set scalar values in each instance
-
-=item *
-
-array: get and set values stored in an array refered to in each
-instance
-
-=item *
-
-hash: get and set values in a hash refered to in each instance
-
-=back
-
-=head2 Basic::Array (Instances)
-
-Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Basic::Array> for details.
-
-=over 4
-
-=item *
-
-new: create and copy instances
-
-=item *
-
-scalar: get and set scalar values in each instance
-
-=item *
-
-array: get and set values stored in an array refered to in each
-instance
-
-=item *
-
-hash: get and set values in a hash refered to in each instance
-
-=back
-
-=head2 Basic::Global (Global)
-
-Global methods are not instance-dependent; calling them by class
-name or from any instance or subclass will consistently access the
-same value. See L<Class::MakeMethods::Basic::Global> for details.
-
-=over 4
-
-=item *
-
-scalar: get and set a global scalar value
-
-=item *
-
-array: get and set values in a global array
-
-=item *
-
-hash: get and set values in a global hash
-
-=back
-
 =head1 SEE ALSO
 
-See L<Class::MakeMethods> for an overview of the method-generation
-framework this is based on.
-
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
+See L<Class::MakeMethods> for general information about this distribution. 
 
 =cut

@@ -1,86 +1,33 @@
 NAME
-    Class::MakeMethods::ReadMe - About This Module
-
-SYNOPSIS
-      # Follow your standard download, test and install sequence
-      perl -MCPAN -e 'install Class::MakeMethods'
-  
-      # Generates methods for your object when you "use" it.
-      package MyObject;
-      use Class::MakeMethods::Standard::Hash (
-        'new'     => [ 'new' ],
-        'scalar'  => [ 'foo', 'bar' ]
-      );
-  
-      # The resulting methods can be called exactly as normal ones
-      package main;   
-      my $obj = MyObject->new( foo => "Foozle", bar => "Bozzle" );
-      print $obj->foo();
-      $obj->bar("Barbados");
-
-MOTIVATION
-      "Make easy things easier."
-
-    This module addresses a problem encountered in object-oriented
-    development wherein numerous methods are defined which differ only
-    slightly from each other.
-
-    A common example is accessor methods for hash-based object attributes,
-    which allow you to get and set the value $self->{'foo'} by calling a
-    method $self->foo().
-
-    These methods are generally quite simple, requiring only a couple of
-    lines of Perl, but in sufficient bulk, they can cut down on the
-    maintainability of large classes.
-
-    Class::MakeMethods allows you to simply declare those methods to be of a
-    predefined type, and it generates and installs the necessary methods in
-    your package at compile-time.
+    Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 1.006
 
 DESCRIPTION
-    The Class::MakeMethods framework allows Perl class developers to quickly
-    define common types of methods. When a module "use"s a subclass of
-    Class::MakeMethods, it can select from the supported method types, and
-    specify a name for each method desired. The methods are dynamically
-    generated and installed in the calling package.
+    This is an updated release of Class::MakeMethods, for distribution
+    through CPAN. This release includes the Class::MakeMethods::Template and
+    Class::MakeMethods::Emulator modules which were previously distributed
+    separately.
 
-    Construction of the individual methods is handled by subclasses. This
-    delegation approach allows for a wide variety of method-generation
-    techniques to be supported, each by a different subclass. Subclasses can
-    also be added to provide support for new types of methods.
+MOTIVATION
+    Here's the "elevator pitch" for the module:
 
-    Over a dozen subclasses are available, including implementations of a
-    variety of different method-generation techniques. Each subclass
-    generates several types of methods, with some supporting their own
-    open-eneded extension syntax, for hundreds of possible combinations of
-    method types.
+      By passing arguments to "use Class::MakeMethods ..." statements,
+      you can select from a library of hundreds of common types of
+      methods, which are dynamically generated and installed as
+      subroutines in your module, simplifying the code for your class.
 
-RELATED MODULES
-    Class::MakeMethods is based on Class::MethodMaker, but has been
-    substantially revised in order to provide a range of new features.
-    Although earlier versions of this module were posted for review as a
-    possible "version 2" of MethodMaker, the maintainer of that module
-    subsequently indicated that that he had different goals for future
-    development and suggested a fork. (Full backward compatibility is
-    provided by an emulator, described below.)
+SEE ALSO
+    Documentation is available in POD format throughout the distribution;
+    the Class::MakeMethods manpage is a good starting place. Plain-text
+    versions of some kew documentation are also available in the docs/
+    directory.
 
-    There are a variety of related modules on CPAN; I've included a quick
-    review of several of these in the Class::MakeMethods::RelatedModules
-    manpage. In comparison, this module aims to be quite general purpose and
-    extensible while retaining acceptable performance characteristics.
+    You may browse the latest distribution online here:
 
-  Emulation Adaptors
+      http://search.cpan.org/author/EVO/Class-MakeMethods/
 
-    In several cases, Class::MakeMethods provides functionality closely
-    equivalent to that of an existing module, and it is simple to map the
-    existing module's interface to that of Class::MakeMethods.
+    Further information and module documentation is available here:
 
-    Class::MakeMethods::Emulator is available as a separate distribution
-    from CPAN. See the Class::MakeMethods::Emulator manpage for more
-    information. Emulators are included for Class::MethodMaker,
-    Class::Accessor::Fast, Class::Data::Inheritable, Class::Singleton, and
-    Class::Struct, each of which passes the original module's test suite,
-    usually requiring only a single-line change.
+      http://www.evoscript.org/Class-MakeMethods/
 
 INSTALLATION
     You should be able to install this module using the CPAN shell
@@ -89,142 +36,17 @@ INSTALLATION
       perl -MCPAN -e 'install Class::MakeMethods'
 
     If this module has not yet been posted to your local CPAN mirror, you
-    may also retrieve the current distribution from the below address and
-    follow the normal "gunzip", "tar xf", "cd", "perl Makefile.PL && make
-    test && sudo make install" procedure or your local equivalent:
+    may also retrieve the current distribution from the above web address
+    and follow the normal "gunzip", "tar xf", "cd", "perl Makefile.PL &&
+    make test && sudo make install" procedure or your local equivalent.
 
-      http://www.evoscript.org/Class-MakeMethods/
+FEEDBACK
+    Suggestions and comments would be much appreciated. You may send
+    feedback, bug reports, and support requests to the author:
 
-  Getting Started
+      M. Simon Cavalletto, simonm@cavalletto.org.
 
-    If this is your first exposure to Class::MakeMethods, you may want to
-    jump to the documentation for a few of the included subclasses, perhaps
-    starting with the Class::MakeMethods::Standard::Hash manpage and the
-    Class::MakeMethods::Standard::Universal manpage, before returning to the
-    details presented below.
-
-  Prerequisites
-
-    In general, this module should work with Perl 5.003 or later, without
-    requring any modules beyond the core Perl distribution.
-
-    Certain features may be available only on some platforms, as noted
-    below:
-
-    *   Class::MakeMethods::Attribute
-
-        The ":MakeMethod" subroutine attribute requires Perl version 5.6 and
-        the Attribute::Handlers module (CPAN).
-
-  Tested Platforms
-
-    This release has been tested succesfully on the following platforms:
-
-      5.6.1 on darwin
-
-    Earlier releases have also tested on the following platforms:
-
-      5.005_02 on Rhapsody
-      5.005_03 on sun4-solaris: PASS as of 1.0.13
-      v5.6.0 on sun4-solaris: PASS as of 1.0.13
-      v5.6.1 on WinNT: PASS as of 1.0.14.a (was TEST FAILURE as of 1.0.13)
-      v5.6.? on RedHat 7.1 i386: TEST FAILURE as of 1.0.13
-      v5.6.1 on ppc-linux-64all: FAIL as of 1.0.12
-      5.004 on MacOS (MacPerl 520r4): PASS as of 1.0.6
-      5.005 on WinNT (ActivePerl 618): PASS as of 1.0.6
-
-    You may also review the current test results from CPAN-Testers:
-
-      http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
-
-VERSION
-    This is version 1.004 of Class::MakeMethods.
-
-  Distribution Summary
-
-    This module's summary in the CPAN DSLIP is intended to read:
-
-      Name            DSLIP  Description
-      --------------  -----  ---------------------------------------------
-      Class::
-      ::MakeMethods   bdpOp  Generate common types of methods
-
-  Beta Release
-
-    While numerous additional features have been outlined for future
-    development, the intent is support these by adding more options to the
-    declaration interface, while maintaining backward compatibility.
-
-  Discussion and Support
-
-    There is not currently any offical discussion and support forum for this
-    pacakage.
-
-    If you have questions or feedback about this module, please feel free to
-    contact the author at the below address.
-
-    I would be particularly interested in any suggestions towards improving
-    the documentation, correcting any Perl-version or platform dependencies,
-    as well as general feedback and suggested additions.
-
-SEE ALSO
-    For an overview of this package, see the Class::MakeMethods manpage.
-
-    If you're just getting started, see the Class::MakeMethods::Standard
-    manpage for a listing of common method generators.
-
-    If you need a bit more flexibility, see the
-    Class::MakeMethods::Composite manpage for method generators which offer
-    more customization options.
-
-    For the largest collection of methods and options, see the
-    Class::MakeMethods::Template manpage, available as a separate
-    distribution on CPAN.
-
-    If you have used Class::MethodMaker, you will note numerous
-    similarities. Backward compatibility and conversion documentation is
-    provded in the Class::MakeMethods::Emulator::MethodMaker manpage,
-    available in a separate distribution on CPAN.
-
-CREDITS AND COPYRIGHT
-  Developed By
-
-      M. Simon Cavalletto, simonm@cavalletto.org
-      Evolution Softworks, www.evoscript.org
-
-  Source Material
-
-    Inspiration, cool tricks, and blocks of useful code for this module were
-    extracted from the following CPAN modules:
-
-      Class::MethodMaker, by Peter Seibel.
-      Class::Accessor, by Michael G Schwern 
-      Class::Contract, by Damian Conway
-      Class::SelfMethods, by Toby Everett
-
-  Feedback and Suggestions
-
-    Thanks to:
-
-      Martyn J. Pearce
-      Scott R. Godin
-      Ron Savage
-      Jay Lawrence
-      Adam Spiers
-      Terrence Brannon
-
-  Copyright
-
-    Copyright 2002 Matthew Simon Cavalletto.
-
-    Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
-
-    Portions copyright 1996 Organic Online.
-
-    Portions copyright 2000 Martyn J. Pearce.
-
-  License
-
+LICENSE
     You may use, modify, and distribute this software under the same terms
     as Perl.
 

@@ -154,7 +154,7 @@ sub _compare {
 
 =head1 SEE ALSO
 
-See L<Class::MakeMethods> for a reference to the internals of the Class::MakeMethods framework.
+See L<Class::MakeMethods> for general information about this distribution. 
 
 See L<Ref> for the original version of the clone and compare functions used above.
 
@@ -163,18 +163,6 @@ See L<Clone> (v0.09 on CPAN as of 2000-09-21) for a clone method with an XS impl
 The Perl6 RFP #67 proposes including clone functionality in the core.
 
 See L<Data::Compare> (v0.01 on CPAN as of 1999-04-24) for a Compare method which checks two references for similarity, but it does not provide positive/negative values for ordering purposes.
-
-See L<Class::MakeMethods::ReadMe> for distribution and support information.
-
-=head1 LICENSE
-
-Copyright 1998, 2000, 2001 Evolution Online Systems, Inc.
-
-  M. Simon Cavalletto, simonm@evolution.com
-
-Copyright 2002, Matthew Simon Cavalletto.
-
-Derived in part from Ref.pm, Copyright 1994, David Muir Sharnoff.
 
 =cut
 

@@ -64,7 +64,9 @@ I<generator_type> => [ 'I<name_1>', 'I<name_2>', ...]
 
 =back
 
-For a list of the supported values of I<generator_type>, see L<"SUBCLASS CATALOG"> below, or the documentation for each subclass.
+For a list of the supported values of I<generator_type>, see
+L<Class::MakeMethods::Docs::Catalog/"STANDARD CLASSES">, or the documentation
+for each subclass.
 
 For each method name you provide, a subroutine of the indicated
 type will be generated and installed under that name in your module.
@@ -178,114 +180,9 @@ sub get_declarations {
 
 ########################################################################
 
-=head1 SUBCLASS CATALOG
-
-=head2 Standard::Hash (Instances)
-
-Methods for objects based on blessed hashes. See L<Class::MakeMethods::Standard::Hash> for details.
-
-=over 4
-
-=item *
-
-new: create and copy instances
-
-=item *
-
-scalar: get and set scalar values in each instance
-
-=item *
-
-array: get and set values stored in an array refered to in each
-instance
-
-=item *
-
-hash: get and set values in a hash refered to in each instance
-
-=item *
-
-object: access an object refered to by each instance
-
-=back
-
-=head2 Standard::Array (Instances)
-
-Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Standard::Array> for details.
-
-=over 4
-
-=item *
-
-new: create and copy instances
-
-=item *
-
-scalar: get and set scalar values in each instance
-
-=item *
-
-array: get and set values stored in an array refered to in each
-instance
-
-=item *
-
-hash: get and set values in a hash refered to in each instance
-
-=item *
-
-object: access an object refered to by each instance
-
-=back
-
-=head2 Standard::Global (Global)
-
-Methods for manipulating global data. See L<Class::MakeMethods::Standard::Global> for details.
-
-=over 4
-
-=item *
-
-scalar: get and set global scalar
-
-=item *
-
-array: get and set values stored in a global array
-
-=item *
-
-hash: get and set values in a global hash
-
-=item *
-
-object: global access to an object ref
-
-=back
-
-
-=head2 Standard::Inheritable (Any)
-
-Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type.  See L<Class::MakeMethods::Standard::Inheritable> for details.
-
-=over 4
-
-=item *
-
-scalar: get and set scalar values for each instance or class
-
-=back
-
-=cut
-
-########################################################################
-
 =head1 SEE ALSO
 
-See L<Class::MakeMethods> for an overview of the method-generation
-framework this is based on.
-
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
+See L<Class::MakeMethods> for general information about this distribution. 
 
 =cut
 

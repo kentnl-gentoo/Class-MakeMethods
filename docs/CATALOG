@@ -1,0 +1,431 @@
+NAME
+    Class::MakeMethods::Docs::Catalog - List of Makable Method Types
+
+DESCRIPTION
+    This document lists the various subclasses of Class::MakeMethods
+    included in this distribution, and the method types each one provides.
+
+    See the documentation for each implementation for more details about the
+    features it provides.
+
+    For each class, a parenthetical comment indicates whether the methods it
+    generates are applicable to individual blessed objects (Instances), to
+    class data (Global), or both (Any)
+
+BASIC CLASSES
+  Basic::Hash (Instances)
+
+    Methods for objects based on blessed hashes. See the
+    Class::MakeMethods::Basic::Hash manpage for details.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   array: get and set values stored in an array refered to in each
+        instance
+
+    *   hash: get and set values in a hash refered to in each instance
+
+  Basic::Array (Instances)
+
+    Methods for manipulating positional values in arrays. See the
+    Class::MakeMethods::Basic::Array manpage for details.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   array: get and set values stored in an array refered to in each
+        instance
+
+    *   hash: get and set values in a hash refered to in each instance
+
+  Basic::Global (Global)
+
+    Global methods are not instance-dependent; calling them by class name or
+    from any instance or subclass will consistently access the same value.
+    See the Class::MakeMethods::Basic::Global manpage for details.
+
+    *   scalar: get and set a global scalar value
+
+    *   array: get and set values in a global array
+
+    *   hash: get and set values in a global hash
+
+STANDARD CLASSES
+  Standard::Hash (Instances)
+
+    Methods for objects based on blessed hashes. See the
+    Class::MakeMethods::Standard::Hash manpage for details.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   array: get and set values stored in an array refered to in each
+        instance
+
+    *   hash: get and set values in a hash refered to in each instance
+
+    *   object: access an object refered to by each instance
+
+  Standard::Array (Instances)
+
+    Methods for manipulating positional values in arrays. See the
+    Class::MakeMethods::Standard::Array manpage for details.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   array: get and set values stored in an array refered to in each
+        instance
+
+    *   hash: get and set values in a hash refered to in each instance
+
+    *   object: access an object refered to by each instance
+
+  Standard::Global (Global)
+
+    Methods for manipulating global data. See the
+    Class::MakeMethods::Standard::Global manpage for details.
+
+    *   scalar: get and set global scalar
+
+    *   array: get and set values stored in a global array
+
+    *   hash: get and set values in a global hash
+
+    *   object: global access to an object ref
+
+  Standard::Inheritable (Any)
+
+    Methods for manipulating data which may be overridden per class or
+    instance. Uses external data storage, so it works with objects of any
+    underlying data type. See the Class::MakeMethods::Standard::Inheritable
+    manpage for details.
+
+    *   scalar: get and set scalar values for each instance or class
+
+COMPOSITE CLASSES
+  Composite::Hash (Instances)
+
+    Methods for objects based on blessed hashes. See the
+    Class::MakeMethods::Composite::Hash manpage for details.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   array: get and set values stored in an array refered to in each
+        instance
+
+    *   hash: get and set values in a hash refered to in each instance
+
+    *   object: access an object refered to by each instance
+
+  Composite::Array (Instances)
+
+    Methods for manipulating positional values in arrays. See the
+    Class::MakeMethods::Composite::Array manpage for details.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   array: get and set values stored in an array refered to in each
+        instance
+
+    *   hash: get and set values in a hash refered to in each instance
+
+    *   object: access an object refered to by each instance
+
+  Composite::Global (Global)
+
+    Methods for manipulating global data. See the
+    Class::MakeMethods::Composite::Global manpage for details.
+
+    *   scalar: get and set global scalar
+
+    *   array: get and set values stored in a global array
+
+    *   hash: get and set values in a global hash
+
+    *   object: global access to an object ref
+
+  Composite::Inheritable (Any)
+
+    Methods for manipulating data which may be overridden per class or
+    instance. Uses external data storage, so it works with objects of any
+    underlying data type. See the Class::MakeMethods::Composite::Inheritable
+    manpage for details.
+
+    *   scalar: get and set scalar values for each instance or class
+
+    *   hook: create a subroutine intended to have operations added to it
+
+  Composite::Universal (Any)
+
+    Methods for padding pre- and post-conditions to any class. See the
+    Class::MakeMethods::Composite::Universal manpage for details.
+
+    *   patch: add pre and post operations to an existing subroutine
+
+TEMPLATE CLASSES
+  Template::Universal (Any)
+
+    Meta-methods for any type of object. See the
+    Class::MakeMethods::Template::Universal manpage.
+
+    *   no_op - a method with an empty body
+
+    *   croak - a method which will croak if called
+
+    *   method_init - calls other methods from a list of method name =>
+        argument pairs
+
+    *   forward_methods - delegates to an object provided by another method
+
+  Template::Ref (Any Instance)
+
+    Methods for deep copies and comparisons. See the
+    Class::MakeMethods::Template::Ref manpage.
+
+    *   clone: make a deep copy of an object instance
+
+    *   prototype: make new objects by cloning a typical instance
+
+    *   compare: compare one object to another
+
+  Template::Generic (Abstract)
+
+    The remaining subclasses inherit a similar collection of templates from
+    Template::Generic, and provide a different type of scoping or binding
+    for the functionality defined by the Generic template. See the
+    Class::MakeMethods::Template::Generic manpage for details.
+
+  Template::Hash (Instances)
+
+    The most commonly used implementation, for objects based on blessed
+    hashes. See the Class::MakeMethods::Template::Hash manpage.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   string: get and set string values in each instance
+
+    *   number: get and set numeric values in each instance
+
+    *   boolean: get and set boolean values in each instance
+
+    *   bits: get and set boolean values stored in a single value in each
+        instance
+
+    *   array: get and set values stored in an array refered to in each
+        instance
+
+    *   struct - methods for acccessing values which are stored by position
+        in an array
+
+    *   hash: get and set values in a hash refered to in each instance
+
+    *   tiedhash: get and set values in a tied hash refered to in each
+        instance
+
+    *   hash_of_arrays: for references to hashes of arrays contained in each
+        instance
+
+    *   object: set or access a reference to an object contained in each
+        instance
+
+    *   array_of_objects: manipulate an array of object references within in
+        each instance
+
+    *   code: set or call a function reference contained in each instance
+
+  Template::Struct (Instances)
+
+    Methods for manipulating positional values in arrays. See the
+    Class::MakeMethods::Template::Struct manpage.
+
+    *   new: create and copy array instances
+
+    *   scalar: get and set scalar values in a given array position
+
+    *   string: get and set string values in a given array position
+
+    *   number: get and set numeric values in a given array position
+
+    *   boolean: get and set boolean values in a given array position
+
+    *   builtin_isa: generates a wrapper around some builtin function,
+        cacheing the results in the object and providing a by-name interface
+
+  Template::Scalar (Instances)
+
+    For objects based on blessed scalars. See the
+    Class::MakeMethods::Template::Scalar manpage.
+
+    Note that these objects can generally only have one value accessor
+    method, as all such accessors will refer to the same value.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values in each instance
+
+    *   string: get and set a string value in each instance
+
+    *   number: get and set a numeric value in each instance
+
+    *   boolean: get and set a boolean value in each instance
+
+    *   bits: get and set boolean values stored in a single value in each
+        instance
+
+    *   code: set or call a function reference contained in each instance
+
+  Template::Flyweight (Instances)
+
+    Stores values for objects in an external location hashed by identity.
+    See the Class::MakeMethods::Template::Flyweight manpage.
+
+    Note that while the below constructor creates and returns scalar
+    references, accessor methods can be created with this implementation for
+    use with any type of object.
+
+    *   new: create and copy instances
+
+    *   scalar: get and set scalar values associated with each instance
+
+    *   string: get and set string values associated with each instance
+
+    *   string_index: get and set string values associated with each
+        instance, and maintain an index of instances by value
+
+    *   number: get and set numeric values associated with each instance
+
+    *   boolean: get and set boolean values associated with each instance
+
+    *   boolean_index: get and set boolean values associated with each
+        instance, and maintain a list of items which have the flag set
+
+    *   bits: get and set boolean values stored in a single value associated
+        with each instance
+
+    *   array: get and set values stored in an array associated with each
+        instance
+
+    *   hash: get and set values in a hash associated with each instance
+
+    *   code: set or call a function reference associated with each instance
+
+  Template::Static (Global)
+
+    Static methods are not instance-dependent; calling them by class name or
+    from any instance will consistently access the same value. See the
+    Class::MakeMethods::Template::Static manpage.
+
+    *   scalar: get and set a global scalar value
+
+    *   string: get and set a global string value
+
+    *   number: get and set a global number value
+
+    *   boolean: get and set a global boolean value
+
+    *   array: get and set values in a global array
+
+    *   hash: get and set values in a global hash
+
+    *   tiedhash: get and set values in a global tied hash
+
+    *   hash_of_arrays: get and set values in a global hash of arrays
+
+    *   object: set and access a global reference to an object
+
+    *   instance: set and access a global reference to an object of the
+        declaring class
+
+    *   code: set and access a global reference to a subroutine.
+
+  Template::PackageVar (Global)
+
+    PackageVar methods access a variable in the declaring package. Thus,
+    they have the same effect as Static methods, while keeping their value
+    accessible via the symbol table. See the
+    Class::MakeMethods::Template::PackageVar manpage.
+
+    *   scalar: get and set a global scalar value
+
+    *   string: get and set a global string value
+
+    *   number: get and set a global number value
+
+    *   boolean: get and set a global boolean value
+
+    *   array: get and set values in a global array
+
+    *   hash: get and set values in a global hash
+
+  Template::Class (Global)
+
+    Class methods are similar to Static methods, except that each subclass
+    and its instances will access a distinct value. See the
+    Class::MakeMethods::Template::Class manpage.
+
+    *   scalar: get and set a class-specific scalar value
+
+    *   string: get and set a class-specific string value
+
+    *   number: get and set a class-specific number value
+
+    *   boolean: get and set a class-specific boolean value
+
+    *   array: get and set values in a class-specific array
+
+    *   hash: get and set values in a class-specific hash
+
+  Template::ClassVar (Global)
+
+    ClassVar methods access a variable in the package on which they are
+    called. Thus, they have the same effect as Class methods, while keeping
+    their value accessible via the symbol table, like PackageVar. See the
+    Class::MakeMethods::Template::ClassVar manpage.
+
+    *   scalar: get and set a class-specific scalar value
+
+    *   string: get and set a class-specific string value
+
+    *   number: get and set a class-specific number value
+
+    *   boolean: get and set a class-specific boolean value
+
+    *   array: get and set values in a class-specific array
+
+    *   hash: get and set values in a class-specific hash
+
+  Template::ClassInherit (Global)
+
+    ClassInherit methods are an intermediate point between Static and Class
+    methods; subclasses inherit their superclass's value until they set
+    their own value, after which they become distinct. See the
+    Class::MakeMethods::Template::ClassInherit manpage.
+
+    *   scalar: get and set an inheritable class-specific scalar value
+
+    *   string: get and set an inheritable class-specific string value
+
+    *   number: get and set an inheritable class-specific number value
+
+    *   boolean: get and set an inheritable class-specific boolean value
+
+    *   array: get and set values in an inheritable class-specific array
+
+    *   hash: get and set values in an inheritable class-specific hash
+
+SEE ALSO
+    See the Class::MakeMethods manpage for general information about this
+    distribution.
+

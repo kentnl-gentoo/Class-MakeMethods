@@ -209,7 +209,7 @@ sub array {
 	if ( $init and ! defined $data ) {
 	  $data = [];
 	}
-	wantarray ? @$data : $data;
+	! $data ? () : wantarray ? @$data : $data;
       } elsif ( scalar(@_) == 1 and ref $_[0] eq 'ARRAY' ) {
 	$data = [ @{ $_[0] } ];
 	wantarray ? @$data : $data;
@@ -298,7 +298,7 @@ sub hash {
 	if ( $init and ! defined $data ) {
 	  $data = {};
 	}
-	! wantarray ? $data : $data ? %$data : ();
+	! $data ? () : wantarray  ? %$data : $data
       } elsif ( scalar(@_) == 1 ) {
 	if ( ref($_[0]) eq 'HASH' ) {
 	  my $hash = shift;
@@ -395,11 +395,9 @@ sub object {
 
 =head1 SEE ALSO
 
-See L<Class::MakeMethods> and L<Class::MakeMethods::Standard> for
-an overview of the method-generation framework this is based on.
+See L<Class::MakeMethods> for general information about this distribution. 
 
-See L<Class::MakeMethods::ReadMe> for distribution, installation,
-version and support information.
+See L<Class::MakeMethods::Standard> for more about this family of subclasses.
 
 =cut
 
