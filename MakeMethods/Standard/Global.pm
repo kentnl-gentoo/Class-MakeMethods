@@ -298,11 +298,11 @@ sub hash {
 	if ( $init and ! defined $data ) {
 	  $data = {};
 	}
-	wantarray ? %$data : $data;
+	! wantarray ? $data : $data ? %$data : ();
       } elsif ( scalar(@_) == 1 ) {
 	if ( ref($_[0]) eq 'HASH' ) {
 	  my $hash = shift;
-	  %$data = %$hash;
+	  $data = { %$hash };
 	} elsif ( ref($_[0]) eq 'ARRAY' ) {
 	  return @{$data}{ @{$_[0]} }
 	} else {

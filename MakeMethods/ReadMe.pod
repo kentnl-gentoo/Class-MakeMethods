@@ -113,8 +113,7 @@ perhaps starting with L<Class::MakeMethods::Standard::Hash> and
 L<Class::MakeMethods::Standard::Universal>, before returning to
 the details presented below.
 
-
-=head1 PREREQUISITES
+=head2 Prerequisites
 
 In general, this module should work with Perl 5.003 or later,
 without requring any modules beyond the core Perl distribution.
@@ -154,7 +153,7 @@ You may also review the current test results from CPAN-Testers:
 
 =head1 VERSION
 
-This is version 1.003 of Class::MakeMethods. 
+This is version 1.004 of Class::MakeMethods. 
 
 =head2 Distribution Summary
 

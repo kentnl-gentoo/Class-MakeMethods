@@ -83,11 +83,6 @@ built for them when they use them.
 
 =item *
 
-Figure out which modules, if any, should actually be using AutoLoader.
-Probably just Template::Generic?
-
-=item *
-
 Improve use of _diagnostic hooks for debugging. Add various "(Q)"
 warning diagnostics.
 

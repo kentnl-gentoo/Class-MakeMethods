@@ -146,13 +146,9 @@ For each method name passed, returns a subroutine with the following characteris
 
 =item *
 
-Calls .
+Accepts a hash of key-value pairs, or a reference to hash of such pairs. For each pair, the key is interpreted as the name of a method to call, and the value is the argument to be passed to that method.
 
 =back
-
-You might want to create and use such methods to allow easy initialization of multiple object or class parameters in a single call.
-
-B<Note>: including methods of this type will circumvent the protection of private and protected methods.
 
 Sample declaration and usage:
 
@@ -162,8 +158,12 @@ Sample declaration and usage:
   );
   ...
   
-  # Success
-  MySubclass->new()->init( foo => 'Foozle', bar => 'Barbados' );
+  my $object = MyObject->new()
+  $object->init( foo => 'Foozle', bar => 'Barbados' );
+  
+  # Equivalent to:
+  $object->foo('Foozle');
+  $object->bar('Barbados');
 
 =cut
 
@@ -228,6 +228,49 @@ sub join_methods {
 
 ########################################################################
 
+=head2 alias - Call another method
+
+For each method name passed, returns a subroutine with the following characteristics:
+
+=over 4
+
+=item *
+
+Calls another method on the same callee.
+
+=back
+
+You might create such a method to extend or adapt your class' interface.
+
+Sample declaration and usage:
+
+  package MyObject;
+  use Class::MakeMethods::Standard::Universal (
+    alias => { name=>'click_here', target=>'complex_machinery' }
+  );
+  sub complex_machinery { ... }
+  ...
+  
+  $myobj->click_here(...); # calls $myobj->complex_machinery(...)
+
+=cut
+
+sub alias {
+  map { 
+    my $method = $_;
+    $method->{name} => sub { 
+      my $self = shift;
+      
+      my $t_method = $method->{target} or confess("no target");
+      my @t_args = $method->{target_args} ? @{$method->{target_args}} : ();
+      
+      $self->$t_method(@t_args, @_);
+    }
+  } (shift)->get_declarations(@_)
+}
+
+########################################################################
+
 =head2 delegate - Use another object to provide method
 
 For each method name passed, returns a subroutine with the following characteristics:
@@ -251,7 +294,6 @@ Sample declaration and usage:
   );
   ...
   
-  # Failure
   my $object = MyObject->new();
   $object->instrument( MyInstrument->new );
   $object->play_music;

@@ -9,7 +9,7 @@ use strict;
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = 1.003;
+$VERSION = 1.004;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 
@@ -114,10 +114,10 @@ sub make {
       unshift @args, @items;
     }
     
-    # If name contains a colon, treat the preceeding part as the
-    # subclass name but only for this one set of methods.
+    # If name contains a colon or double colon, treat the preceeding part 
+    # as the subclass name but only for this one set of methods.
     local $CONTEXT{MakerClass} = _find_subclass($CONTEXT{MakerClass}, $1)
-		if ($name =~ s/^(.*)\://);
+		if ($name =~ s/^(.*)\:{1,2}//);
     
     # Meta-method invocation via named_method or direct method call
     my @results = (

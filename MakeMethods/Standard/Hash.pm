@@ -384,10 +384,11 @@ sub hash {
 	if ( $init and ! defined $self->{$hash_key} ) {
 	  $self->{$hash_key} = {};
 	}
-	wantarray ? %{ $self->{$hash_key} } : $self->{$hash_key};
+	! wantarray ? $self->{$hash_key} : 
+	$self->{$hash_key} ? %{ $self->{$hash_key} } : ();
       } elsif ( scalar(@_) == 1 ) {
 	if ( ref($_[0]) eq 'HASH' ) {
-	  %{$self->{$hash_key}} = %{$_[0]};
+	  $self->{$hash_key} = { %{$_[0]} };
 	} elsif ( ref($_[0]) eq 'ARRAY' ) {
 	  return @{$self->{$hash_key}}{ @{$_[0]} }
 	} else {

@@ -75,6 +75,7 @@ use strict;
 
 use Class::MakeMethods::Standard '-isasubclass';
 use Class::MakeMethods::Utility::Inheritable qw(get_vvalue set_vvalue find_vself);
+use Class::MakeMethods::Utility::ArraySplicer 'array_splicer';
 
 ########################################################################
 
@@ -337,7 +338,7 @@ sub hash {
 	if ( $method->{auto_init} and ! $value ) {
 	  $value = $method->{data}{$self} = {};
 	}
-	wantarray ? %$value : $value;
+	! wantarray ? $value : $value ? %$value : ();
       } elsif ( scalar(@_) == 1 ) {
 	if ( ref($_[0]) eq 'HASH' ) {
 	  $method->{data}{$self} = { %{$_[0]} };

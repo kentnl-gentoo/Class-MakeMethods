@@ -429,11 +429,12 @@ sub hash {
 	if ( $init and ! defined $self->[$index] ) {
 	  $self->[$index] = {};
 	}
-	wantarray ? %{$self->[$index]} : $self->[$index];
+	! wantarray ? $self->[$index] : 
+	$self->[$index] ? %{ $self->[$index] } : ();
       } elsif ( scalar(@_) == 1 ) {
 	if ( ref($_[0]) eq 'HASH' ) {
 	  my $hash = shift;
-	  %{$self->[$index]} = %$hash;
+	  $self->[$index] = { %$hash };
 	} elsif ( ref($_[0]) eq 'ARRAY' ) {
 	  return @{$self->[$index]}{ @{$_[0]} }
 	} else {

@@ -103,7 +103,8 @@ INSTALLATION
     Class::MakeMethods::Standard::Universal manpage, before returning to the
     details presented below.
 
-PREREQUISITES
+  Prerequisites
+
     In general, this module should work with Perl 5.003 or later, without
     requring any modules beyond the core Perl distribution.
 
@@ -137,7 +138,7 @@ PREREQUISITES
       http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
 
 VERSION
-    This is version 1.003 of Class::MakeMethods.
+    This is version 1.004 of Class::MakeMethods.
 
   Distribution Summary
 

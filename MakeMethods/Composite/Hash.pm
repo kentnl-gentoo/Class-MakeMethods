@@ -130,7 +130,7 @@ For each method name passed, returns a subroutine with the following characteris
 
 =item *
 
-Has a reference to a sample item to copy. This defaults to a reference to an empty hash, but you may override this with the C<'defaults' => I<hash_ref>>  method parameter. 
+Has a reference to a sample item to copy. This defaults to a reference to an empty hash, but you may override this with the C<'defaults' =E<gt> I<hash_ref>>  method parameter. 
 
 =item *
 
@@ -166,6 +166,28 @@ Sample declaration and usage:
   
   # Copy with overriding value
   my $copy = $obj->new( bar => 'Bob' );
+
+=cut
+
+=head2 new --with_values - Constructor
+
+For each method name passed, returns a subroutine with the following characteristics:
+
+=over 4
+
+=item *
+
+May be called as a class method, or (equivalently) on any existing object of that class. 
+
+=item *
+
+Creates a hash, blesses it into the class, and returns the new instance.
+
+=item *
+
+If no arguments are provided, the returned hash will be empty. If passed a single hash-ref argument, copies its contents into the new hash. If called with multiple arguments, treats them as key-value pairs, and copies them into the new hash. (Note that this is a "shallow" copy, not a "deep" clone.)
+
+=back
 
 =cut
 
@@ -207,30 +229,6 @@ sub new {
       }
   ],
 );
-
-########################################################################
-
-=head2 new --with_values - Constructor
-
-For each method name passed, returns a subroutine with the following characteristics:
-
-=over 4
-
-=item *
-
-May be called as a class method, or (equivalently) on any existing object of that class. 
-
-=item *
-
-Creates a hash, blesses it into the class, and returns the new instance.
-
-=item *
-
-If no arguments are provided, the returned array will be empty. If passed a single hash-ref argument, copies its contents into the new hash. If called with multiple arguments, treats them as key-value pairs, and copies them into the new hash. (Note that this is a "shallow" copy, not a "deep" clone.)
-
-=back
-
-=cut
 
 ########################################################################
 

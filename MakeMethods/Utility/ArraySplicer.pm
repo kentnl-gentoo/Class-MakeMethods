@@ -190,7 +190,7 @@ sub array_splicer {
     ( ! wantarray and scalar @results == 1 ) ? $results[0] : @results;
     
   } else {
-    Carp::confess 'Unexpected arguments to array accessor method';
+    Carp::confess 'Unexpected arguments to array accessor: ' . join(', ', map "'$_'", @_ );
   }
 }
 

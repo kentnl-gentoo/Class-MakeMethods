@@ -791,6 +791,8 @@ No.
     read_write => [ qw( simple ordered mapping obj_ref ) ] 
   );
 
+=back
+
 
 =head1 SEE ALSO
 
@@ -799,15 +801,21 @@ See L<Class::MakeMethods> for general information about this module.
 See L<Class::MakeMethods::ReadMe> for distribution, installation, version and support information.
 
 
-=head1 AUTHOR
+=head1 CREDITS AND COPYRIGHT
 
-  M. Simon Cavalletto, Evolution Online Systems, simonm@evolution.com
+=head2 Developed By
 
+  M. Simon Cavalletto, simonm@cavalletto.org
+  Evolution Softworks, www.evoscript.org
 
-=head1 LICENSE
+=head2 Copyright
 
-Copyright (c) 2000, 2001 Evolution Online Systems, Inc.
+Copyright 2002 Matthew Simon Cavalletto. 
 
-This documentation may be used, redistributed and/or modified under the same terms as Perl.
+Portions copyright 2000, 2001 Evolution Online Systems, Inc.
+
+=head2 License
+
+You may use, modify, and distribute this document under the same terms as Perl.
 
 =cut
