@@ -119,6 +119,7 @@ Simple declarations, as shown in the prior section, are treated as if they had a
 
 package Class::MakeMethods::Standard;
 
+$VERSION = 1.000;
 use strict;
 use Class::MakeMethods '-isasubclass';
 

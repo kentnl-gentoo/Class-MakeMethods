@@ -3,13 +3,14 @@ package Class::MakeMethods::Template::Scalar;
 use Class::MakeMethods::Template::Generic;
 @ISA = qw( Class::MakeMethods::Template::Generic );
 
+$VERSION = 1.008;
 use strict;
 require 5.00;
 use Carp;
 
 =head1 NAME
 
-B<Class::MakeMethods::Template::ExternalData> - Method interfaces for external data storage
+Class::MakeMethods::Template::Scalar - Methods for blessed scalars
 
 =head1 SYNOPSIS
 

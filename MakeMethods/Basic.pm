@@ -2,6 +2,8 @@ package Class::MakeMethods::Basic;
 
 use Class::MakeMethods '-isasubclass';
 
+$VERSION = 1.000;
+
 1;
 
 __END__

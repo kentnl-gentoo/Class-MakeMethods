@@ -3,12 +3,13 @@ package Class::MakeMethods::Template::Global;
 use Class::MakeMethods::Template::Generic;
 @ISA = qw( Class::MakeMethods::Template::Generic );
 
+$VERSION = 1.008;
 use strict;
 require 5.0;
 
 =head1 NAME
 
-B<Class::MakeMethods::Template::Global> - Method that are not instance-dependent
+Class::MakeMethods::Template::Global - Method that are not instance-dependent
 
 =head1 SYNOPSIS
 

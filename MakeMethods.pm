@@ -9,7 +9,7 @@ use strict;
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = 1.007;
+$VERSION = 1.008;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 
@@ -1275,7 +1275,7 @@ to C<Dist=Class-MakeMethods#rt.cpan.org>, replacing C<#> with C<@>.
 
 =head1 VERSION
 
-This is Class::MakeMethods v1.007.
+This is Class::MakeMethods v1.008.
 
 =head2 Distribution Summary
 
@@ -1432,7 +1432,7 @@ You may contact the author directly at C<evo@cpan.org> or C<simonm@cavalletto.or
 
 =head2 Feedback and Suggestions 
 
-Thanks to:
+Thanks to the following people for bug reports, suggestions, and other feedback:
 
   Martyn J. Pearce
   Scott R. Godin
@@ -1442,6 +1442,8 @@ Thanks to:
   Malcolm Cook
   Terrence Brannon
   Jared Rhine
+  Peter Chen
+  Mike Castle
 
 =head2 Source Material
 

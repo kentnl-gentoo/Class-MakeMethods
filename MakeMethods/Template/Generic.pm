@@ -1,6 +1,6 @@
 =head1 NAME
 
-B<Class::MakeMethods::Template::Generic> - Templates for common meta-method types
+Class::MakeMethods::Template::Generic - Templates for common meta-method types
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,7 @@ package Class::MakeMethods::Template::Generic;
 
 use Class::MakeMethods::Template '-isasubclass';
 
+$VERSION = 1.008;
 use strict;
 use Carp;
 
@@ -1807,7 +1808,7 @@ B<Interfaces>: The following calling interfaces are available.
 
 Provides get_set behavior for I<*>, clear behavior for 'delete_*',
 and forwarding methods for any values in the method's 'delegate'
-parameter.
+or 'soft_delegate' parameters.
 
 =item get_and_set
 
@@ -1865,8 +1866,9 @@ Removes the reference value.
 
 =item I<forwarding>
 
-If a 'delegate' parameter is provided, methods with those names
-are created that are forwarded directly to the object in the slot.
+If a 'delegate' or 'soft_delegate' parameter is provided, methods
+with those names are created that are forwarded directly to the
+object in the slot, as described below.
 
 =back
 
@@ -1886,7 +1888,15 @@ The name of the method to call on the above class to create a new instance. Defa
 
 The methods to forward to the object. Can contain a method name,
 a string of space-spearated method names, or an array of method
-names.
+names. This type of method will croak if it is called when the
+target object is not defined.
+
+=item soft_delegate
+
+The methods to forward to the object, if it is present. Can contain
+a method name, a string of space-spearated method names, or an
+array of method names. This type of method will return nothing if
+it is called when the target object is not defined.
 
 =back
 
@@ -1952,20 +1962,19 @@ sub object {
 	  _VALUE_;
 	},
       '-subs' => sub { 
-	  my $m_info = $_[0]; 
-	  my $forward = $m_info->{'delegate'}; 
-	  my @forward = ! defined $forward ? ()
-					: ref($forward) eq 'ARRAY' ? @$forward 
-							: split(' ', $forward);
-	  my $m_name = $m_info->{'name'};
-	  map { 
-	    my $fwd = $_; 
-	    $fwd, sub { 
+	  {
+	    'delegate' => sub { my($m_info, $name) = @_; sub { 
+	      my $m_name = $m_info->{'name'};
 	      my $obj = (shift)->$m_name() 
-		or Carp::croak("Can't forward $fwd because $m_name is empty");
-	      $obj->$fwd(@_) 
-	    } 
-	  } @forward;
+		or Carp::croak("Can't forward $name because $m_name is empty");
+	      $obj->$name(@_) 
+	    } },
+	    'soft_delegate' => sub { my($m_info, $name) = @_; sub { 
+	      my $m_name = $m_info->{'name'};
+	      my $obj = (shift)->$m_name() or return;
+	      $obj->$name(@_) 
+	    } },
+	  }
 	},
     },
   }
@@ -2120,15 +2129,12 @@ sub array_of_objects {
     },
     'behavior' => {
       '-subs' => sub { 
-	  my $m_info = $_[0]; 
-	  my $m_name = $m_info->{'name'};
-	  my $forward = $m_info->{'delegate'}; 
-	  my @forward = ! defined $forward ? ()
-				  : ref($forward) eq 'ARRAY' ? @$forward 
-							      : $forward;
-	  return map { my $fwd = $_; $fwd, sub {
-	    map { $_->$fwd(@_) } (shift)->$m_name() 
-	  } } @forward;
+	  {
+	    'delegate' => sub { my($m_info, $name) = @_; sub { 
+	      my $m_name = $m_info->{'name'};
+		map { $_->$name(@_) } (shift)->$m_name() 
+	    } },
+	  }
 	},
     },
   }

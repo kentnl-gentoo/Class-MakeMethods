@@ -1,6 +1,6 @@
 package Class::MakeMethods::Template::DiskCache;
 
-$VERSION = 1.000_001;
+$VERSION = 1.008;
 
 @EXPORT_OK = qw( disk_cache );
 sub import { require Exporter and goto &Exporter::import } # lazy Exporter

@@ -3,6 +3,7 @@ package Class::MakeMethods::Template::Array;
 require Class::MakeMethods::Template::Generic;
 @ISA = qw( Class::MakeMethods::Template::Generic );
 
+$VERSION = 1.008;
 use strict;
 require 5.00;
 use Carp;

@@ -1,6 +1,6 @@
 =head1 NAME
 
-B<Class::MakeMethods::Template::Ref> - Universal copy and compare methods
+Class::MakeMethods::Template::Ref - Universal copy and compare methods
 
 =head1 SYNOPSIS
 
@@ -20,6 +20,7 @@ B<Class::MakeMethods::Template::Ref> - Universal copy and compare methods
 
 package Class::MakeMethods::Template::Ref;
 
+$VERSION = 1.008;
 use strict;
 require 5.00;
 use Carp;

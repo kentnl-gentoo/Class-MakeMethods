@@ -51,6 +51,7 @@ See L<Class::MakeMethods::Standard/"Declaration Syntax"> and L<Class::MakeMethod
 
 package Class::MakeMethods::Standard::Global;
 
+$VERSION = 1.000;
 use strict;
 use Class::MakeMethods::Standard '-isasubclass';
 use Class::MakeMethods::Utility::ArraySplicer 'array_splicer';

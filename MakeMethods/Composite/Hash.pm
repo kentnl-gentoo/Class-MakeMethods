@@ -114,6 +114,7 @@ Basic declarations, as described above, are given an empty parameter hash.
 
 package Class::MakeMethods::Composite::Hash;
 
+$VERSION = 1.000;
 use strict;
 use Class::MakeMethods::Composite '-isasubclass';
 use Carp;

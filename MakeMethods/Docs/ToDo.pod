@@ -88,7 +88,7 @@ Finish building and testing of Composite::* packages.
 
 =item *
 
-Resolve DESTROY-time issues with Standard::Inheritable, Composite::Inheritable, and Template::Flyweight.
+Resolve DESTROY-time issues with Standard::Inheritable, Composite::Inheritable, and Template::InsideOut.
 
 =item *
 
@@ -109,11 +109,11 @@ Finish overhauling Template documentation.
 
 =item * 
 
-Include Static and Flyweight uses in the EXAMPLES section
+Include Global and InsideOut uses in the EXAMPLES section
 
 =item * 
 
-Template Internals: Finish documenting the Template mechanism.
+Template Internals: Finish documenting the TextBuilder mechanism.
 
 =item *
 

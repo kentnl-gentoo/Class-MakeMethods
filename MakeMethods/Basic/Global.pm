@@ -54,6 +54,7 @@ syntax information.
 
 package Class::MakeMethods::Basic::Global;
 
+$VERSION = 1.000;
 use Class::MakeMethods '-isasubclass';
 
 ########################################################################

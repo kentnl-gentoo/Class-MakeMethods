@@ -28,6 +28,7 @@ The Composite::Universal suclass of MakeMethods provides some generally-applicab
 
 package Class::MakeMethods::Composite::Universal;
 
+$VERSION = 1.000;
 use strict;
 use Class::MakeMethods::Composite '-isasubclass';
 use Carp;

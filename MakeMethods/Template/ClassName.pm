@@ -1,6 +1,7 @@
 package Class::MakeMethods::Template::ClassName;
 
 use Class::MakeMethods::Template '-isasubclass';
+$VERSION = 1.008;
 
 sub _diagnostic { &Class::MakeMethods::_diagnostic }
 

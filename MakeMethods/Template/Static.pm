@@ -3,6 +3,7 @@ package Class::MakeMethods::Template::Static;
 use Class::MakeMethods::Template::Global;
 
 @ISA = "Class::MakeMethods::Template::Global";
+$VERSION = 1.008;
 
 1;
 

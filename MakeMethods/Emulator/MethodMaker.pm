@@ -9,7 +9,7 @@ use strict;
 
 =head1 NAME
 
-B<Class::MakeMethods::Emulator::MethodMaker> - Emulate Class::MethodMaker 
+Class::MakeMethods::Emulator::MethodMaker - Emulate Class::MethodMaker 
 
 
 =head1 SYNOPSIS
@@ -49,8 +49,8 @@ Full compatibility is maintained with version 1.03; some of the
 changes in versions 1.04 through 1.10 are not yet included.
 
 The test suite from Class::MethodMaker version 1.10 is included
-with this package, in the t-mm/ directory. The unsupported
-tests have names ending in ".todo".
+with this package, in the t/emulator_class_methodmaker/ directory. 
+The unsupported tests have names ending in ".todo".
 
 The tests are unchanged from those in the Class::MethodMaker
 distribution, except for the substitution of

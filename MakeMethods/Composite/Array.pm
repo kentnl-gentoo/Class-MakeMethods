@@ -116,6 +116,7 @@ Basic declarations, as described above, are treated as having an empty parameter
 
 package Class::MakeMethods::Composite::Array;
 
+$VERSION = 1.000;
 use strict;
 use Class::MakeMethods::Composite '-isasubclass';
 

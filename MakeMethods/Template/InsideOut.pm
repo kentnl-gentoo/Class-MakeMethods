@@ -3,17 +3,47 @@ package Class::MakeMethods::Template::InsideOut;
 use Class::MakeMethods::Template::Generic;
 @ISA = qw( Class::MakeMethods::Template::Generic );
 
+$VERSION = 1.008;
 use strict;
 require 5.0;
 
+my %ClassInfo;
+my %Data;
+
+sub generic {
+  {
+    '-import' => { 
+      'Template::Generic:generic' => '*' 
+    },
+    'code_expr' => { 
+      '_VALUE_' => '_ATTR_{data}->{_SELF_}',
+    },
+    'behavior' => {
+      -register => [ sub {
+	my $m_info = shift;
+	my $class_info = ( $ClassInfo{$m_info->{target_class}} ||= [] );
+	return (
+	  'DESTROY' => sub { 
+	    my $self = shift;
+	    foreach ( @$class_info ) { delete $self->{data}->{$self} } 
+	    $self->SUPER::DESTROY( @_ ) 
+	  },
+	);
+      } ],
+    }
+  }
+}
+
+########################################################################
+
 =head1 NAME
 
-B<Class::MakeMethods::Template::ExternalData> - Method interfaces for external data storage
+Class::MakeMethods::Template::InsideOut - External data
 
 =head1 SYNOPSIS
 
   package MyObject;
-  use Class::MakeMethods::Template::ExternalData (
+  use Class::MakeMethods::Template::InsideOut (
     scalar          => [ 'foo', 'bar' ]
   );
   sub new { ... }
@@ -34,15 +64,14 @@ Each method stores the values associated with various objects in
 an hash keyed by the object's stringified identity. Since that hash
 is accessible only from the generated closures, it is impossible
 for foreign code to manipulate those values except through the
-method interface. (Caveat: the _flyweight_class_info class method
-currently exposes the meta-method information; this method should
-become private RSN.) A DESTROY method is installed to call the
-_destroy_flyweight_info method, removing data for expired objects
-from the various hashes, or you can call the _destroy_flyweight_info
-method from your own DESTROY method.
+method interface. 
+
+A DESTROY method is installed to remove data for expired objects
+from the various hashes. (If the DESTROY method is not called, your
+program will not release this data and memory will be wasted.)
 
 B<Common Parameters>: The following parameters are defined for
-ExternalData meta-methods.
+InsideOut meta-methods.
 
 =over 4
 
@@ -53,47 +82,11 @@ for each object.
 
 =back
 
-Note that using ExternalData meta-methods causes the installation of
+Note that using InsideOut meta-methods causes the installation of
 a DESTROY method in the calling class, which deallocates data for
 each instance when it is discarded.
 
 NOTE: This needs some more work to properly handle inheritance.
-
-=cut
-
-my %ClassInfo;
-my %Data;
-
-sub generic {
-  {
-    '-import' => { 
-      'Template::Generic:generic' => '*' 
-    },
-    'code_expr' => { 
-      '_VALUE_' => '_ATTR_{data}->{_SELF_}',
-    },
-    'behavior' => {
-      -register => [ sub {
-	my $m_info = shift;
-	my $class_info = ( $ClassInfo{$m_info->{target_class}} ||= [] );
-	return (
-	  _flyweight_class_info => sub { @$class_info },
-	  _destroy_flyweight_info => \&_destroy_flyweight_info,
-	  'DESTROY' => sub { ( $_[0] )->_destroy_flyweight_info },
-	);
-      } ],
-    }
-  }
-}
-
-sub _destroy_flyweight_info {
-  my $self = shift;
-  foreach ( $self->_flyweight_class_info() ) {
-    delete $_->{data}->{$self};
-  }
-}
-
-########################################################################
 
 =head2 Standard Methods
 
@@ -127,7 +120,7 @@ The items marked with a * above are specifically defined in this package, wherea
 
   boolean_index => [ qw / foo bar baz / ]
 
-Like ExternalData:boolean, boolean_index creates x, set_x, and clear_x
+Like InsideOut:boolean, boolean_index creates x, set_x, and clear_x
 methods. However, it also defines a class method find_x which returns
 a list of the objects which presently have the x-flag set to
 true. 
@@ -211,9 +204,7 @@ sub string_index {
 	},
       'set' => q{ 
 	  my $new_value = shift;
-	  
 	  _REMOVE_FROM_INDEX_
-	  
 	  _ADD_TO_INDEX_{ $new_value }
 	},
       'clear' => q{

@@ -32,7 +32,7 @@ __END__
 
 =head1 NAME
 
-B<Class::MakeMethods::Emulator::Singleton> - Emulate Class::Singleton
+Class::MakeMethods::Emulator::Singleton - Emulate Class::Singleton
 
 
 =head1 SYNOPSIS

@@ -1,5 +1,5 @@
 NAME
-    Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 1.007
+    Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods
 
 DESCRIPTION
     This is an updated release of Class::MakeMethods, for distribution
@@ -17,9 +17,7 @@ MOTIVATION
 
 SEE ALSO
     Documentation is available in POD format throughout the distribution;
-    the Class::MakeMethods manpage is a good starting place. Plain-text
-    versions of some kew documentation are also available in the docs/
-    directory.
+    the Class::MakeMethods manpage is a good starting place.
 
     You may browse the latest distribution online here:
 

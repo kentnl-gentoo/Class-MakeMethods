@@ -70,6 +70,7 @@ See L<Class::MakeMethods::Standard/"Declaration Syntax"> and L<Class::MakeMethod
 
 package Class::MakeMethods::Composite::Inheritable;
 
+$VERSION = 1.000;
 use strict;
 use Carp;
 

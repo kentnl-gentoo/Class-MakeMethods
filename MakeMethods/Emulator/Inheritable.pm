@@ -41,7 +41,7 @@ __END__
 
 =head1 NAME
 
-B<Class::MakeMethods::Emulator::Inheritable> - Emulate Class::Inheritable
+Class::MakeMethods::Emulator::Inheritable - Emulate Class::Inheritable
 
 
 =head1 SYNOPSIS

@@ -3,13 +3,14 @@ package Class::MakeMethods::Template::ClassVar;
 use Class::MakeMethods::Template::Generic;
 BEGIN { @ISA = qw( Class::MakeMethods::Template::Generic ); }
 
+$VERSION = 1.008;
 use strict;
 require 5.0;
 use Carp;
 
 =head1 NAME
 
-B<Class::MakeMethods::Template::ClassVar> - Static methods with subclass variation
+Class::MakeMethods::Template::ClassVar - Static methods with subclass variation
 
 =head1 SYNOPSIS
 

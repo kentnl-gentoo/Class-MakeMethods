@@ -2,12 +2,33 @@ package Class::MakeMethods::Template::Hash;
 
 use Class::MakeMethods::Template::Generic '-isasubclass';
 
+$VERSION = 1.008;
 use strict;
 require 5.0;
 
+sub generic {
+  {
+    'params' => {
+      'hash_key' => '*',
+    },
+    'code_expr' => { 
+      _VALUE_ => '_SELF_->{_STATIC_ATTR_{hash_key}}',
+      '-import' => { 'Template::Generic:generic' => '*' },
+      _EMPTY_NEW_INSTANCE_ => 'bless {}, _SELF_CLASS_',
+      _SET_VALUES_FROM_HASH_ => 'while ( scalar @_ ) { local $_ = shift(); $self->{ $_ } = shift() }'
+    },
+    'behavior' => {
+      'hash_delete' => q{ delete _VALUE_ },
+      'hash_exists' => q{ exists _VALUE_ },
+    },
+  }
+}
+
+########################################################################
+
 =head1 NAME
 
-B<Class::MakeMethods::Template::Hash> - Method interfaces for hash-based objects
+Class::MakeMethods::Template::Hash - Method interfaces for hash-based objects
 
 =head1 SYNOPSIS
 
@@ -37,7 +58,11 @@ The hash key to use when retrieving values from each hash instance. Defaults to 
 
 Changing this allows you to change an accessor method name to something other than the name of the hash key used to retrieve its value.
 
-Note that this parameter is not portable to the other implementations, such as Static or Flyweight.
+Note that this parameter is not portable to the other implementations, such as Global or InsideOut.
+
+You can take advantage of parameter expansion to define methods whose hash key is composed of the defining package's name and the individual method name, such as C<$self-E<gt>{I<MyObject>-I<foo>}>:
+
+      'hash_key' => '*{target_class}-*{name}'
 
 =back
 
@@ -50,28 +75,6 @@ B<Common Behaviors>
 Deletes the named key and associated value from the current hash instance.
 
 =back
-
-=cut
-
-sub generic {
-  {
-    'params' => {
-      'hash_key' => '*',
-    },
-    'code_expr' => { 
-      _VALUE_ => '_SELF_->{_STATIC_ATTR_{hash_key}}',
-      '-import' => { 'Template::Generic:generic' => '*' },
-      _EMPTY_NEW_INSTANCE_ => 'bless {}, _SELF_CLASS_',
-      _SET_VALUES_FROM_HASH_ => 'while ( scalar @_ ) { local $_ = shift(); $self->{ $_ } = shift() }'
-    },
-    'behavior' => {
-      'hash_delete' => q{ delete _VALUE_ },
-      'hash_exists' => q{ exists _VALUE_ },
-    },
-  }
-}
-
-########################################################################
 
 =head2 Standard Methods
 
@@ -207,7 +210,6 @@ sub struct {
 ########################################################################
 
 =head1  SEE ALSO
-
 
 See L<Class::MakeMethods> for general information about this distribution. 
 

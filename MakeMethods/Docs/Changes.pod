@@ -1,6 +1,6 @@
 =head1 NAME
 
-Class::MakeMethods::Docs::Changes - Revision history for Class::MakeMethods
+Class::MakeMethods::Docs::Changes - History of Class::MakeMethods
 
 =head1 SYNOPSIS
 
@@ -8,27 +8,55 @@ Revision history for Class::MakeMethods.
 
 =head1 CHANGES
 
+=head2 Version 1.008
+
+=over 4
+
+=item 2003/09/05
+
+Adjusted layout of test directories in another attempt to solve a MakeMaker/shell-glob issue on Windows that was preventing make test from running correctly. 
+
+Removed Template::PseudoHash, since this package never really worked, as pointed out by a question from Mike Castle. Management of array-based objects can be handled by any of the existing ::Array subclasses, and support for pseudo-hashes would not provide any useful new capabilities.
+
+Added support for "Template::Universal:forward_methods -delegate" and "Template::Generic:object --soft_delegate" based on a suggestion from Peter Chen. Extended behavior of Template -subs handling to make it easy to add such functionality in the future.
+
+Released to CPAN as Class-MakeMethods-1.008.tar.gz.
+
+=item 2003/09/02
+
+Adjusted DESTROY behavior of Template::InsideOut and cleaned up documentation.
+
+=back
+
 =head2 Version 1.007
 
 =over 4
 
 =item 2003/09/01
 
-Made Template definitions automatically import their class's generic definitions, if present. This eliminates the need for Generic subclasses to explicitly redeclare every method it inherits, and should obviate the "missing declaration" problems referenced below.
+Made Template definitions automatically import their class's generic
+definitions, if present. This eliminates the need for Generic
+subclasses to explicitly redeclare every method it inherits, and
+should obviate the "missing declaration" problems referenced below.
 
-Updated the names of several Template subclasses, with stubs at the old names for backwards compatibility: Flyweight becomes InsideOut, Static becomes Global, and Struct becomes Array. 
+Updated the names of several Template subclasses, with stubs at
+the old names for backwards compatibility: Flyweight becomes
+InsideOut, Static becomes Global, and Struct becomes Array.
 
 Added Template::Inheritable and basic tests for it.
 
-Eliminated use of legacy Test.pm from remaining tests, except for MethodMaker emulation.
+Eliminated use of legacy Test.pm from remaining tests, except for
+MethodMaker emulation.
 
-Rearranged test directories in an effort to avoid a reported bug with the test path of t/*/*.t under Windows.
+Rearranged test directories in an effort to avoid a reported bug
+with the test path of t/*/*.t under Windows.
 
 Released to CPAN as Class-MakeMethods-1.007.tar.gz.
 
-=item 2003/08/27 
+=item 2003/08/27
 
-Added section to Class::MakeMethods/EXTENDING documentation based on question from Terrence Brannon.
+Added section to Class::MakeMethods/EXTENDING documentation based
+on question from Terrence Brannon.
 
 =item 2003/02/07
 

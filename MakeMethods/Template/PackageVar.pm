@@ -3,13 +3,14 @@ package Class::MakeMethods::Template::PackageVar;
 use Class::MakeMethods::Template::Generic;
 BEGIN { @ISA = qw( Class::MakeMethods::Template::Generic ); }
 
+$VERSION = 1.008;
 use strict;
 require 5.0;
 use Carp;
 
 =head1 NAME
 
-B<Class::MakeMethods::Template::PackageVar> - Static methods with global variables
+Class::MakeMethods::Template::PackageVar - Static methods with global variables
 
 =head1 SYNOPSIS
 

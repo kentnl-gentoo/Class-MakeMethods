@@ -1,6 +1,6 @@
 =head1 NAME
 
-B<Class::MakeMethods::Template::ClassInherit> - Overridable class data
+Class::MakeMethods::Template::ClassInherit - Overridable class data
 
 =head1 SYNOPSIS
 
@@ -34,6 +34,7 @@ package Class::MakeMethods::Template::ClassInherit;
 use Class::MakeMethods::Template::Generic;
 BEGIN { @ISA = qw( Class::MakeMethods::Template::Generic ); }
 
+$VERSION = 1.008;
 use strict;
 require 5.0;
 use Carp;

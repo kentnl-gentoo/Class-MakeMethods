@@ -58,6 +58,7 @@ syntax information.
 
 package Class::MakeMethods::Basic::Hash;
 
+$VERSION = 1.000;
 use strict;
 use Class::MakeMethods '-isasubclass';
 

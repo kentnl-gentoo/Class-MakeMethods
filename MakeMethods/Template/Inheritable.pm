@@ -41,6 +41,7 @@ package Class::MakeMethods::Template::Inheritable;
 use Class::MakeMethods::Template::Generic;
 BEGIN { @ISA = qw( Class::MakeMethods::Template::Generic ); }
 
+$VERSION = 1.008;
 use strict;
 require 5.0;
 use Carp;

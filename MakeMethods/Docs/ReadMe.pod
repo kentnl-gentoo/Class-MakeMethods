@@ -1,6 +1,6 @@
 =head1 NAME
 
-Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 1.007
+Class::MakeMethods::Docs::ReadMe - About Class::MakeMethods 
 
 
 =head1 DESCRIPTION
@@ -24,8 +24,7 @@ Here's the "elevator pitch" for the module:
 =head1 SEE ALSO
 
 Documentation is available in POD format throughout the distribution;
-L<Class::MakeMethods> is a good starting place. Plain-text versions
-of some kew documentation are also available in the docs/ directory.
+L<Class::MakeMethods> is a good starting place. 
 
 You may browse the latest distribution online here:
 

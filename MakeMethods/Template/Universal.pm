@@ -2,13 +2,14 @@ package Class::MakeMethods::Template::Universal;
 
 use Class::MakeMethods::Template '-isasubclass';
 
+$VERSION = 1.008;
 use strict;
 require 5.00;
 require Carp;
 
 =head1 NAME
 
-B<Class::MakeMethods::Template::Universal> - Meta-methods for any type of object
+Class::MakeMethods::Template::Universal - Meta-methods for any type of object
 
 =head1 SYNOPSIS
 
@@ -217,7 +218,6 @@ If each subclass is expected to provide an implementation of a given method, usi
 
 However, note that the existence of this method will be detected by UNIVERSAL::can(), so it is not suitable for use in optional interfaces, for which you may wish to be able to detect whether the method is supported or not.
 
-
 The -unsupported and -prohibited interfaces provide alternate error
 messages, or a custom error message can be provided using the
 'croak_msg' parameter.
@@ -330,6 +330,20 @@ calling C<w> on the object returned by C<whistle>, whilst methods C<x>
 and C<y> will be handled by C<xylophone>, and method C<z> will be handled
 by calling C<do_zed> on the object returned by calling C<zither(123)>.
 
+B<Interfaces>:
+
+=over 4
+
+=item forward (default)
+
+Calls the method on the target object. If the target object is missing, croaks at runtime with a message saying "Can't forward bar because bar is empty."
+
+=item delegate
+
+Calls the method on the target object, if present. If the target object is missing, returns nothing.
+
+=back
+
 B<Parameters>: The following additional parameters are supported:
 
 =over 4
@@ -363,6 +377,14 @@ sub forward_methods {
 	my @args = $m_info->{'target_args'} ? @{$m_info->{'target_args'}} : ();
 	my $obj = (shift)->$target(@args) 
 	  or Carp::croak("Can't forward $m_info->{name} because $m_info->{target} is empty");
+	my $method = $m_info->{'method_name'};
+	$obj->$method(@_);
+      }},
+      'delegate' => sub { my $m_info = $_[0]; sub {
+	my $target = $m_info->{'target'};
+	my @args = $m_info->{'target_args'} ? @{$m_info->{'target_args'}} : ();
+	my $obj = (shift)->$target(@args) 
+	  or return;
 	my $method = $m_info->{'method_name'};
 	$obj->$method(@_);
       }},

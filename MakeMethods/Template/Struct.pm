@@ -3,6 +3,7 @@ package Class::MakeMethods::Template::Struct;
 use Class::MakeMethods::Template::Array;
 
 @ISA = "Class::MakeMethods::Template::Array";
+$VERSION = 1.008;
 
 1;
 
@@ -10,7 +11,7 @@ __END__
 
 =head1 NAME
 
-B<Class::MakeMethods::Template::Struct> - Deprecated name for Array
+Class::MakeMethods::Template::Struct - Deprecated name for Array
 
 =head1 SYNOPSIS
 

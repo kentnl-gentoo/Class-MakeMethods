@@ -1,6 +1,6 @@
 =head1 NAME
 
-B<Class::MakeMethods::Docs::RelatedModules> - Survey of Class Builders
+Class::MakeMethods::Docs::RelatedModules - Survey of Class Builders
 
 
 =head1 SYNOPSIS

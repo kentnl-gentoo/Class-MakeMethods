@@ -3,13 +3,14 @@ package Class::MakeMethods::Template::StructBuiltin;
 require Class::MakeMethods::Template::Generic;
 @ISA = qw( Class::MakeMethods::Template::Generic );
 
+$VERSION = 1.008;
 use strict;
 require 5.00;
 use Carp;
 
 =head1 NAME
 
-B<Class::MakeMethods::Template::StructBuiltin> 
+Class::MakeMethods::Template::StructBuiltin
 
 =head1 SYNOPSIS
 

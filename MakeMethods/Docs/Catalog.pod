@@ -425,9 +425,9 @@ code: set or call a function reference contained in each instance
 =back
 
 
-=head2 Template::Struct (Instances)
+=head2 Template::Array (Instances)
 
-Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Template::Struct>.
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Template::Array>.
 
 =over 4
 
@@ -500,9 +500,9 @@ code: set or call a function reference contained in each instance
 =back
 
 
-=head2 Template::Flyweight (Instances)
+=head2 Template::InsideOut (Instances)
 
-Stores values for objects in an external location hashed by identity. See L<Class::MakeMethods::Template::Flyweight>.
+Stores values for objects in an external location hashed by identity. See L<Class::MakeMethods::Template::InsideOut>.
 
 Note that while the below constructor creates and returns scalar
 references, accessor methods can be created with this implementation
@@ -560,9 +560,9 @@ code: set or call a function reference associated with each instance
 =back
 
 
-=head2 Template::Static (Global)
+=head2 Template::Global (Global)
 
-Static methods are not instance-dependent; calling them by class
+Global methods are not instance-dependent; calling them by class
 name or from any instance will consistently access the same value.  See L<Class::MakeMethods::Template::Static>.
 
 =over 4

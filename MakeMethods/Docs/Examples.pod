@@ -381,6 +381,30 @@ Usage of this accessor would then be as follows:
   $obj->setFoo("Bozzle");
 
 
+=head2 Selecting Specific Helper Methods
+
+You can use the ability to specify interfaces to select specific helper methods rather than getting the default collection. 
+
+For example, let's say you wanted to use a Template::Hash:array, but you only wanted two methods to be installed in your class, a foo() accessor and a shift_foo() mutator. Any of the below combinations of syntax should do the trick:
+
+  use Class::MakeMethods::Template::Hash
+    'array' => [
+      'foo' => { interface=>{'foo'=>'get_set', 'shift_foo'=>'shift'} },
+    ];
+
+If you're going to have a lot of methods with the same interface, you could pre-declare a named interface once and use it repeatedly:
+
+  BEGIN {
+    require Class::MakeMethods::Template::Hash;
+    Class::MakeMethods::Template::Hash->named_method('array')->
+        {'interface'}->{'my_get_set_shift'} =
+            { '*'=>'get_set', 'shift_*'=>'shift' };
+  }
+
+  use Class::MakeMethods::Template::Hash
+    'array --my_get_set_shift' => [ 'foo', 'bar' ];
+
+
 =head2 Tree Structure Example
 
 In this example we will create a pair of classes with references
