@@ -31,8 +31,7 @@ The MakeMethods subclass provides accessor methods that search an inheritance tr
 
 package Class::MakeMethods::Template::ClassInherit;
 
-use Class::MakeMethods::Template::Generic;
-BEGIN { @ISA = qw( Class::MakeMethods::Template::Generic ); }
+use Class::MakeMethods::Template::Generic '-isasubclass';
 
 $VERSION = 1.008;
 use strict;

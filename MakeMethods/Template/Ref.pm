@@ -94,21 +94,23 @@ sub prototype {
       'set_or_new' => sub { my $m_info = $_[0]; sub {
 	my $class = shift;
 	
-	# set
-	$m_info->{'instance'} = shift 
-	    if ( scalar @_ == 1 and UNIVERSAL::isa( $_[0], $class ) );
+	if ( scalar @_ == 1 and UNIVERSAL::isa( $_[0], $class ) ) {
+	  # set
+	  $m_info->{'instance'} = shift 
 	
-	# get
-	croak "Prototype is not defined" unless $m_info->{'instance'};
-	my $self = Ref::copyref($m_info->{'instance'});
-	
-	my $init_method = $m_info->{'init_method'};
-	if ( $init_method ) {
-	  $self->$init_method( @_ );
-	} elsif ( scalar @_ ) {
-	  croak "No init_method";
+	} else {
+	  # get
+	  croak "Prototype is not defined" unless $m_info->{'instance'};
+	  my $self = ref_clone($m_info->{'instance'});
+	  
+	  my $init_method = $m_info->{'init_method'};
+	  if ( $init_method ) {
+	    $self->$init_method( @_ );
+	  } elsif ( scalar @_ ) {
+	    croak "No init_method";
+	  }
+	  return $self;
 	}
-	return $self;
       }},
       'set' => sub { my $m_info = $_[0]; sub {
 	my $class = shift;
