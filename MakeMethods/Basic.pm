@@ -1,6 +1,16 @@
+package Class::MakeMethods::Basic;
+
+use Class::MakeMethods '-isasubclass';
+
+1;
+
+__END__
+
+########################################################################
+
 =head1 NAME
 
-Class::MakeMethods::Basic - Guide to subclasses
+Class::MakeMethods::Basic - Make really simple methods
 
 
 =head1 SYNOPSIS
@@ -78,7 +88,7 @@ letters, numbers, or underscores.
 
 =head2 Basic::Hash (Instances)
 
-Methods for objects based on blessed hashes.
+Methods for objects based on blessed hashes. See L<Class::MakeMethods::Basic::Hash> for details.
 
 =over 4
 
@@ -103,7 +113,7 @@ hash: get and set values in a hash refered to in each instance
 
 =head2 Basic::Array (Instances)
 
-Methods for manipulating positional values in arrays.
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Basic::Array> for details.
 
 =over 4
 
@@ -130,7 +140,7 @@ hash: get and set values in a hash refered to in each instance
 
 Global methods are not instance-dependent; calling them by class
 name or from any instance or subclass will consistently access the
-same value.
+same value. See L<Class::MakeMethods::Basic::Global> for details.
 
 =over 4
 
@@ -152,10 +162,6 @@ hash: get and set values in a global hash
 
 See L<Class::MakeMethods> for an overview of the method-generation
 framework this is based on.
-
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
 
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.

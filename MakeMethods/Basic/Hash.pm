@@ -356,10 +356,6 @@ constructors and accessors declared using this package, and your
 class will not be extensively subclassed, consider switching to
 Basic::Array to minimize resource consumption.
 
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
-
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.
 

@@ -186,6 +186,8 @@ sub call_methods {
 
 =head2 join_methods - Concatenate results of other methods
 
+For each method name passed, returns a subroutine with the following characteristics:
+
 =over 4
 
 =item *
@@ -203,6 +205,8 @@ If a 'join' parameter is provided it is included between each method result.
 =item *
 
 If the 'skip_blanks' parameter is omitted, or is provided with a true value, removes all undefined or empty-string values from the results.
+
+=back
 
 =cut
 
@@ -251,7 +255,7 @@ Sample declaration and usage:
   my $object = MyObject->new();
   $object->instrument( MyInstrument->new );
   $object->play_music;
-  
+
 =cut
 
 sub delegate {
@@ -282,10 +286,6 @@ sub delegate {
 
 See L<Class::MakeMethods> and L<Class::MakeMethods::Standard> for
 an overview of the method-generation framework this is based on.
-
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
 
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.

@@ -1,6 +1,6 @@
 =head1 NAME
 
-Class::MakeMethods::Standard - Guide to subclasses
+Class::MakeMethods::Composite - Make extensible compound methods
 
 
 =head1 SYNOPSIS
@@ -17,14 +17,14 @@ Class::MakeMethods::Standard - Guide to subclasses
 =head1 DESCRIPTION
 
 This document describes the various subclasses of Class::MakeMethods
-included under the Standard::* namespace, and the method types each
+included under the Composite::* namespace, and the method types each
 one provides.
 
-The Standard subclasses provide a parameterized set of method-generation
+The Composite subclasses provide a parameterized set of method-generation
 implementations.
 
 Subroutines are generated as closures bound to a hash containing
-the method name and (optionally) additional parameters.
+the method name and additional parameters, including the arrays of subroutine references that will provide the method's functionality.
 
 
 =head2 Calling Conventions
@@ -88,8 +88,25 @@ You can add pre- and post- operations to any composite method.
 
 use vars qw( $Method );
 
-sub _current_method {
+sub CurrentMethod {
   $Method;
+}
+
+sub CurrentResults {
+  my $package = shift;
+  if ( ! scalar @_ ) {
+    ( ! $Method->{result} ) 	          ? () :
+    ( ref($Method->{result}) eq 'ARRAY' ) ? @{$Method->{result}} :  
+					    ${$Method->{result}};
+  } elsif ( scalar @_ == 1) {
+    my $value = shift;
+    $Method->{result} = \$value; 
+    $value
+  } else {
+    my @value = @_;
+    $Method->{result} = \@value;
+    @value;
+  }
 }
 
 sub _build_composite {
@@ -141,21 +158,22 @@ sub _bind_composite {
     # Strange but true: you can local a hash-value in hash that's not 
     # a package variable. Confirmed in in 5.004, 5.005, 5.6.0.
 
-    my $wantarray = wantarray;
+    local $Method->{wantarray} = wantarray;
 
     if ( my $subs = $Method->{"pre_rules"} ) {
       foreach my $sub ( @$subs ) {
 	&$sub( @{$Method->{args}}, $Method );
       }
     }
+    
     my $subs = $Method->{"do_rules"} 
 	or Carp::confess("No operations provided for $Method->{name}");
-    if ( ! defined $wantarray ) {
+    if ( ! defined $Method->{wantarray} ) {
       foreach my $sub ( @$subs ) {
 	last if $Method->{result};
 	&$sub( @{$Method->{args}}, $Method );	
       }
-    } elsif ( ! $wantarray ) {
+    } elsif ( ! $Method->{wantarray} ) {
       foreach my $sub ( @$subs ) {
 	last if $Method->{result};
 	my $value = &$sub( @{$Method->{args}}, $Method );
@@ -172,17 +190,16 @@ sub _bind_composite {
 	}
       }
     }
+    
     if ( my $subs = $Method->{"post_rules"} ) {
       foreach my $sub ( @$subs ) {
 	&$sub( @{$Method->{args}}, $Method );
       }
     }
-    return ( 
-      ( ref($Method->{result}) eq 'ARRAY'  ) ? @{$Method->{result}} : 
-      ( ref($Method->{result}) eq 'REF'    ) ? ${$Method->{result}} : 
-      ( ref($Method->{result}) eq 'SCALAR' ) ? ${$Method->{result}} : 
-      ()
-    );
+    
+    ( ! $Method->{result} ) 	          ? () :
+    ( ref($Method->{result}) eq 'ARRAY' ) ? @{$Method->{result}} :  
+					    ${$Method->{result}};
   }
 }
 
@@ -192,7 +209,7 @@ sub _bind_composite {
 
 =head2 Composite::Hash (Instances)
 
-Methods for objects based on blessed hashes.
+Methods for objects based on blessed hashes. See L<Class::MakeMethods::Composite::Hash> for details.
 
 =over 4
 
@@ -221,7 +238,7 @@ object: access an object refered to by each instance
 
 =head2 Composite::Array (Instances)
 
-Methods for manipulating positional values in arrays.
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Composite::Array> for details.
 
 =over 4
 
@@ -250,7 +267,7 @@ object: access an object refered to by each instance
 
 =head2 Composite::Global (Global)
 
-Methods for manipulating global data.
+Methods for manipulating global data. See L<Class::MakeMethods::Composite::Global> for details.
 
 =over 4
 
@@ -275,7 +292,7 @@ object: global access to an object ref
 
 =head2 Composite::Inheritable (Any)
 
-Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type. 
+Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type.  See L<Class::MakeMethods::Composite::Inheritable> for details.
 
 =over 4
 
@@ -283,20 +300,22 @@ Methods for manipulating data which may be overridden per class or instance. Use
 
 scalar: get and set scalar values for each instance or class
 
+=item *
+
+hook: create a subroutine intended to have operations added to it
+
 =back
 
 
 =head2 Composite::Universal (Any)
+
+Methods for padding pre- and post-conditions to any class. See L<Class::MakeMethods::Composite::Universal> for details.
 
 =over 4
 
 =item *
 
 patch: add pre and post operations to an existing subroutine
-
-=item *
-
-hook: create a subroutine intended to have operations added to it
 
 =back
 
@@ -308,10 +327,6 @@ hook: create a subroutine intended to have operations added to it
 
 See L<Class::MakeMethods> for an overview of the method-generation
 framework this is based on.
-
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
 
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.

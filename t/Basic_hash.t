@@ -60,4 +60,6 @@ ok( $obj_3->a() eq 'Bar' and $obj_3->b() eq 'Bowling' );
 ok( $obj_4 = MyObject::CornedBeef->new( a => 'Foo', b => 'Bar', c => 'Baz' ) );
 ok( $obj_4->a() eq 'Foo' and $obj_4->b() eq 'Bar' and $obj_4->c() eq 'Baz' );
 
+########################################################################
+
 1;

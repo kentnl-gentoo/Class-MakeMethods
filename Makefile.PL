@@ -21,10 +21,10 @@ CHANGES: MakeMethods/Changes.pod
 TODO: MakeMethods/ToDo.pod
 	pod2text MakeMethods/ToDo.pod > TODO
 
-GUIDE: MakeMethods/Guide.pod
-	pod2text MakeMethods/Guide.pod > GUIDE
+GUIDE: MakeMethods.pm
+	pod2text MakeMethods.pm > GUIDE
 
 cleanmanifest:
-	rm MANIFEST ; touch MANIFEST; make manifest
+	make realclean; rm MANIFEST ; perl Makefile.PL; touch MANIFEST; make manifest
 
 }; }

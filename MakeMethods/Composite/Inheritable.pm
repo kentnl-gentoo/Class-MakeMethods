@@ -311,7 +311,45 @@ B<NOTE: THIS METHOD GENERATOR HAS NOT BEEN WRITTEN YET.>
 
 =cut
 
-sub array { };
+use vars qw( %ArrayFragments );
+
+sub array {
+  (shift)->_build_composite( \%ArrayFragments, @_ );
+}
+
+%ArrayFragments = (
+  '' => [
+    '+init' => sub {
+	my ($method) = @_;
+	$method->{hash_key} ||= $_->{name};
+	$method->{data} ||= {};
+      },
+    'do' => sub {
+	my $method = pop @_;
+	my $self = shift @_;
+	
+	if ( scalar(@_) == 0 ) {
+	  my $v_self = find_vself($method->{data}, $self);
+	  my $value = $v_self ? $method->{data}{$v_self} : ();
+	  if ( $method->{auto_init} and ! $value ) {
+	    $value = $method->{data}{$self} = [];
+	  }
+	  ( ! $value ) ? () : wantarray ? @$value : $value;
+	  
+	} elsif ( scalar(@_) == 1 and ref $_[0] eq 'ARRAY' ) {
+	  $method->{data}{$self} = [ @{ $_[0] } ];
+	  wantarray ? @{ $method->{data}{$self} } : $method->{data}{$self}
+	  
+	} else {
+	  if ( ! exists $method->{data}{$self} ) {
+	    my $v_self = find_vself($method->{data}, $self);
+	    $method->{data}{$self} = [ $v_self ? @{$method->{data}{$v_self}} : () ];
+	  }
+	  return array_splicer( $method->{data}{$self}, @_ );
+	}
+      },
+  ],
+);
 
 ########################################################################
 
@@ -432,6 +470,88 @@ sub hash {
   ],
 );
 
+########################################################################
+
+=head2 hook - Overrideable array of subroutines
+
+A hook method is called from the outside as a normal method. However, internally, it contains an array of subroutine references, each of which are called in turn to produce the method's results.
+
+Subroutines may be added to the hook's array by calling it with a blessed subroutine reference, as shown below. Subroutines may be added on a class-wide basis or on an individual object. 
+
+You might want to use this type of method to provide an easy way for callbacks to be registered.
+
+  package MyClass;
+  use Class::MakeMethods::Composite::Inheritable ( 'hook' => 'init' );
+  
+  MyClass->init( Class::MakeMethods::Composite::Inheritable->Hook( sub { 
+      my $callee = shift;
+      warn "Init...";
+  } );
+  
+  my $obj = MyClass->new;
+  $obj->init();
+
+=cut
+
+use vars qw( %HookFragments );
+
+sub hook {
+  (shift)->_build_composite( \%HookFragments, @_ );
+}
+
+%HookFragments = (
+  '' => [
+    '+init' => sub {
+	my ($method) = @_;
+	$method->{data} ||= {};
+      },
+    'do' => sub {
+	my $method = pop @_;
+	my $self = shift @_;
+	
+	if ( scalar(@_) and 
+	    ref($_[0]) eq 'Class::MakeMethods::Composite::Inheritable::Hook' ) {
+	  if ( ! exists $method->{data}{$self} ) {
+	    my $v_self = find_vself($method->{data}, $self);
+	    $method->{data}{$self} = [ $v_self ? @{ $method->{data}{$v_self} } : () ];
+	  }
+	  push @{ $method->{data}{$self} }, map $$_, @_;
+	} else {
+	  my $v_self = find_vself($method->{data}, $self);
+	  my $subs = $v_self ? $method->{data}{$v_self} : ();
+	  my @subs = ( ( ! $subs ) ? () : @$subs );
+	  
+	  if ( ! defined $method->{wantarray} ) {
+	    foreach my $sub ( @subs ) {
+	      &$sub( @{$method->{args}} );	
+	    }
+	  } elsif ( ! $method->{wantarray} ) {
+	    foreach my $sub ( @subs ) {
+	      my $value = &$sub( @{$method->{args}} );
+	      if ( defined $value ) { 
+		$method->{result} = \$value;
+	      }
+	    }
+	  } else {
+	    foreach my $sub ( @subs ) {
+	      my @value = &$sub( @{$method->{args}} );
+	      if ( scalar @value ) { 
+		push @{ $method->{result} }, @value;
+	      }
+	    }
+	  }
+	  
+	}
+	return Class::MakeMethods::Composite->CurrentResults();
+      },
+  ],
+);
+
+sub Hook (&) { 
+  my $package = shift;
+  my $sub = shift;
+  bless \$sub, 'Class::MakeMethods::Composite::Inheritable::Hook';
+}
 
 ########################################################################
 
@@ -486,10 +606,6 @@ sub object { }
 
 See L<Class::MakeMethods> and L<Class::MakeMethods::Composite> for
 an overview of the method-generation framework this is based on.
-
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
 
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.

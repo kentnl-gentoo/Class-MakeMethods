@@ -8,6 +8,32 @@ Revision history for Class::MakeMethods:
 
 =over 4
 
+=item v1.003 - 2002/01/24
+
+Folded "Getting Started Guide" POD into main module documentation.
+
+Split Template and Emulator packages into their own distributions. 
+
+B<Please Note:> This means that to fully upgrade you must retrieve all three of these files:
+
+  Class-MakeMethods-1.003.tar.gz 
+  Class-MakeMethods-Template-1.003.tar.gz 
+  Class-MakeMethods-Emulator-1.003.tar.gz 
+
+Of course, if you're not using the Template or Emulator classes, there's no need to download them...
+
+
+=item v1.003 - 2002/01/21
+
+Started bumping sub-version numbers and not using sub-sub-versions, to shorten distribution names and more closely match standard practice.
+
+Added Composite::Inheritable:hook and matching test. Added Composite->CurrentResults method to easily access, update composite method results.
+
+
+=item v1.0.16 - 2002/01/21
+
+Released to CPAN as v1.000.016.
+
 =item v1.0.16 - 2002/01/20
 
 Adjusted the hash and array methods in the Standard::* and Composite::* packages to properly accept a set-contents call with a single reference argument, and to return contents rather than ref in list context.
@@ -15,6 +41,11 @@ Adjusted the hash and array methods in the Standard::* and Composite::* packages
 =item v1.0.16 - 2002/01/14
 
 Fixed a subtle bug in a test script inherited from Class::MethodMaker: 4_Template_hash_hash_array.t and 7_MethodMaker_hash_of_lists.t both relied on "keys %hash" returning the keys in a particular order, which *almost* always worked, but caused failures on one or more Perl version/platform combinations.
+
+
+=item v1.0.15 - 2002/01/14
+
+Released to CPAN as v1.000.015.
 
 =item v1.0.15 - 2002/01/12
 
@@ -36,6 +67,11 @@ Adjusted Template::Universal's code for _CALL_METHODS_FROM_HASH_, to ensure that
 =item v1.0.15 - 2001/07/04, 2001/07/19
 
 Minor additions to documentation of various method types.
+
+
+=item v1.0.14 - 2001/07/01
+
+Released as v1.000.014.
 
 
 =item v1.0.14 - 2001/06/25, 2001/06/29, 2001/07/01

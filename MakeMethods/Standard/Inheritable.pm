@@ -223,11 +223,38 @@ There are also calling conventions for slice and splice operations:
   # Set a new value at position 2, and return the old value 
   print MyClass->bar([2, 1], 'Froth' );
 
-B<NOTE: THIS METHOD GENERATOR HAS NOT BEEN WRITTEN YET.> 
-
 =cut
 
-sub array { }
+sub array {
+  my $class = shift;
+  map { 
+    my $method = $_;
+    my $name = $method->{name};
+    $name => sub {
+      my $self = shift;
+
+     if ( scalar(@_) == 0 ) {
+	my $v_self = find_vself($method->{data}, $self);
+	my $value = $v_self ? $method->{data}{$v_self} : ();
+	if ( $method->{auto_init} and ! $value ) {
+	  $value = $method->{data}{$self} = [];
+	}
+	wantarray ? @$value : $value;
+	
+      } elsif ( scalar(@_) == 1 and ref $_[0] eq 'ARRAY' ) {
+	$method->{data}{$self} = [ @{ $_[0] } ];
+	wantarray ? @{ $method->{data}{$self} } : $method->{data}{$self}
+	
+      } else {
+	if ( ! exists $method->{data}{$self} ) {
+	  my $v_self = find_vself($method->{data}, $self);
+	  $method->{data}{$self} = [ $v_self ? @$v_self : () ];
+	}
+	return array_splicer( $method->{data}{$self}, @_ );
+      }
+    } 
+  } $class->get_declarations(@_)
+}
 
 ########################################################################
 
@@ -392,10 +419,6 @@ sub object { }
 
 See L<Class::MakeMethods> and L<Class::MakeMethods::Standard> for
 an overview of the method-generation framework this is based on.
-
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
 
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.

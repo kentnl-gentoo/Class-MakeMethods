@@ -1,6 +1,6 @@
 =head1 NAME
 
-Class::MakeMethods::Standard - Guide to subclasses
+Class::MakeMethods::Standard - Make common object accessors
 
 
 =head1 SYNOPSIS
@@ -182,7 +182,7 @@ sub get_declarations {
 
 =head2 Standard::Hash (Instances)
 
-Methods for objects based on blessed hashes.
+Methods for objects based on blessed hashes. See L<Class::MakeMethods::Standard::Hash> for details.
 
 =over 4
 
@@ -211,7 +211,7 @@ object: access an object refered to by each instance
 
 =head2 Standard::Array (Instances)
 
-Methods for manipulating positional values in arrays.
+Methods for manipulating positional values in arrays. See L<Class::MakeMethods::Standard::Array> for details.
 
 =over 4
 
@@ -240,7 +240,7 @@ object: access an object refered to by each instance
 
 =head2 Standard::Global (Global)
 
-Methods for manipulating global data.
+Methods for manipulating global data. See L<Class::MakeMethods::Standard::Global> for details.
 
 =over 4
 
@@ -265,7 +265,7 @@ object: global access to an object ref
 
 =head2 Standard::Inheritable (Any)
 
-Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type. 
+Methods for manipulating data which may be overridden per class or instance. Uses external data storage, so it works with objects of any underlying data type.  See L<Class::MakeMethods::Standard::Inheritable> for details.
 
 =over 4
 
@@ -283,10 +283,6 @@ scalar: get and set scalar values for each instance or class
 
 See L<Class::MakeMethods> for an overview of the method-generation
 framework this is based on.
-
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
 
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.

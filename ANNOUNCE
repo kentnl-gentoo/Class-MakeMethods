@@ -1,4 +1,4 @@
-ANNOUNCE: Class::MakeMethods 1.0.15
+ANNOUNCE: Class::MakeMethods 1.003
 
 This is the second release of Class::MakeMethods to CPAN.
 
@@ -9,24 +9,21 @@ Here's the "elevator pitch" for the module:
   methods, which are dynamically generated and installed as
   subroutines in your module, simplifying the code for your class.
 
-A further description of the module is in this readme: 
-  http://www.evoscript.org/Class-MakeMethods/docs/ReadMe.html
+Further information and module documentation is available here: 
 
-The "getting started guide" contains an introduction and examples: 
-  http://www.evoscript.org/Class-MakeMethods/docs/ReadMe.html
+  http://www.evoscript.org/Class-MakeMethods/
 
-To install, download the tarball and use your normal "make" procedure: 
-  http://www.evoscript.org/Class-MakeMethods/dist/
+You should be able to install this module using the CPAN shell
+interface:
+
+  perl -MCPAN -e 'install Class::MakeMethods'
+
+If this module has not yet been posted to your local CPAN mirror, you
+may also retrieve the current distribution from the above web address and
+follow the normal "gunzip", "tar xf", "cd", "perl Makefile.PL && make
+test && sudo make install" procedure or your local equivalent:
 
 Suggestions and comments would be much appreciated. 
-
-In particular, I'd be interested in answers to these questions:
-- Is the getting-started guide helpful? What about the documentation
-  for the individual subclasses, like Class::MakeMethods::Standard::Hash?
-- Does it test cleanly on various platforms, under Perl 5.004 through
-  wherever bleedperl is these days?
-- Can you find the methods that might be useful to you? Anything missing? 
-  What would make the module more useful to you?
 
 Please send any feedback to me at simonm@evolution.com.
 

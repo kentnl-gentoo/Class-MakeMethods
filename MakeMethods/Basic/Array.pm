@@ -415,10 +415,6 @@ sub hash {
 See L<Class::MakeMethods> and L<Class::MakeMethods::Basic> for an
 overview of the method-generation framework this is based on.
 
-See L<Class::MakeMethods::Guide> for a getting-started guide,
-annotated examples of usage, and a listing of the method generation
-classes included in this distribution.
-
 See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.
 

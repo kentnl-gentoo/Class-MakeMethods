@@ -44,24 +44,16 @@ DESCRIPTION
     specify a name for each method desired. The methods are dynamically
     generated and installed in the calling package.
 
-  Extensible Architecture
+    Construction of the individual methods is handled by subclasses. This
+    delegation approach allows for a wide variety of method-generation
+    techniques to be supported, each by a different subclass. Subclasses can
+    also be added to provide support for new types of methods.
 
-    The Class::MakeMethods package defines a superclass for
-    method-generating modules, and provides a calling convention, on-the-fly
-    subclass loading, and subroutine installation that will be shared by all
-    subclasses.
-
-    Construction of the individual methods is handled by subclasses. Over a
-    dozen subclasses are included, including implementations of a variety of
-    different method-generation techniques. Each subclass generates several
-    types of methods, with some supporting their own open-eneded extension
-    syntax, for hundreds of possible combinations of method types. (See the
-    Class::MakeMethods::Guide manpage for an overview of the included
-    subclasses.)
-
-    Other subclasses may be available separately, or you can define your own
-    for future use. (See the section on "EXTENDING" in the
-    Class::MakeMethods manpage.)
+    Over a dozen subclasses are available, including implementations of a
+    variety of different method-generation techniques. Each subclass
+    generates several types of methods, with some supporting their own
+    open-eneded extension syntax, for hundreds of possible combinations of
+    method types.
 
 RELATED MODULES
     Class::MakeMethods is based on Class::MethodMaker, but has been
@@ -83,10 +75,12 @@ RELATED MODULES
     equivalent to that of an existing module, and it is simple to map the
     existing module's interface to that of Class::MakeMethods.
 
-    Emulators are included for Class::MethodMaker, Class::Accessor::Fast,
-    Class::Data::Inheritable, Class::Singleton, and Class::Struct, each of
-    which passes the original module's test suite, usually requiring only a
-    single-line change.
+    Class::MakeMethods::Emulator is available as a separate distribution
+    from CPAN. See the Class::MakeMethods::Emulator manpage for more
+    information. Emulators are included for Class::MethodMaker,
+    Class::Accessor::Fast, Class::Data::Inheritable, Class::Singleton, and
+    Class::Struct, each of which passes the original module's test suite,
+    usually requiring only a single-line change.
 
 INSTALLATION
     You should be able to install this module using the CPAN shell
@@ -96,17 +90,18 @@ INSTALLATION
 
     If this module has not yet been posted to your local CPAN mirror, you
     may also retrieve the current distribution from the below address and
-    use the standard unpack, "perl Makefile.PL", "make test", "make install"
-    sequence:
+    follow the normal "gunzip", "tar xf", "cd", "perl Makefile.PL && make
+    test && sudo make install" procedure or your local equivalent:
 
       http://www.evoscript.org/Class-MakeMethods/
 
   Getting Started
 
     If this is your first exposure to Class::MakeMethods, you may want to
-    start with the Class::MakeMethods::Guide manpage, and then perhaps jump
-    to the documentation for a few of the included subclasses, before
-    returning to the details presented in the Class::MakeMethods manpage.
+    jump to the documentation for a few of the included subclasses, perhaps
+    starting with the Class::MakeMethods::Standard::Hash manpage and the
+    Class::MakeMethods::Standard::Universal manpage, before returning to the
+    details presented below.
 
 PREREQUISITES
     In general, this module should work with Perl 5.003 or later, without
@@ -142,7 +137,7 @@ PREREQUISITES
       http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
 
 VERSION
-    This is version 1.000.016 of Class::MakeMethods.
+    This is version 1.003 of Class::MakeMethods.
 
   Distribution Summary
 
@@ -182,11 +177,13 @@ SEE ALSO
     more customization options.
 
     For the largest collection of methods and options, see the
-    Class::MakeMethods::Template manpage.
+    Class::MakeMethods::Template manpage, available as a separate
+    distribution on CPAN.
 
     If you have used Class::MethodMaker, you will note numerous
     similarities. Backward compatibility and conversion documentation is
-    provded in the Class::MakeMethods::Emulator::MethodMaker manpage.
+    provded in the Class::MakeMethods::Emulator::MethodMaker manpage,
+    available in a separate distribution on CPAN.
 
 CREDITS AND COPYRIGHT
   Developed By
@@ -194,7 +191,7 @@ CREDITS AND COPYRIGHT
       M. Simon Cavalletto, simonm@cavalletto.org
       Evolution Softworks, www.evoscript.org
 
-  The Shoulders of Giants
+  Source Material
 
     Inspiration, cool tricks, and blocks of useful code for this module were
     extracted from the following CPAN modules:
