@@ -1,0 +1,255 @@
+=head1 NAME
+
+Class::MakeMethods::ReadMe - About This Module
+
+
+=head1 SYNOPSIS
+
+  # Follow your standard download, test and install sequence
+  perl -MCPAN -e 'install Class::MakeMethods'
+  
+  # Generates methods for your object when you "use" it.
+  package MyObject;
+  use Class::MakeMethods::Basic::Hash (
+    'new'     => [ 'new' ],
+    'scalar'  => [ 'foo', 'bar' ]
+  );
+  
+  # The resulting methods can be called exactly as normal ones
+  package main;   
+  my $obj = MyObject->new( foo => "Foozle", bar => "Bozzle" );
+  print $obj->foo();
+  $obj->bar("Barbados");
+
+
+=head1 MOTIVATION
+
+  "Make easy things easier."
+
+This module addresses a problem encountered in object-oriented
+development wherein numerous methods are defined which differ only
+slightly from each other.
+
+A common example is accessor methods for hash-based object attributes,
+which allow you to get and set the value $self-E<gt>{'foo'} by
+calling a method $self-E<gt>foo().
+
+These methods are generally quite simple, requiring only a couple
+of lines of Perl, but in sufficient bulk, they can cut down on the
+maintainability of large classes.
+
+Class::MakeMethods allows you to simply declare those methods to
+be of a predefined type, and it generates and installs the necessary
+methods in your package at compile-time.
+
+
+=head1 DESCRIPTION
+
+The Class::MakeMethods framework allows Perl class developers to
+quickly define common types of methods. When a module C<use>s a
+subclass of Class::MakeMethods, it can select from the supported
+method types, and specify a name for each method desired. The
+methods are dynamically generated and installed in the calling
+package.
+
+=head2 Extensible Architecture
+
+The Class::MakeMethods package defines a superclass for method-generating
+modules, and provides a calling convention, on-the-fly subclass
+loading, and subroutine installation that will be shared by all
+subclasses.
+
+Construction of the individual methods is handled by subclasses.
+Over a dozen subclasses are included, including implementations of
+a variety of different method-generation techniques. Each subclass
+generates several types of methods, with some supporting their own
+open-eneded extension syntax, for hundreds of possible combinations
+of method types. (See L<Class::MakeMethods::Guide> for an overview
+of the included subclasses.)
+
+Other subclasses may be available separately, or you can define
+your own for future use. (See L<Class::MakeMethods/"EXTENDING">.)
+
+
+=head1 RELATED MODULES
+
+Class::MakeMethods is based on Class::MethodMaker, but has been
+substantially revised in order to provide a range of new features.
+Although earlier versions of this module were posted for review as
+a possible "version 2" of MethodMaker, the maintainer of that module
+subsequently indicated that that he had different goals for future
+development and suggested a fork. (Full backward compatibility is
+provided by an emulator, described below.)
+
+There are a variety of related modules on CPAN; I've included a
+quick review of several of these in L<Class::MakeMethods::RelatedModules>.
+In comparison, this module aims to be quite general purpose and
+extensible while retaining acceptable performance characteristics. 
+
+=head2 Emulation Adaptors
+
+In several cases, Class::MakeMethods provides functionality closely
+equivalent to that of an existing module, and it is simple to map
+the existing module's interface to that of Class::MakeMethods.
+
+Emulators are included for Class::MethodMaker, Class::Accessor::Fast,
+Class::Data::Inheritable, Class::Singleton, and Class::Struct, each
+of which passes the original module's test suite, usually requiring
+only a single-line change.
+
+
+=head1 INSTALLATION
+
+You should be able to install this module using the CPAN shell interface:
+
+  perl -MCPAN -e 'install Class::MakeMethods'
+
+If this module has not yet been posted to your local CPAN mirror,
+you may also retrieve the current distribution from the below
+address and use the standard unpack, "perl Makefile.PL", "make
+test", "make install" sequence:
+
+  http://work.evolution.com/dist/
+
+=head2 Getting Started
+
+If this is your first exposure to Class::MakeMethods, you may want
+to start with L<Class::MakeMethods::Guide>, and then perhaps jump
+to the documentation for a few of the included subclasses, before
+returning to the details presented in L<Class::MakeMethods>.
+
+
+=head1 PREREQUISITES
+
+In general, this module should work with Perl 5.003 or later,
+without requring any modules beyond the core Perl distribution.
+
+Certain features may be available only on some platforms, as noted below:
+
+=over 4
+
+=item *
+
+Class::MakeMethods::Attribute
+
+The C<:MakeMethod> subroutine attribute requires Perl version 5.6 and the Attribute::Handlers module (CPAN).
+
+=back
+
+=head2 Tested Platforms
+
+This release has been tested succesfully on the following platforms:
+
+  5.005_02 on Rhapsody
+
+Earlier releases have also tested on the following platforms:
+
+  5.005_03 on sun4-solaris: PASS as of 1.0.13
+  v5.6.0 on sun4-solaris: PASS as of 1.0.13
+  v5.6.1 on WinNT: PASS as of 1.0.14.a (was TEST FAILURE as of 1.0.13)
+  v5.6.? on RedHat 7.1 i386: TEST FAILURE as of 1.0.13
+  v5.6.1 on ppc-linux-64all: FAIL as of 1.0.12
+  5.004 on MacOS (MacPerl 520r4): PASS as of 1.0.6
+  5.005 on WinNT (ActivePerl 618): PASS as of 1.0.6
+
+(Once this module has been on CPAN for a while, I'll replace this information with a link to the CPAN-Testers results.)
+
+
+=head1 VERSION
+
+This is version 1.0.14 of Class::MakeMethods. 
+
+=head2 Distribution Summary
+
+This is the first release of Class::MakeMethods to be uploaded to CPAN.
+
+This module's summary in the CPAN DSLI is intended to read:
+
+  Name            DSLI  Description
+  --------------  ----  ---------------------------------------------
+  Class::
+  ::MakeMethods   bdpO  Generate common types of methods
+
+=head2 Beta Release
+
+Although earlier versions of this module were widely used and
+considered quite stable, numerous changes and additions have been
+made in recent months, and this package must be viewed as "pre-release
+quality" until those changes have been tested in a more thorough
+and widespread fashion.
+
+While numerous additional features have been outlined for future
+development, the intent is support these by adding more options to
+the declaration interface, while maintaining backward compatibility.
+
+=head2 Discussion and Support
+
+There is not currently any offical discussion and support forum for this pacakage. 
+
+If you have questions or feedback about this module, please feel
+free to contact the author at the below address.
+
+I would be particularly interested in any suggestions towards
+improving the documentation, correcting any Perl-version or platform
+dependencies, as well as general feedback and suggested additions.
+
+
+=head1 SEE ALSO
+
+For an overview of this package, see L<Class::MakeMethods>.
+
+If you're just getting started, see L<Class::MakeMethods::Basic> for a listing of basic method generators.
+
+If you need a bit more flexibility, see L<Class::MakeMethods::Standard> for a listing of enhanced method generators.
+
+For the largest collection of methods and options, see L<Class::MakeMethods::Template>.
+
+If you have used Class::MethodMaker, you will note numerous
+similarities. Backward compatibility and conversion documentation
+is provded in L<Class::MakeMethods::Emulator::MethodMaker>.
+
+
+=head1 AUTHORS
+
+=over 4
+
+=item Developed by
+
+  M. Simon Cavalletto, simonm@evolution.com
+  Evolution Online Systems, http://www.evolution.com
+
+=item The Shoulders of Giants
+
+Inspiration, cool tricks, and blocks of useful code for this module
+were extracted from the following CPAN modules:
+
+  Class::MethodMaker, by Peter Seibel.
+  Class::Accessor, by Michael G Schwern 
+  Class::Contract, by Damian Conway
+  Class::SelfMethods, by Toby Everett
+
+=item Contributors
+
+Thank you for your feedback and suggestions.
+
+  Martyn J. Pearce
+  Scott R. Godin
+  Ron Savage
+  Jay Lawrence
+
+=back
+
+
+=head1 LICENSE
+
+This module is free software. It may be used, redistributed and/or
+modified under the same terms as Perl.
+
+Copyright (c) 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
+
+Portions Copyright (c) 1996 Organic Online
+
+Portions Copyright (c) 2000 Martyn J. Pearce.
+
+=cut
+

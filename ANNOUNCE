@@ -1,0 +1,27 @@
+ANNOUNCE: Class::MakeMethods 1.0.14
+
+This is the first release of Class::MakeMethods intended for upload to CPAN
+
+Here's the "elevator pitch" for the module:
+
+  By passing arguments to "use Class::MakeMethods ..." statements,
+  you can select from a library of hundreds of common types of
+  methods, which are dynamically generated and installed as
+  subroutines in your module, simplifying the code for your class.
+
+Suggestions and comments would be much appreciated. 
+
+In particular, I'd be interested in answers to these questions:
+- Does the "Class::MakeMethods" name make sense on first read? 
+- Is the getting-started guide helpful? What about the documentation
+  for the individual subclasses, like Class::MakeMethods::Basic::Hash?
+- Does it test cleanly on various platforms, under Perl 5.004 through
+  wherever bleedperl is these days?
+- Can you find the methods that might be useful to you? Anything missing? 
+  What would make the module more useful to you?
+
+Please send any feedback to me at simonm@evolution.com.
+
+Thanks,
+
+-Simon
