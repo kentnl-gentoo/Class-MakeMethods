@@ -26,7 +26,7 @@ sub generic {
 	  'DESTROY' => sub { 
 	    my $self = shift;
 	    foreach ( @$class_info ) { delete $self->{data}->{$self} } 
-	    $self->SUPER::DESTROY( @_ ) 
+	    # $self->SUPER::DESTROY( @_ ) 
 	  },
 	);
       } ],

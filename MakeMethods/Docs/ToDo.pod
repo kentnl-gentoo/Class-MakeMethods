@@ -29,6 +29,18 @@ As user questions arrive, add the answers as documentation points or examples.
 
 Assemble annotated examples and tutorials, and either link to or distribute them.
 
+=item *
+
+Finish overhauling Template documentation.
+
+=item * 
+
+Include Global and InsideOut uses in the EXAMPLES section
+
+=item *
+
+Template Internals: Finish documenting disk-based meta-method code-caching. 
+
 =back
 
 =head2 Tests
@@ -39,6 +51,10 @@ Assemble annotated examples and tutorials, and either link to or distribute them
 
 Use Devel::Coverage to measure test coverage, and fill in missing
 cases.
+
+=item *
+
+Finish tests for Standard and Composite modules.
 
 =back
 
@@ -65,18 +81,7 @@ adopt is probably that of Attribute::Types:
 =item *
 
 Improve use of _diagnostic hooks for debugging. Add various "(Q)"
-warning diagnostics.
-
-=back
-
-
-=head1 GENERATOR CLASSES
-
-=over 4
-
-=item *
-
-Finish tests for Standard modules.
+debug diagnostics.
 
 =item *
 
@@ -84,7 +89,7 @@ Finish building Inheritable array and object accessors.
 
 =item *
 
-Finish building and testing of Composite::* packages.
+Finish building Composite::* packages.
 
 =item *
 
@@ -99,36 +104,9 @@ Add slice and splice functionality to Standard::*:hash and Composite::*:hash.
 
 =head1 TEMPLATE CLASSES
 
-=head2 Documentation
-
-=over 4
-
-=item *
-
-Finish overhauling Template documentation.
-
-=item * 
-
-Include Global and InsideOut uses in the EXAMPLES section
-
-=item * 
-
-Template Internals: Finish documenting the TextBuilder mechanism.
-
-=item *
-
-Template Internals: Finish documenting disk-based meta-method code-caching. 
-
-=back
-
-
 =head2 Template::Generic 
 
 =over 4
-
-=item *
-
-Make instance a template of object.
 
 =item *
 
@@ -150,14 +128,15 @@ Should default object template provide auto-create behavior on ->get()?
 
 =item *
 
-Figure out how to standardize the "Generic:scalar -init_and_get"
-interface to support memoizing values for other types.
+Generalize the "Generic:scalar -init_and_get" interface to support 
+memoizing values for other accessor types.
 
 =item *
 
-Consider adding hash each and array iterator methods, using a closure to provide iteration.
+Consider adding hash each and array iterator methods, using a closure 
+to provide iteration.
 
-=item !
+=item *
 
 Add support for tied arrays & scalars, a la tiedhash
 
@@ -171,21 +150,12 @@ Extend index methods to support weak indexes with WeakRef. Perhaps
 just have it accept a hash ref to use as the index, and then allow
 people to pass in tied hashes?
 
-=item *?
+=item *
 
-Provide lvalue subs as alternative to get_set:
-
-   sub foo : lvalue { 
-       my $self = shift;
-       $self->{foo};
-   }
-
-=item *?
-
-Make private or protected method croak if they were called by a
+Maybe make private or protected method croak if they were called by a
 method_init method which was called by an outside package.
 
-Not entirely clear what the right semantics are here... 
+Not entirely clear what the right semantics or security precautions are here... 
 
 =back
 
@@ -205,12 +175,6 @@ Finish building Class::MakeMethods::ClassInherit subclass.
 Need to work out how to capture changes for non-scalar values. For
 example, if a subclass inherits an array accessor and then pops
 it, do they get copy-on-write?
-
-=item *
-
-Finish building PseudoHash subclass.
-
-Use %FIELDS rather than array of slot names.
 
 =item *
 
@@ -246,10 +210,6 @@ Probably just Template::Generic?
 
 =item *
 
-Need to fix method-definition initialization behavior to properly search up the inheritance hierarchy, so that you don't have to redclare methods in each Generic subclass to get your class expressions.
-
-=item *
-
 Give users a way to do meta-method code-caching in Perl library
 hierarchy, rather than in /tmp/auto or other user-specified
 directory..
@@ -260,9 +220,9 @@ Perhaps load these via do, rather than open/read/eval?
 
 Perhaps pre-generate expanded libs with all of the -imports resolved?
 
-=item !
+=item *
 
-Generate code files and load them instead.
+Support generating code files and loading them as needed.
 
 This would be similar to Class::Classgen, except that we'd do the
 generation at run-time the first time it was required, rather than
@@ -271,10 +231,10 @@ in a separate pass.
 For example, given the following declaration:
 
   package Foo::Bar;
-  Class::MakeMethods::Hash->import(-codecache=>'auto', scalar=>'foo');
-  
+  Class::MakeMethods::Template::Hash->import(-codecache=>'auto', scalar=>'foo');
+
 We should be able to write out the following file:
-  
+
   cat 'auto/Foo/Bar/methods-line-2.pl'
   # NOTE: Generated for Foo::Bar by the Class::MakeMethods module.
   # Changes made here will be lost when Foo::Bar is modified.
@@ -295,21 +255,22 @@ To do this, we need to:
 
 =over 4
 
-=item -
+=item *
 
-Provide an option to select this if desired; maybe ... import('-cache' => 'auto/', ...)?
+Provide an option to select this if desired; maybe ... 
+import('-cache' => 'auto/', ...)?
 
-=item -
+=item *
 
 Figure out which directory we can/should write into.
 
-=item -
+=item *
 
 Re-evaluate the textual code templates, without generating the
 closures. Substitute in any _STATIC_ATTR_ values. Make other _ATTR_
 values point to some public lookup table or package scalar.
 
-=item -
+=item *
 
 Notice if the source file (or Class::MakeMethods modules) has
 been updated more recently than the generated file.

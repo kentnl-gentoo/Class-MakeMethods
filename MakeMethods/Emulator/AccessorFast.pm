@@ -2,19 +2,13 @@ package Class::MakeMethods::Emulator::AccessorFast;
 
 use strict;
 use Class::MakeMethods::Composite::Hash;
-use Class::MakeMethods::Emulator;
+use Class::MakeMethods::Emulator '-isasubclass';
 
-my $emulation_target = 'Class::Accessor::Fast';
+sub _emulator_target { 'Class::Accessor::Fast' }
 
 sub import {
-  my $mm_class = shift;
-  if ( scalar @_ and $_[0] =~ /^-take_namespace/ and shift) {
-    Class::MakeMethods::Emulator::namespace_capture(__PACKAGE__, $emulation_target);
-  } elsif ( scalar @_ and $_[0] =~ /^-release_namespace/ and shift) {
-    Class::MakeMethods::Emulator::namespace_release(__PACKAGE__, $emulation_target);
-  }
-  # The fallback should really be to NEXT::import.
-  $mm_class->SUPER::import( @_ );
+  my $class = shift;  
+  $class->_handle_namespace( $class->_emulator_target, $_[0] ) and shift;
 }
 
 ########################################################################

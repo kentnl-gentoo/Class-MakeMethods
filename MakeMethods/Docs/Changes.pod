@@ -8,6 +8,26 @@ Revision history for Class::MakeMethods.
 
 =head1 CHANGES
 
+=head2 Version 1.009
+
+=over 4
+
+=item 2003/09/25
+
+Added Emulator::mcoder and compatibility tests.
+
+Released to CPAN as Class-MakeMethods-1.009.tar.gz.
+
+=item 2003/09/22
+
+Added support for lvalue methods to Template and Template::Generic. Added a few tests to demonstrate it's working. Added an example to Docs::Examples.
+
+Added Emulator::accessors and compatibility tests.
+
+Minor documentation improvements.
+
+=back
+
 =head2 Version 1.008
 
 =over 4

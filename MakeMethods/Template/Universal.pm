@@ -43,7 +43,7 @@ B<Modifiers>
 
 =item *
 
--private
+--private
 
 Causes the method to croak if it is called from outside of the package which originally declared it.
 
@@ -51,7 +51,7 @@ Note that this protection can currently be circumvented if your class provides t
 
 =item *
 
--protected
+--protected
 
 Causes the method to croak if it is called from a package other than the declaring package and its inheritors.
 
@@ -59,21 +59,29 @@ Note that this protection can currently be circumvented if your class provides t
 
 =item *
 
--public
+--public
 
 Cancels any previous -private or -protected declaration.
 
 =item *
 
--self_closure
+--self_closure
 
 Causes the method to return a function reference which is bound to the arguments provided when it is first called.
 
-For examples of usage, see the test scripts in t/*self_closure*.t.
+For examples of usage, see the test scripts in t/*closure.t.
 
 =item *
 
--warn_calls
+--lvalue
+
+Adds the ":lvalue" attribute to the subroutine declaration. 
+
+For examples of usage, see the test scripts in t/*lvalue.t.
+
+=item *
+
+--warn_calls
 
 For diagnostic purposes, call warn with the object reference, method name, and arguments before executing the body of the method.
 
@@ -145,6 +153,7 @@ sub generic {
 	'-private -protected' => '-protected',
 	'-protected -private' => '-private',
       ],
+      'lvalue' => { _SUB_ATTRIBS_ => ': lvalue' },
     },
     'behavior' => {
       -import => {
@@ -392,5 +401,15 @@ sub forward_methods {
   }
 }
 
-1;
 
+########################################################################
+
+=head1 SEE ALSO
+
+See L<Class::MakeMethods> for general information about this distribution. 
+
+See L<Class::MakeMethods::Template> for information about this family of subclasses.
+
+=cut
+
+1;

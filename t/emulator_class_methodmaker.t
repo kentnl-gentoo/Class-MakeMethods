@@ -1,9 +1,13 @@
 use Test;
-BEGIN { plan tests => 2 }
+use Test::Harness; 
+BEGIN { plan tests => 1 }
 
-use Test::Harness qw(&runtests $verbose); 
-$verbose=0; 
-@tests =  glob('t/emulator_class_methodmaker/*.t');
-ok( $count = scalar @tests ); 
-warn "\nRunning $count compatibility tests for Class::MethodMaker; this may take a minute...\n";
-ok( runtests @tests );
+my $subtest_dir = 'emulator_class_methodmaker';
+my $subtest_glob = "t/$subtest_dir/*.t";
+
+my @tests = glob($subtest_glob);
+my $count = scalar @tests
+    or die "Can't find subtests: $subtest_glob\n";
+
+warn "Running $count subtests from $subtest_glob...\n";
+ok( runtests( @tests ) )

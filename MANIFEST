@@ -25,6 +25,8 @@ MakeMethods/Emulator/Inheritable.pm
 MakeMethods/Emulator/MethodMaker.pm
 MakeMethods/Emulator/Singleton.pm
 MakeMethods/Emulator/Struct.pm
+MakeMethods/Emulator/accessors.pm
+MakeMethods/Emulator/mcoder.pm
 MakeMethods/Standard.pm
 MakeMethods/Standard/Array.pm
 MakeMethods/Standard/Global.pm
@@ -72,6 +74,10 @@ t/composite_inheritable_hash.t
 t/composite_inheritable_hook.t
 t/composite_patch.t
 t/core_import_version.t
+t/emulator_accessors_chained.t
+t/emulator_accessors_classic.t
+t/emulator_accessors_default.t
+t/emulator_accessors_invalid.t
 t/emulator_class_accessor_fast.t
 t/emulator_class_inheritable.t
 t/emulator_class_inheritable_trans.t
@@ -122,6 +128,9 @@ t/emulator_class_singleton.t
 t/emulator_class_singleton_trans.t
 t/emulator_class_struct.t
 t/emulator_class_struct_compare.t
+t/emulator_mcoder_getset.t
+t/emulator_mcoder_proxies.t
+t/emulator_mcoder_sugar.t
 t/standard_declarations.t
 t/standard_hash.t
 t/standard_inheritable.t
@@ -142,13 +151,16 @@ t/template_global_array.t
 t/template_global_code.t
 t/template_global_hash.t
 t/template_global_scalar.t
+t/template_global_scalar_lvalue.t
 t/template_hash_array.t
 t/template_hash_array_getset.t
+t/template_hash_array_lvalue.t
 t/template_hash_array_object.t
 t/template_hash_boolean.t
 t/template_hash_code.t
 t/template_hash_copy.t
 t/template_hash_counter.t
+t/template_hash_counter_closure.t
 t/template_hash_hash.t
 t/template_hash_hash_array.t
 t/template_hash_method.t
@@ -157,7 +169,9 @@ t/template_hash_number.t
 t/template_hash_number_interfaces.t
 t/template_hash_object.t
 t/template_hash_scalar.t
+t/template_hash_scalar_closure.t
 t/template_hash_scalar_interfaces.t
+t/template_hash_scalar_lvalue.t
 t/template_hash_string_concat.t
 t/template_hash_string_index.t
 t/template_hash_string_index_create.t
@@ -168,8 +182,6 @@ t/template_inherit_scalar.t
 t/template_insideout_array.t
 t/template_insideout_bool_i.t
 t/template_insideout_scalar.t
-t/template_modifier_clos_cnt.t
-t/template_modifier_closure.t
 t/template_modifier_private.t
 t/template_package_scalar.t
 t/template_scalar_bits.t

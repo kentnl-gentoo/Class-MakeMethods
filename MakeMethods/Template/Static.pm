@@ -37,6 +37,6 @@ This functionality is now provided by Class::MakeMethods::Template::Global, of w
 
 =head1 SEE ALSO
 
-L<Class::MakeMethods::Template::InsideOut>.
+L<Class::MakeMethods::Template::Global>.
 
 =cut

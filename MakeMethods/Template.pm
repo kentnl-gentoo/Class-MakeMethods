@@ -393,13 +393,12 @@ sub _behavior_builder {
   if ( $mm_def->{'behavior'}{$core_behavior} ) {
     $builder = $mm_def->{'behavior'}{$core_behavior};
   } else {
-    my $universal = _definition('Class::MakeMethods::Template::Universal','universal');
+    my $universal = _definition('Class::MakeMethods::Template::Universal','generic');
     $builder = $universal->{'behavior'}{$core_behavior} 
   }
   
   # Otherwise we're hosed.
-  _diagnostic('make_bad_behavior', $m_info->{'name'}, $behavior)
-							if ( ! $builder );
+  $builder or _diagnostic('make_bad_behavior', $m_info->{'name'}, $behavior);
   
   if ( ! ref $builder ) {
     # If we've got a text template, pass it off for interpretation.
@@ -411,7 +410,7 @@ sub _behavior_builder {
     local $^W unless $Class::MakeMethods::CONTEXT{Debug};
     $builder = eval $code;
     if ( $@ ) { _diagnostic('behavior_eval', $@, $code) }
-    unless ( ref $builder eq 'CODE' ) { _diagnostic('behavior_eval', $@, $code) }
+    unless (ref $builder eq 'CODE') { _diagnostic('behavior_eval', $@, $code) }
   
   } elsif ( scalar @modifiers ) {
     # Can't modify code subs
@@ -427,17 +426,6 @@ sub _behavior_builder {
 ### CODE EXPRESSIONS: _interpret_text_builder(), _disk_cache_builder()
 ########################################################################
 
-sub _disk_cache_builder { 
-  require Class::MakeMethods::Template::DiskCache;
-  my ( $mm_def, $core_behavior, $builder, @modifiers ) = @_;
-  
-  Class::MakeMethods::Template::DiskCache::disk_cache( 
-    "$mm_def->{template_class}::$mm_def->{template_name}", 
-    join('.', $core_behavior, @modifiers),
-    \&_interpret_text_builder, ($mm_def, $core_behavior, $builder, @modifiers)
-  );
-}
-
 sub _interpret_text_builder {
   require Class::MakeMethods::Template::TextBuilder;
   
@@ -448,32 +436,45 @@ sub _interpret_text_builder {
       or _diagnostic('behavior_mod_unknown', $name, $_);
   }
   
-  my @mod_exprs = grep { $_ } map { 
+  my @exprs = grep { $_ } map { 
 	$mm_def->{'modifier'}{ $_ }, 
 	$mm_def->{'modifier'}{ "$_ $name" } || $mm_def->{'modifier'}{ "$_ *" }
       } ( '-all', ( scalar(@modifiers) ? @modifiers : '-default' ) );
   
   # Generic method template
-  push @mod_exprs, "sub { \n  my \$self = shift;\n  * }";
+  push @exprs, "return sub _SUB_ATTRIBS_ { \n  my \$self = shift;\n  * }";
   
   # Closure-generator
-  push @mod_exprs, "sub { my \$m_info = \$_[0]; * }";
+  push @exprs, "sub { my \$m_info = \$_[0]; * }";
   
   my $exprs = $mm_def->{code_expr};
-  unshift @mod_exprs, { 
+  unshift @exprs, { 
 	( map { $_=>$exprs->{$_} } grep /^[^-]/, keys %$exprs ),
-	'_BEHAVIOR_{}' => $mm_def->{'behavior'} 
+	'_BEHAVIOR_{}' => $mm_def->{'behavior'},
+	'_SUB_ATTRIBS_' => '',
   };
   
+  my $result = Class::MakeMethods::Template::TextBuilder::text_builder($code,
+								       @exprs);
+  
   my $modifier_string = join(' ', map "-$_", @modifiers);
-  my $full_name = $name . ( $modifier_string ? " ($modifier_string)" : '' );
-  my $expr_name = "$mm_def->{template_class} $mm_def->{template_name} $modifier_string";
+  my $full_name = "$name ($mm_def->{template_class} $mm_def->{template_name}" .
+		    ( $modifier_string ? " $modifier_string" : '' ) . ")";
   
-  $code = Class::MakeMethods::Template::TextBuilder::text_builder( $code, @mod_exprs );
+  _diagnostic('debug_template_builder', $full_name, $code, $result);
   
-  _diagnostic('debug_template_builder', $full_name, $_[2], $code);
+  return $result;
+}
+
+sub _disk_cache_builder { 
+  require Class::MakeMethods::Template::DiskCache;
+  my ( $mm_def, $core_behavior, $builder, @modifiers ) = @_;
   
-  return $code;
+  Class::MakeMethods::Template::DiskCache::disk_cache( 
+    "$mm_def->{template_class}::$mm_def->{template_name}", 
+    join('.', $core_behavior, @modifiers),
+    \&_interpret_text_builder, ($mm_def, $core_behavior, $builder, @modifiers)
+  );
 }
 
 1;
@@ -806,7 +807,7 @@ description of the C<java> interface.)
 
 'I<behavior_name>'
 
-A custom interface consisting of the named behavior.
+A simple interface consisting only of the named behavior.
 
 For example, the below declaration creates a read-only methods named q. (There
 are no set or clear methods, so any value would have to be placed
@@ -1179,21 +1180,8 @@ See L<Class::MakeMethods::Template::DiskCache> for more information.
 
 =head1 SEE ALSO
 
-=head2 Getting-Started Resources
-
-Ron Savage has posted a pair of annotated examples, linked to below.
-Each demonstrates building a class with MakeMethods, and each
-includes scads of comments that walk you through the logic and
-demonstrate how the various methods work together.
-
-  http://savage.net.au/Perl-tutorials.html
-  http://savage.net.au/Perl-tutorials/tut-33.tgz
-  http://savage.net.au/Perl-tutorials/tut-34.tgz
-
-=head2 Package Documentation
-
 See L<Class::MakeMethods> for general information about this distribution. 
 
-See L<Class::MakeMethods::Template> for information about this family of subclasses.
+See L<Class::MakeMethods::Examples> for some illustrations of what you can do with this package.
 
 =cut

@@ -9,7 +9,7 @@ use strict;
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = 1.008;
+$VERSION = 1.009;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 
@@ -34,15 +34,16 @@ sub import {
   $class->make( @_ ) if ( scalar @_ );
 }
 
-  # If passed a version number, ensure that we measure up.
-  # Based on similar functionality in Exporter.pm
 sub _import_version {
   my $class = shift;
-  
   my $wanted = shift;
+  
+  no strict;
   my $version = ${ $class.'::VERSION '};
   
-  if (!$version or $version < $wanted) {
+  # If passed a version number, ensure that we measure up.
+  # Based on similar functionality in Exporter.pm
+  if ( ! $version or $version < $wanted ) {
     my $file = "$class.pm";
     $file =~ s!::!/!g;
     $file = $INC{$file} ? " ($INC{$file})" : '';
@@ -67,21 +68,21 @@ sub make {
   my @methods;
   
   # For compatibility with 5.004, which fails to splice use's constant @_
-  my @uscore = @_; 
+  my @declarations = @_; 
   
   if (@_ % 2) { _diagnostic('make_odd_args', $CONTEXT{MakerClass}); }
-  while ( scalar @uscore ) {
+  while ( scalar @declarations ) {
     # The list passed to import should alternate between the names of the
     # meta-method to call to generate the methods, and arguments to it.
-    my ($name, $args) = splice(@uscore, 0, 2);
+    my ($name, $args) = splice(@declarations, 0, 2);
     unless ( defined $name ) {
       croak "Undefined name";
     }
     
-    # Leading dash on the first argument of a pair means it's a global/general
-    # option handled via CONTEXT.
+    # Leading dash on the first argument of a pair means it's a
+    # global/general option to be stored in CONTEXT.
     if ( $name =~ s/^\-// ) {
-    
+      
       # To prevent difficult-to-predict retroactive behaviour, start by
       # flushing any pending methods before letting settings take effect
       if ( scalar @methods ) { 
@@ -105,6 +106,13 @@ sub make {
       ref($args) eq 'ARRAY' ? (@$args) : # If an arrayref, use its contents.
       ( $args )     			 # If a hashref, it is used directly
     );
+
+    # If the type argument contains an array of method types, do the first
+    # now, and put the others back in the queue to be processed subsequently.
+    if ( ref($name) eq 'ARRAY' ) {	
+      ($name, my @name) = @$name;	
+      unshift @declarations, map { $_=>[@args] } @name;
+    }
     
     # If the type argument contains space characters, use the first word
     # as the type, and prepend the remaining items to the argument list.
@@ -137,28 +145,28 @@ sub make {
     # with generators that are written as foreach loops, which return ''!)
     if ( ! scalar @results or scalar @results == 1 and ! $results[0] ) { } 
     
-    # GENERATOR OBJECT: It may return an object reference which will construct
-    # the relevant methods.
-    elsif ( UNIVERSAL::can( $results[0], 'make_methods' ) ) {
-      push @methods, ( shift @results )->make_methods(@results, @args);
-    } 
-    
     # ALIAS: It may return a string containing a meta-method type to run 
-    # instead. Put the arguments back on the stack and go through again.
+    # instead. Put the arguments back in the queue and go through again.
     elsif ( scalar @results == 1 and ! ref $results[0]) {
-      unshift @uscore, $results[0], \@args;
+      unshift @declarations, $results[0], \@args;
     } 
     
     # REWRITER: It may return one or more array reference containing a meta-
     # method type and arguments which should be created to complete this 
-    # request. Put the arguments back on the stack and go through again.
-    elsif ( scalar @results and ! grep { ref $_ ne 'ARRAY' } @results ) {
-      unshift @uscore, ( map { shift(@$_), $_ } @results );
+    # request. Put the arguments back in the queue and go through again.
+    elsif ( ! grep { ref $_ ne 'ARRAY' } @results ) {
+      unshift @declarations, ( map { shift(@$_), $_ } @results );
     } 
     
     # CODE REFS: It may provide a list of name, code pairs to install
     elsif ( ! scalar @results % 2 and ! ref $results[0] ) {
       push @methods, @results;
+    } 
+    
+    # GENERATOR OBJECT: It may return an object reference which will construct
+    # the relevant methods.
+    elsif ( UNIVERSAL::can( $results[0], 'make_methods' ) ) {
+      push @methods, ( shift @results )->make_methods(@results, @args);
     } 
     
     else {
@@ -360,7 +368,7 @@ Class::MakeMethods - Generate common types of methods
     'scalar'    => 'bar',
   );
   
-  # The resulting methods can be called exactly as normal ones
+  # The generated methods can be called just like normal ones
   my $obj = MyObject->new( foo => "Foozle", bar => "Bozzle" );
   print $obj->foo();
   $obj->bar("Barbados");
@@ -369,11 +377,11 @@ Class::MakeMethods - Generate common types of methods
 =head1 DESCRIPTION
 
 The Class::MakeMethods framework allows Perl class developers to
-quickly define common types of methods. When a module C<use>s a
-subclass of Class::MakeMethods, it can select from the supported
-method types, and specify a name for each method desired. The
-methods are dynamically generated and installed in the calling
-package.
+quickly define common types of methods. When a module C<use>s
+Class::MakeMethods or one of its subclasses, it can select from a
+variety of supported method types, and specify a name for each
+method desired. The methods are dynamically generated and installed
+in the calling package.
 
 Construction of the individual methods is handled by subclasses.
 This delegation approach allows for a wide variety of method-generation
@@ -387,7 +395,9 @@ open-eneded extension syntax, for hundreds of possible combinations
 of method types.
 
 
-=head1 MOTIVATION
+=head1 GETTING STARTED
+
+=head2 Motivation
 
   "Make easy things easier."
 
@@ -489,8 +499,7 @@ This is the basic purpose of Class::MakeMethods: The "boring" pieces
 of code have been replaced by succinct declarations, placing the
 focus on the "unique" or "custom" pieces.
 
-
-=head1 GETTING STARTED
+=head2 Finding the Method Types You Need
 
 Once you've grasped the basic idea -- simplifying repetitive code
 by generating and installing methods on demand -- the remaining
@@ -572,7 +581,7 @@ The superclass also lets you generate several different types of
 methods in a single call, and will automatically load named subclasses
 the first time they're used.
 
-=head2 The MakeMethods Subclasses
+=head2 The Method Generator Subclasses
 
 The type of method that gets created is controlled by the specific
 subclass and generator function you request. For example,
@@ -643,7 +652,7 @@ data for better performance.
 Templates for dozens of types of constructor, accessor, and mutator
 methods are included, ranging from from the mundane (constructors
 and value accessors for hash and array slots) to the esoteric
-(inheritable class data and "flyweight" accessors with external
+(inheritable class data and "inside-out" accessors with external
 indexes).
 
 =item Basic (See L<Class::MakeMethods::Basic>.)
@@ -686,13 +695,13 @@ The included subclasses are grouped into several major groups, so the names used
 
 =over 4
 
-=item MakerGroup
+=item Maker Group
 
 Each group shares a similar style of technical implementation and level of complexity. For example, the C<Standard::*> packages are all simple, while the C<Composite::*> packages all support pre- and post-conditions.
 
 (For a listing of the four main groups of included subclasses, see L<"/Included Subclasses">.)
 
-=item MakerSubclass
+=item Maker Subclass
 
 Each subclass generates methods for a similar level of scoping or underlying object type. For example, the C<*::Hash> packages all make methods for objects based on blessed hashes, while the C<*::Global> packages make methods that access class-wide data that will be shared between all objects in a class.
 
@@ -702,7 +711,7 @@ Each method type produces a similar type of constructor or accessor. For example
 
 =back
 
-Bearing that in mind, you should be able to guess the intent of many of the method types based on their names alone; when you see "Standard::Array:list" you can read it as "a type of method to access a I<list> of data stored in an I<array> object, with a I<"standard"> implementation style" and know that it's going to call the list() function in the Class::MakeMethods::Standard::Array package to generate the requested method.
+Bearing that in mind, you should be able to guess the intent of many of the method types based on their names alone; when you see "Standard::Hash:scalar" you can read it as "a type of method to access a I<scalar> value stored in a I<hash>-based object, with a I<standard> implementation style" and know that it's going to call the scalar() function in the Class::MakeMethods::Standard::Hash package to generate the requested method.
 
 
 =head1 USAGE
@@ -933,9 +942,9 @@ The difference between C<use> and C<make> is primarily one of precedence; the C<
 
 By default, Class::MakeMethods will not install generated methods over any pre-existing methods in the target class. To override this you can pass C<-ForceInstall =E<gt> 1> as initial arguments to C<use> or C<make>. 
 
-If methods with the same name already exist, earlier
-calls to C<use> or C<make()> win over later ones, but within each
-call, later declarations superceed earlier ones.
+If the same method is declared multiple times, earlier calls to
+C<use> or C<make()> win over later ones, but within each call,
+later declarations superceed earlier ones.
 
 Here are some examples of the results of these precedence rules:
 
@@ -970,6 +979,112 @@ Here are some examples of the results of these precedence rules:
       -ForceInstall => 1, # Set flag for following methods...
     'scalar' => ['ping']  # ... now overwrites pre-existing ping()
   );
+
+
+=head2 Diagnostic Messages
+
+The following warnings and errors may be produced when using
+Class::MakeMethods to generate methods. (Note that this list does not
+include run-time messages produced by calling the generated methods.)
+
+These messages are classified as follows (listed in increasing order of
+desperation): 
+
+    (Q) A debugging message, only shown if $CONTEXT{Debug} is true
+    (W) A warning.
+    (D) A deprecation.
+    (F) A fatal error in caller's use of the module.
+    (I) An internal problem with the module or subclasses.
+
+Portions of the message which may vary are denoted with a %s.
+
+=over 4
+
+=item Can't interpret meta-method template: argument is empty or
+undefined
+
+(F)
+
+=item Can't interpret meta-method template: unknown template name
+'%s'
+
+(F)
+
+=item Can't interpret meta-method template: unsupported template
+type '%s'
+
+(F)
+
+=item Can't make method %s(): template specifies unknown behavior
+'%s'
+
+(F)
+
+=item Can't parse meta-method declaration: argument is empty or
+undefined
+
+(F) You passed an undefined value or an empty string in the list
+of meta-method declarations to use or make.
+
+=item Can't parse meta-method declaration: missing name attribute.
+
+(F) You included an hash-ref-style meta-method declaration that
+did not include the required name attribute. You may have meant
+this to be an attributes hash for a previously specified name, but
+if so we were unable to locate it.
+
+=item Can't parse meta-method declaration: unknown template name
+'%s'
+
+(F) You included a template specifier of the form C<'-I<template_name>'>
+in a the list of meta-method declaration, but that template is not
+available.
+
+=item Can't parse meta-method declaration: unsupported declaration
+type '%s'
+
+(F) You included an unsupported type of value in a list of meta-method
+declarations.
+
+=item Compilation error: %s
+
+(I)
+
+=item Not an interpretable meta-method: '%s'
+
+(I)
+
+=item Odd number of arguments passed to %s make
+
+(F) You specified an odd number of arguments in a call to use or
+make.  The arguments should be key => value pairs.
+
+=item Unable to compile generated method %s(): %s
+
+(I) The install_methods subroutine attempted to compile a subroutine
+by calling eval on a provided string, which failed for the indicated
+reason, usually some type of Perl syntax error.
+
+=item Unable to dynamically load $package: $%s
+
+(F)
+
+=item Unable to install code for %s() method: '%s'
+
+(I) The install_methods subroutine was passed an unsupported value
+as the code to install for the named method.
+
+=item Unexpected return value from compilation of %s(): '%s'
+
+(I) The install_methods subroutine attempted to compile a subroutine
+by calling eval on a provided string, but the eval returned something
+other than than the code ref we expect.
+
+=item Unexpected return value from meta-method constructor %s: %s
+
+(I) The requested method-generator was invoked, but it returned an unacceptable value.
+
+=back
 
 
 =head1 EXTENDING
@@ -1156,215 +1271,6 @@ Controls whether generated methods will be installed over pre-existing methods i
 =back
 
 
-=head1 DIAGNOSTICS
-
-The following warnings and errors may be produced when using
-Class::MakeMethods to generate methods. (Note that this list does not
-include run-time messages produced by calling the generated methods.)
-
-These messages are classified as follows (listed in increasing order of
-desperation): 
-
-    (Q) A debugging message, only shown if $CONTEXT{Debug} is true
-    (W) A warning.
-    (D) A deprecation.
-    (F) A fatal error in caller's use of the module.
-    (I) An internal problem with the module or subclasses.
-
-Portions of the message which may vary are denoted with a %s.
-
-=over 4
-
-=item Can't interpret meta-method template: argument is empty or
-undefined
-
-(F)
-
-=item Can't interpret meta-method template: unknown template name
-'%s'
-
-(F)
-
-=item Can't interpret meta-method template: unsupported template
-type '%s'
-
-(F)
-
-=item Can't make method %s(): template specifies unknown behavior
-'%s'
-
-(F)
-
-=item Can't parse meta-method declaration: argument is empty or
-undefined
-
-(F) You passed an undefined value or an empty string in the list
-of meta-method declarations to use or make.
-
-=item Can't parse meta-method declaration: missing name attribute.
-
-(F) You included an hash-ref-style meta-method declaration that
-did not include the required name attribute. You may have meant
-this to be an attributes hash for a previously specified name, but
-if so we were unable to locate it.
-
-=item Can't parse meta-method declaration: unknown template name
-'%s'
-
-(F) You included a template specifier of the form C<'-I<template_name>'>
-in a the list of meta-method declaration, but that template is not
-available.
-
-=item Can't parse meta-method declaration: unsupported declaration
-type '%s'
-
-(F) You included an unsupported type of value in a list of meta-method
-declarations.
-
-=item Compilation error: %s
-
-(I)
-
-=item Not an interpretable meta-method: '%s'
-
-(I)
-
-=item Odd number of arguments passed to %s make
-
-(F) You specified an odd number of arguments in a call to use or
-make.  The arguments should be key => value pairs.
-
-=item Unable to compile generated method %s(): %s
-
-(I) The install_methods subroutine attempted to compile a subroutine
-by calling eval on a provided string, which failed for the indicated
-reason, usually some type of Perl syntax error.
-
-=item Unable to dynamically load $package: $%s
-
-(F)
-
-=item Unable to install code for %s() method: '%s'
-
-(I) The install_methods subroutine was passed an unsupported value
-as the code to install for the named method.
-
-=item Unexpected return value from compilation of %s(): '%s'
-
-(I) The install_methods subroutine attempted to compile a subroutine
-by calling eval on a provided string, but the eval returned something
-other than than the code ref we expect.
-
-=item Unexpected return value from meta-method constructor %s: %s
-
-(I) The requested method-generator was invoked, but it returned an unacceptable value.
-
-=back
-
-
-=head1 BUGS 
-
-It does not appear to be possible to assign subroutine names to closures within Perl. As a result, debugging output from Carp and similar sources will show all generated methods as "ANON()" rather than "YourClass::methodname()".
-
-See L<Class::MakeMethods::Docs::ToDo> for other outstanding issues.
-
-To report bugs via the CPAN web tracking system, go to 
-C<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-MakeMethods> or send mail 
-to C<Dist=Class-MakeMethods#rt.cpan.org>, replacing C<#> with C<@>.
-
-
-=head1 VERSION
-
-This is Class::MakeMethods v1.008.
-
-=head2 Distribution Summary
-
-This module's summary in the CPAN DSLIP is intended to read:
-
-  Name            DSLIP  Description
-  --------------  -----  ---------------------------------------------
-  Class::
-  ::MakeMethods   RdpOp  Generate common types of methods
-
-=head2 Release Status
-
-This module has been used in a variety of production contexts, has
-been available on CPAN for over a year, and several other CPAN
-modules depend on it for their own operation, so it would be fair
-to say that it is no longer in "beta test" but rather fully released.
-
-However, while some portions are well tested, others are not, and
-new bug reports do trickle in occasionally. If you do encounter
-any problems, please inform the author and I'll endeavor to patch
-them promptly.
-
-While numerous additional features have been outlined for future
-development, the intent is support these by adding more options to
-the declaration interface, while maintaining backward compatibility.
-
-=head2 Discussion and Support
-
-There is not currently any offical discussion and support forum for this pacakage. 
-
-If you have questions or feedback about this module, please feel
-free to contact the author at the below address.
-
-I would be particularly interested in any suggestions towards
-improving the documentation, correcting any Perl-version or platform
-dependencies, as well as general feedback and suggested additions.
-
-
-=head1 INSTALLATION
-
-You should be able to install this module using the CPAN shell interface:
-
-  perl -MCPAN -e 'install Class::MakeMethods'
-
-If this module has not yet been posted to your local CPAN mirror,
-you may also retrieve the current distribution from the below
-address and follow the normal "gunzip", "tar xf", "cd", "perl Makefile.PL && make test && sudo make install" procedure or your local equivalent:
-
-  http://www.evoscript.org/Class-MakeMethods/
-
-=head2 Prerequisites
-
-In general, this module should work with Perl 5.003 or later,
-without requring any modules beyond the core Perl distribution.
-
-Certain features may be available only on some platforms, as noted below:
-
-=over 4
-
-=item *
-
-Class::MakeMethods::Attribute
-
-The C<:MakeMethod> subroutine attribute requires Perl version 5.6 and the Attribute::Handlers module (from CPAN).
-
-=back
-
-=head2 Tested Platforms
-
-This release has been tested succesfully on the following platforms:
-
-  5.6.1 on darwin
-
-Earlier releases have also tested on the following platforms:
-
-  5.005_02 on Rhapsody
-  5.005_03 on sun4-solaris: PASS as of 1.0.13
-  v5.6.0 on sun4-solaris: PASS as of 1.0.13
-  v5.6.1 on WinNT: PASS as of 1.0.14.a (was TEST FAILURE as of 1.0.13)
-  v5.6.? on RedHat 7.1 i386: TEST FAILURE as of 1.0.13
-  v5.6.1 on ppc-linux-64all: FAIL as of 1.0.12
-  5.004 on MacOS (MacPerl 520r4): PASS as of 1.0.6
-  5.005 on WinNT (ActivePerl 618): PASS as of 1.0.6
-
-You may also review the current test results from CPAN-Testers:
-
-  http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
-
-
 =head1 SEE ALSO
 
 =head2 Package Documentation
@@ -1416,9 +1322,210 @@ information.
 
 =head2 Perl Docs
 
-See L<perlboot> for a quick introduction to objects for beginners. For an extensive discussion of various approaches to class construction, see L<perltoot> and L<perltootc> (called L<perltootc> in the most recent versions of Perl).
+See L<perlboot> for a quick introduction to objects for beginners.
+For an extensive discussion of various approaches to class
+construction, see L<perltoot> and L<perltootc> (called L<perltootc>
+in the most recent versions of Perl).
 
-See L<perlref/"Making References">, point 4 for more information on closures. (FWIW, I think there's a big opportunity for a "perltfun" podfile bundled with Perl in the tradition of "perlboot" and "perltoot", exploring the utility of function references, callbacks, closures, and continuations... There are a bunch of useful references out there, but not a good overview of how they all interact in a Perlish way.)
+See L<perlref/"Making References">, point 4 for more information
+on closures. (FWIW, I think there's a big opportunity for a "perlfunt"
+podfile bundled with Perl in the tradition of "perlboot" and
+"perltoot", exploring the utility of function references, callbacks,
+closures, and continuations... There are a bunch of useful references
+available, but not a good overview of how they all interact in a
+Perlish way.)
+
+
+=head1 BUGS AND SUPPORT
+
+=head2 Release Status
+
+This module has been used in a variety of production systems and
+has been available on CPAN for over two years, with several other
+distributions dependant on it, so it would be fair to say that it
+is fully released. 
+
+However, while some portions are well tested, others are less so,
+and new bug reports do trickle in occasionally. If you do encounter
+any problems, please inform the author and I'll endeavor to patch
+them promptly. 
+
+Additional features have been outlined for future development, but
+the intent is support these by adding more options to the declaration
+interface, while maintaining backward compatibility.
+
+=head2 Known Problems
+
+It does not appear to be possible to assign subroutine names to
+closures within Perl. As a result, debugging output from Carp and
+similar sources will show all generated methods as "ANON()" rather
+than "YourClass::methodname()".
+
+See L<Class::MakeMethods::Docs::ToDo> for other outstanding issues
+and development plans.
+
+=head2 Support
+
+If you have questions or feedback about this module, please feel
+free to contact the author at the below address. Although there is
+no formal support program, I do attempt to answer email promptly. 
+
+I would be particularly interested in any suggestions towards
+improving the documentation, correcting any Perl-version or platform
+dependencies, as well as general feedback and suggested additions.
+
+Bug reports that contain a failing test case are greatly appreciated,
+and suggested patches will be promptly considered for inclusion in
+future releases.
+
+To report bugs via the CPAN web tracking system, go to 
+C<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-MakeMethods> or send mail 
+to C<Dist=Class-MakeMethods#rt.cpan.org>, replacing C<#> with C<@>.
+
+=head2 Community
+
+If you've found this module useful or have feedback about your
+experience with it, consider sharing your opinion with other Perl
+users by posting your comment to CPAN's ratings system:
+
+=over 2
+
+=item *
+
+http://cpanratings.perl.org/rate/?distribution=Class-MakeMethods
+
+=back
+
+For more general discussion, you may wish to post a message on PerlMonks or the comp.lang.perl.misc newsgroup:
+
+=over 2
+
+=item *
+
+http://www.perlmonks.org/index.pl?node=Seekers%20of%20Perl%20Wisdom
+
+=item *
+
+http://groups.google.com/groups?group=comp.lang.perl.misc
+
+=back
+
+
+=head1 DISTRIBUTION AND INSTALLATION
+
+=head2 Version
+
+This is Class::MakeMethods v1.009, intended for general use.
+
+This module's CPAN registration should read:
+
+  Name            DSLIP  Description
+  --------------  -----  ---------------------------------------------
+  Class::
+  ::MakeMethods   RdpOp  Generate common types of methods
+
+=head2 Prerequisites
+
+In general, this module should work with Perl 5.003 or later,
+without requring any modules beyond the core Perl distribution.
+
+The following optional feature may not be available on some platforms:
+
+=over 4
+
+=item *
+
+Class::MakeMethods::Attribute: The C<:MakeMethod> subroutine attribute requires Perl version 5.6 and the Attribute::Handlers module (from CPAN).
+
+=item *
+
+Class::MakeMethods::Template C<--lvalue>: The lvalue modifier provided by the Template generator subclasses will only work on Perl version 5.6 or later.
+
+=back
+
+=head2 Installation
+
+You should be able to install this module using the CPAN shell interface:
+
+  perl -MCPAN -e 'install Class::MakeMethods'
+
+Alternately, you may retrieve this package from CPAN or from the author's site:
+
+=over 2
+
+=item *
+
+http://search.cpan.org/~evo/
+
+=item *
+
+http://www.cpan.org/modules/by-authors/id/E/EV/EVO
+
+=item *
+
+http://www.evoscript.org/Class-MakeMethods/dist/
+
+=back
+
+After downloading the distribution, follow the normal procedure to unpack and install it, using the commands shown below or their local equivalents on your system:
+
+  tar xzf Class-MakeMethods-*.tar.gz
+  cd Class-MakeMethods-*
+  perl Makefile.PL
+  make test && sudo make install
+
+Thanks to the kind generosity of other members of the Perl community,
+this distribution is also available repackaged in the FreeBSD
+"ports" and Linux RPM formats. This may simplify installation for
+some users, but be aware that these alternate distributions may
+lag a few versions behind the latest release on CPAN.
+
+=over 2
+
+=item *
+
+http://www.freebsd.org/cgi/ports.cgi?query=Class-MakeMethods
+
+=item *
+
+http://www.rpmfind.net/linux/rpm2html/search.php?query=perl-Class-MakeMethods
+
+=back
+
+=head2 Tested Platforms
+
+This release has been tested succesfully on the following platforms:
+
+  5.6.1 on darwin
+
+Earlier releases have also tested OK on the following platforms:
+
+  IP30-R12000-irix
+  OpenBSD.i386-openbsd
+  i386-freebsd / i386-freebsd-thread-multi
+  i386-linux
+  i386-netbsd / i386-netbsd-thread-multi
+  i586-linux / i586-linux-thread-multi-ld
+  i686-linux / i686-pld-linux-thread-multi
+  ia64-linux
+  ppc-linux
+  sparc-linux
+  sparc-netbsd
+  sun4-solaris
+
+Some earlier versions failed to "make test" on MSWin32, although
+a forced installation would still work; that problem should be
+fixed in the most recent releases.
+
+You may also review the current test results from CPAN-Testers:
+
+=over 2
+
+=item *
+
+http://testers.cpan.org/show/Class-MakeMethods.html
+
+=back
 
 
 =head1 CREDITS AND COPYRIGHT
@@ -1464,15 +1571,19 @@ Copyright 2002, 2003 Matthew Simon Cavalletto.
 
 Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
 
-Based in part on Class::MethodMaker, originally developed by Peter Seibel. Portions Copyright 1996 Organic Online. Portions Copyright 2000 Martyn J. Pearce. 
+Based on Class::MethodMaker, originally developed by Peter Seibel. Portions Copyright 1996 Organic Online. Portions Copyright 2000 Martyn J. Pearce. 
 
-Emulator::AccessorFast is based on Class::Accessor::Fast. Portions Copyright 2000 Michael G Schwern.
+Class::MakeMethods::Emulator::accessors is based on accessors. Portions by Steve Purkis.
 
-Emulator::Inheritable is based on Class::Data::Inheritable. Portions Copyright 2000 Damian Conway and Michael G Schwern.
+Class::MakeMethods::Emulator::AccessorFast is based on Class::Accessor::Fast. Portions Copyright 2000 Michael G Schwern.
 
-Emulator::Singleton is based on Class::Singleton, by Andy Wardley. Portions Copyright 1998 Canon Research Centre Europe Ltd. 
+Class::MakeMethods::Emulator::Inheritable is based on Class::Data::Inheritable. Portions Copyright 2000 Damian Conway and Michael G Schwern.
 
-Utility::Ref is based on Ref.pm. Portions Copyright 1994 David Muir Sharnoff.
+Class::MakeMethods::Emulator::mcoder is based on mcoder. Portions Copyright 2003 by Salvador Fandiño.
+
+Class::MakeMethods::Emulator::Singleton is based on Class::Singleton, by Andy Wardley. Portions Copyright 1998 Canon Research Centre Europe Ltd. 
+
+Class::MakeMethods::Utility::Ref is based on Ref.pm. Portions Copyright 1994 David Muir Sharnoff.
 
 =head2 License
 

@@ -63,19 +63,10 @@ sub generic {
       '_REF_VALUE_' => q{ _VALUE_ },
       '_GET_VALUE_' => q{ _VALUE_ },
       '_SET_VALUE_{}' => q{ ( _VALUE_ = * ) },
-      '_PROTECTED_SET_VALUE_{}' => q{ ( _ACCESS_PROTECTED_ and _VALUE_ = * ) },
-      '_PRIVATE_SET_VALUE_{}' => q{ ( _ACCESS_PRIVATE_ and _VALUE_ = * ) },
+      '_PROTECTED_SET_VALUE_{}' => q{ (_ACCESS_PROTECTED_ and _SET_VALUE_{*}) },
+      '_PRIVATE_SET_VALUE_{}' => q{ ( _ACCESS_PRIVATE_ and _SET_VALUE_{*} ) },
     },
   }
-}
-
-sub _array_offset {
-  my ($array, $value) = (shift, shift);
-  foreach ( 0..$#$array ) { 
-    return $_ if ( $array->[$_] eq $value ) 
-  }
-  push @$array, $value; 
-  return $#$array;
 }
 
 # 1;
@@ -417,7 +408,25 @@ the value is set to undef. Does not return a value.
 
 =item clear
 
-Sets value to undef.  
+Sets value to undef. 
+
+=item get_set_chain
+
+Like get_set, but if called with an argument, returns the object it was called on. This allows a series of mutators to be called as follows:
+
+  package MyObject;
+  use Class::MakeMethods (
+    'Template::Hash:scalar --get_set_chain' => 'foo bar baz'
+  );
+  ...
+  
+  my $obj = MyObject->new->foo('Foozle');
+  $obj->bar("none")->baz("Brazil");
+  print $obj->foo, $obj->bar, $obj->baz;
+
+=item get_set_prev 
+
+Like get_set, but if called with an argument, returns the previous value before it was changed to the new one. 
 
 =item get_init
 
@@ -471,6 +480,21 @@ sub scalar {
 	  } else {
 	    _BEHAVIOR_{get}
 	  }
+	},
+      'get_set_chain' => q { 
+	  if ( scalar @_ ) {
+	    _BEHAVIOR_{set};
+	    return _SELF_
+	  } else {
+	    _BEHAVIOR_{get}
+	  }
+	},
+      'get_set_prev' => q { 
+	  my $value = _BEHAVIOR_{get};
+	  if ( scalar @_ ) {
+	    _BEHAVIOR_{set};
+	  }
+	  return $value;
 	},
       
       'get_private_set' => q{ 
@@ -903,6 +927,9 @@ sub boolean {
       },      
       'set_true' => q{ _SET_VALUE_{ 1 } },
       'set_false' => q{ _SET_VALUE_{ 0 } },
+      'set_value' => q{ 
+	_SET_VALUE_{ scalar @_ ? shift : 1 }
+      },
     },
   }
 }
@@ -1030,10 +1057,19 @@ sub bits {
       '-init' => sub {
 	my $m_info = $_[0]; 
 	
-	$m_info->{bfp} ||= Class::MakeMethods::Template::Generic::_array_offset(
-	  ( $Class::MakeMethods::Template::Hash::bits{$m_info->{target_class}} ||= [] ), 
-	  $m_info->{'name'} 
-	);
+	$m_info->{bfp} ||= do {
+	  my $array = ( $Class::MakeMethods::Template::Hash::bits{$m_info->{target_class}} ||= [] );
+	  my $idx;
+	  foreach ( 0..$#$array ) { 
+	    if ( $array->[$_] eq $m_info->{'name'} ) { $idx = $_; last }
+	  }
+          unless ( $idx ) {
+	    push @$array, $m_info->{'name'}; 
+	    $idx = $#$array;
+	  }
+	  $idx;
+	};
+	
 	return;	
       },
       'bit_names' => q{
@@ -2295,5 +2331,16 @@ sub code_or_scalar {
     },
   }
 }
+
+
+########################################################################
+
+=head1 SEE ALSO
+
+See L<Class::MakeMethods> for general information about this distribution. 
+
+See L<Class::MakeMethods::Template> for information about this family of subclasses.
+
+=cut
 
 1;

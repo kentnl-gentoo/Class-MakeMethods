@@ -9,21 +9,63 @@ sub _diagnostic { &Class::MakeMethods::_diagnostic }
 ###### CLASS NAME MANIPULATIONS
 ########################################################################
 
-=head2
+=head1 NAME
+
+Class::MakeMethods::Template::ClassName - Access object's class 
+
+=head1 SYNOPSIS
+
+  package MyObject;
+  use Class::MakeMethods::Template::ClassName (
+    subclass_name => [ 'type' ]
+  );
+  ...
+  package main;
+  my $object = MyObject->new;
+
+  $object->type('Foo')
+  # reblesses object to MyObject::Foo subclass
+
+  print $object->type();
+  # prints "Foo".
+
+=head1 DESCRIPTION
+
+These method types access or change information about the class an object is associated with.
+
+=head2 class_name
+
+Called without arguments, returns the class name.
+
+If called with an argument, reblesses object into that class. 
+If the class doesn't already exist, it will be created.
+
+=head2 subclass_name
 
 Called without arguments, returns the subclass name.
 
 If called with an argument, reblesses object into that subclass. 
 If the subclass doesn't already exist, it will be created.
 
-Subclass name is written as follows:
-- if it's the original, defining class: empty
-- if its a a package within the namespace of the original: the distingushing name within that namespace, without leading ::
-- if it's a package elsewhere: the full name with leading ::
+The subclass name is written as follows:
+
+=over 4
+
+=item *
+
+if it's the original, defining class: empty
+
+=item *
+
+if its a a package within the namespace of the original: the distingushing name within that namespace, without leading C<::>
+
+=item *
+
+if it's a package elsewhere: the full name with leading C<::>
+
+=back
 
 =cut
-
-### SUBCLASS NAME
 
 # $subclass = _pack_subclass( $base, $pckg );
 sub _pack_subclass {
@@ -83,6 +125,22 @@ sub class_name {
       autocreate => {  '*'=>'autocreate' },
       require => {  '*'=>'require' },
     },
+    'behavior' => {
+      'autocreate' => q{
+	  if ( ! scalar @_ ) {
+	    _CLASS_GET_
+	  } else {
+	    _CLASS_PROVIDE_
+	  }
+	},
+      'require' => q{
+	  if ( ! scalar @_ ) {
+	    _CLASS_GET_
+	  } else {
+	    _CLASS_REQUIRE_
+	  }
+	},
+    },
     'code_expr' => {
       _CLASS_GET_ => q{
 	  my $class = ref $self || $self;
@@ -101,48 +159,26 @@ sub class_name {
 	  return $class;
       },
     },
-    'behavior' => {
-      'autocreate' => q{
-	  if ( ! scalar @_ ) {
-	    _CLASS_GET_
-	  } else {
-	    _CLASS_PROVIDE_
-	  }
-	},
-      'require' => q{
-	  if ( ! scalar @_ ) {
-	    _CLASS_GET_
-	  } else {
-	    _CLASS_REQUIRE_
-	  }
-	},
-    },
   } 
 }
 
 sub subclass_name {
   {
-    'interface' => {
-      default => 'autocreate',
-      autocreate => {  '*'=>'autocreate' },
-      require => {  '*'=>'require' },
+    '-import' => {
+      'Template::ClassName:class_name' => '*',
     },
     'code_expr' => {
-      _BLESS_AND_RETURN_ => q{
-	  bless $self, $class if ( ref $self );
-	  return $class;
-      },      
-      _SUBCLASS_GET_ => q{
+      _CLASS_GET_ => q{
 	my $class = ref $self || $self;
 	Class::MakeMethods::Template::ClassName::_pack_subclass( $m_info->{'target_class'}, $class )
       },
-      _SUBCLASS_REQUIRE_ => q{
+      _CLASS_REQUIRE_ => q{
 	  my $subclass = Class::MakeMethods::Template::ClassName::_unpack_subclass( 
 				$m_info->{'target_class'}, shift() );
 	  my $class = Class::MakeMethods::Template::ClassName::_require_class($subclass);
 	  _BLESS_AND_RETURN_
       },
-      _SUBCLASS_PROVIDE_ => q{
+      _CLASS_PROVIDE_ => q{
 	  my $subclass = Class::MakeMethods::Template::ClassName::_unpack_subclass( 
 				$m_info->{'target_class'}, shift() );
 	  my $class = Class::MakeMethods::Template::ClassName::_provide_class( 
@@ -150,28 +186,8 @@ sub subclass_name {
 	  _BLESS_AND_RETURN_
       },
     },
-    'behavior' => {
-      'autocreate' => q{
-	  if ( ! scalar @_ ) {
-	    _SUBCLASS_GET_
-	  } else {
-	    _SUBCLASS_PROVIDE_
-	  }
-	},
-      'require' => q{
-	  if ( ! scalar @_ ) {
-	    _SUBCLASS_GET_
-	  } else {
-	    _SUBCLASS_REQUIRE_
-	  }
-	},
-    },
   } 
 }
-
-=head2 SEE ALSO
-
-=cut
 
 
 ########################################################################
@@ -300,5 +316,15 @@ sub static_hash_classname {
     },
   }
 }
+
+########################################################################
+
+=head1 SEE ALSO
+
+See L<Class::MakeMethods> for general information about this distribution. 
+
+See L<Class::MakeMethods::Template> for information about this family of subclasses.
+
+=cut
 
 1;

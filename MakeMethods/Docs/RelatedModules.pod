@@ -72,6 +72,39 @@ Other characteristics or features of note.
 
 =head1 RELATED MODULES 
 
+=head2 accessors
+
+=over 4
+
+=item Distribution
+
+CPAN. Uploaded Sep 2003.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=item Example
+
+  package MyObject;
+  use accessors qw( foo bar baz );
+
+=back
+
+=head2 Attribute::Property
+
+=over 4
+
+=item Distribution
+
+CPAN.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=back
+
 
 =head2 Class::Accessor
 
@@ -369,6 +402,8 @@ Yes, Class::MakeMethods::Emulator::Inheritable, passes original test suite.
 
 =head2 Class::Delegate
 
+=over 4
+
 =item Distribution
 
 CPAN. Uploaded 12/0.
@@ -377,8 +412,11 @@ CPAN. Uploaded 12/0.
 
 I have not yet reviewed this module in detail.
 
+=back
 
 =head2 Class::Delegation
+
+=over 4
 
 =item Distribution
 
@@ -388,6 +426,7 @@ CPAN. Uploaded 12/01.
 
 I have not yet reviewed this module in detail.
 
+=back
 
 =head2 Class::Generate
 
@@ -438,7 +477,6 @@ Usage is similar to Class::Struct:
     mapping => '%',
     obj_ref => 'FooObject' 
   ]; 
-
 
 =back
 
@@ -786,6 +824,8 @@ Generates methods that fail with a message indicating that they were not impleme
 Also provides a list of abstract methods that have not been implemented by a subclass.
 
 =over 4
+
+=item Distribution
 
 CPAN. Last update 3/01.
 
