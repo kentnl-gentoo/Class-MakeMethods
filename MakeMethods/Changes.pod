@@ -8,6 +8,21 @@ Revision history for Class::MakeMethods.
 
 =head1 CHANGES
 
+=head2 Version 1.005
+
+=over 4
+
+=item 2002/06/06
+
+Added Autoload interface.
+
+Modifed Attribute interface to add "inheritable" default logic for Maker class parameter. (Suggested by Malcolm Cook.)
+
+Fixed typo in documentation for Standard::Universal. (Spotted by Malcolm Cook.)
+
+=back
+
+
 =head2 Version 1.004
 
 =over 4

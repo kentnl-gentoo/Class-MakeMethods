@@ -27,8 +27,7 @@ sub b :MakeMethod('scalar');
 ########################################################################
 
 package MyObject::CornedBeef;
-@ISA = 'MyObject';
-use Class::MakeMethods::Attribute 'Standard::Hash';
+use base 'MyObject';
 
 sub c :MakeMethod('scalar');
 

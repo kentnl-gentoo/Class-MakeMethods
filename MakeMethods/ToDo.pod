@@ -37,10 +37,6 @@ Assemble annotated examples and tutorials, and either link to or distribute them
 
 =item *
 
-Expunge old custom Test module in favor of standard version (except for emulation compatibility tests, which should remain untouched).
-
-=item *
-
 Use Devel::Coverage to measure test coverage, and fill in missing
 cases.
 
@@ -68,28 +64,13 @@ adopt is probably that of Attribute::Types:
 
 =item *
 
-Add AUTOLOAD support for clients who wish to have accessors lazily
-built for them when they use them.
-
-  sub AUTOLOAD {
-    (my $func = $AUTOLOAD) =~ s/^.*::(_?)//;
-    Class::MakeMethods->make( ... => [ $func,... ] );
-    if ( my $sub = $1->can( $func ) {
-      goto $sub( @_ );
-    } else {
-      croak sprintf q{Can't locate object method "%s" via package "%s"}, $func, ref( $_[0]);
-    }
-  }
-
-=item *
-
 Improve use of _diagnostic hooks for debugging. Add various "(Q)"
 warning diagnostics.
 
 =back
 
 
-=head1 STANDARD AND COMPOSITE CLASSES
+=head1 GENERATOR CLASSES
 
 =over 4
 

@@ -82,7 +82,7 @@ sub find_vself {
   return;
 }
 
-=head2 find_vself
+=head2 get_vvalue
 
   $value = get_vvalue( $dataset, $instance );
 
@@ -94,7 +94,8 @@ sub get_vvalue {
   my $dataset = shift;
   my $instance = shift;
   my $v_self = find_vself($dataset, $instance);
-  # warn "Retrieving $dataset -> $instance ($v_self)";
+  # warn "Dataset: " . join( ', ', %$dataset );
+  # warn "Retrieving $dataset -> $instance ($v_self): '$dataset->{$v_self}'";
   return $v_self ? $dataset->{$v_self} : ();
 }
 

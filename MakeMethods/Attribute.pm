@@ -6,8 +6,9 @@ use Carp;
 use Attribute::Handlers;
 
 use Class::MakeMethods;
+use Class::MakeMethods::Utility::Inheritable 'get_vvalue';
 
-our $VERSION = 1.000_013;
+our $VERSION = 1.005;
 
 our %DefaultMaker;
 
@@ -38,6 +39,10 @@ sub UNIVERSAL::MakeMethod :ATTR(CODE) {
     $symname = [ @$data, $symname ];
     $data = $_;
   }
+  unless ( $DefaultMaker{$package} ) {
+    local $_ = get_vvalue( \%DefaultMaker, $package );
+    $DefaultMaker{$package} = $_ if ( $_ );
+  }
   Class::MakeMethods->make( 
     -TargetClass => $package,
     -ForceInstall => 1, 
@@ -52,7 +57,7 @@ __END__
 
 =head1 NAME
 
-Class::MakeMethods::Attribute - Declare generated subs
+Class::MakeMethods::Attribute - Declare generated subs with attribute syntax
 
 =head1 SYNOPSIS
 
@@ -66,22 +71,56 @@ Class::MakeMethods::Attribute - Declare generated subs
 
 =head1 DESCRIPTION
 
-This package allows common types of methods to be generated via a subroutine attribute declaration.
+This package allows common types of methods to be generated via a subroutine attribute declaration. (Available in Perl 5.6 and later.)
 
-Adding the :MakeMethod() attribute to a subroutine declaration causes Class::MakeMethods to create and install a subroutine based on the :MakeMethod parameters.
+Adding the :MakeMethod() attribute to a subroutine declaration causes Class::MakeMethods to create and install a subroutine based on the parameters given to the :MakeMethod attribute.
 
-In particular, the example presented in the SYNOPSIS is equivalent to the following Class::MakeMethods declaration:
+You can declare a default method-generation class by passing the name of a MakeMethods subclass in the use Class::MakeMethods::Attribute statement. This default method-generation class will also apply as the default to any subclasses declared at compile time. If no default method-generation class is selected, you will need to fully-qualify all method type declarations.
+
+=head1 EXAMPLE
+
+Here's a typical use of Class::MakeMethods::Attribute:
 
   package MyObject;
+  use Class::MakeMethods::Attribute 'Standard::Hash';
+  
+  sub new    :MakeMethod('new');
+  sub foo    :MakeMethod('scalar');
+  sub bar    :MakeMethod('scalar', { hashkey => 'bar_data' });
+  sub debug  :MakeMethod('Standard::Global:scalar');
+
+  package MySubclass;
+  use base 'MyObject';
+
+  sub bazzle :MakeMethod('scalar');
+
+This is equivalent to the following explicit Class::MakeMethods invocations:
+
+  package MyObject;
+  
   use Class::MakeMethods ( 
     -MakerClass => 'Standard::Hash',
     new => 'new',
     scalar => 'foo',
-    scalar => [ 'bar_accessor', { hashkey => 'bar' } ],
+    scalar => [ 'ba', { hashkey => 'bar_data' } ],
     'Standard::Global:scalar' => 'debug',
+  );
+  
+  package MySubclass;
+  use base 'MyObject';
+  
+  use Class::MakeMethods ( 
+    -MakerClass => 'Standard::Hash',
+    scalar => 'bazzle',
   );
 
 =head1 DIAGNOSTICS
+
+The following warnings and errors may be produced when using
+Class::MakeMethods::Attribute to generate methods. (Note that this
+list does not include run-time messages produced by calling the
+generated methods, or the standard messages produced by
+Class::MakeMethods.)
 
 =over
 
@@ -97,21 +136,9 @@ You called C<:MakeMethod()> without the required method-type argument.
 
 =head1 SEE ALSO
 
-See L<Attribute::Handlers> by Damian Conway 
+See L<Attribute::Handlers> by Damian Conway.
 
-=head1 AUTHOR
-
-Developed by:
-
-  M. Simon Cavalletto, Evolution Online Systems, simonm@evolution.com
-
-Inspired by Attribute::Abstract and Attribute::Memoize by Marcel Grunauer.
-
-=head1 LICENSE
-
-This module is free software. It may be used, redistributed and/or
-modified under the same terms as Perl.
-
-Copyright (c) 2001 Evolution Online Systems, Inc.
+See L<Class::MakeMethods::ReadMe> for distribution, installation,
+version and support information. 
 
 =cut

@@ -6,7 +6,7 @@ Class::MakeMethods::Standard::Universal - Generic Methods
 =head1 SYNOPSIS
 
   package MyObject;
-  use Class::MakeMethods::Standard::Hash (
+  use Class::MakeMethods::Standard::Universal (
     no_op => 'this',
     abstract => 'that',
     delegate => { name=>'play_music', target=>'instrument', method=>'play' },

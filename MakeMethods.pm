@@ -9,7 +9,7 @@ use strict;
 use Carp;
 
 use vars qw( $VERSION );
-$VERSION = 1.004;
+$VERSION = 1.005;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 
@@ -117,7 +117,7 @@ sub make {
     # If name contains a colon or double colon, treat the preceeding part 
     # as the subclass name but only for this one set of methods.
     local $CONTEXT{MakerClass} = _find_subclass($CONTEXT{MakerClass}, $1)
-		if ($name =~ s/^(.*)\:{1,2}//);
+		if ($name =~ s/^(.*?)\:{1,2}(\w+)$/$2/);
     
     # Meta-method invocation via named_method or direct method call
     my @results = (
@@ -205,7 +205,7 @@ sub _install_methods {
     }
     
     # Add the code refence to the target package
-    # _diagnostic('debug_install', $package . '::', $name, $code);
+    # _diagnostic('debug_install', $package, $name, $code);
     local $^W = 0 if ( $CONTEXT{ForceInstall} );
     *{$package . '::' . $name} = $code;
 
@@ -275,41 +275,70 @@ sub _diagnostic {
   }
 }
 
-BEGIN {
-  %DIAGNOSTICS = (
-    make_behavior_mod => q|(F) Can't apply modifiers (%s) to code behavior %s|,
-    behavior_mod_unknown => q|(F) Unknown modification to %s behavior: -%s|,
-    debug_template_builder => qq|(Q) Template interpretation for %s:\n%s|.
-	qq|\n---------\n%s\n---------\n|,
-    debug_template => q|(Q) Parsed template '%s': %s|,
-    debug_eval_builder => q|(Q) Compiling behavior builder '%s':| . qq|\n%s|,
-    debug_declaration => q|(Q) Meta-method declaration parsed: %s|,
-    debug_make_behave => q|(Q) Building meta-method behavior %s: %s(%s)|,
-    debug_install => q|(W) Installing function %s%s (%s)|,
-    make_odd_args => q|(F) Odd number of arguments passed to %s method generator|,
-    make_empty => q|(F) Can't parse meta-method declaration: argument is empty or undefined|,
-    make_noname => q|(F) Can't parse meta-method declaration: missing name attribute.| . 
-	qq|\n  (Perhaps a trailing attributes hash has become separated from its name?)|,
-    make_bad_modifier => q|(F) Can't parse meta-method declaration: unknown option for %s: %s|,
-    make_unsupported => q|(F) Can't parse meta-method declaration: unsupported declaration type '%s'|,
-    make_bad_behavior => q|(F) Can't make method %s(): template specifies unknown behavior '%s'|,
-    make_bad_meta => q|(I) Unexpected return value from meta-method constructor %s: %s|,
-    inst_eval_syntax => q|(I) Unable to compile generated method %s(): %s| . 
-	qq|\n  (There's probably a syntax error in this generated code.)\n%s\n|,
-    inst_eval_result => q|(I) Unexpected return value from compilation of %s(): '%s'| . 
-	qq|\n  (This generated code should have returned a code ref.)\n%s\n|,
-    inst_result => q|(I) Unable to install code for %s() method: '%s'|,
-    mmdef_not_interpretable => qq|(I) Not an interpretable meta-method: '%s'| .
-	qq|\n  (Perhaps a meta-method attempted to import from a non-templated meta-method?)|,
-    mm_package_fail => q|(F) Unable to dynamically load %s: %s|,
-    mm_version_fail => q|(F) %s %s required--this is only version %s%s|,
-    behavior_eval => q|(I) Class::MakeMethods behavior compilation error: %s| . 
-	qq|\n  (There's probably a syntax error in the below code.)\n%s|,
-    tmpl_unkown => q|(F) Can't interpret meta-method template: unknown template name '%s'|,
-    tmpl_empty => q|(F) Can't interpret meta-method template: argument is empty or undefined|,
-    tmpl_unsupported => q|(F) Can't interpret meta-method template: unsupported template type '%s'|,
-  );
-}
+
+BEGIN { %DIAGNOSTICS = (
+
+  ### BASE CLASS DIAGNOSTICS
+  
+  # _diagnostic('debug_install', $package, $name, $code)
+  debug_install => q|(W) Installing function %s::%s (%s)|,
+  
+  # _diagnostic('make_odd_args', $CONTEXT{MakerClass})
+  make_odd_args => q|(F) Odd number of arguments passed to %s method generator|,
+  
+  # _diagnostic('make_bad_meta', $name, join(', ', map "'$_'", @results)
+  make_bad_meta => q|(I) Unexpected return value from method constructor %s: %s|,
+  
+  # _diagnostic('inst_eval_syntax', $name, $@, $code)
+  inst_eval_syntax => q|(I) Unable to compile generated method %s(): %s| . 
+      qq|\n  (There's probably a syntax error in this generated code.)\n%s\n|,
+  
+  # _diagnostic('inst_eval_result', $name, $coderef, $code)
+  inst_eval_result => q|(I) Unexpected return value from compilation of %s(): '%s'| . 
+      qq|\n  (This generated code should have returned a code ref.)\n%s\n|,
+  
+  # _diagnostic('inst_result', $name, $code)
+  inst_result => q|(I) Unable to install code for %s() method: '%s'|,
+  
+  # _diagnostic('mm_package_fail', $package, $@)
+  mm_package_fail => q|(F) Unable to dynamically load %s: %s|,
+  
+  # _diagnostic('mm_version_fail', $class, $wanted, $version || '(undef)
+  mm_version_fail => q|(F) %s %s required--this is only version %s%s|,
+  
+  ### STANDARD SUBCLASS DIAGNOSTICS
+  
+  # _diagnostic('make_empty')
+  make_empty => q|(F) Can't parse meta-method declaration: argument is empty or undefined|,
+  
+  # _diagnostic('make_noname')
+  make_noname => q|(F) Can't parse meta-method declaration: missing name attribute.| . 
+      qq|\n  (Perhaps a trailing attributes hash has become separated from its name?)|,
+  
+  # _diagnostic('make_unsupported', $m_name)
+  make_unsupported => q|(F) Can't parse meta-method declaration: unsupported declaration type '%s'|,
+  
+  ### TEMPLATE SUBCLASS DIAGNOSTICS 
+    # ToDo: Should be moved to the Class::MakeMethods::Template distribution
+  
+  debug_declaration => q|(Q) Meta-method declaration parsed: %s|,
+  debug_make_behave => q|(Q) Building meta-method behavior %s: %s(%s)|,
+  mmdef_not_interpretable => qq|(I) Not an interpretable meta-method: '%s'| .
+      qq|\n  (Perhaps a meta-method attempted to import from a non-templated meta-method?)|,
+  make_bad_modifier => q|(F) Can't parse meta-method declaration: unknown option for %s: %s|,
+  make_bad_behavior => q|(F) Can't make method %s(): template specifies unknown behavior '%s'|,
+  behavior_mod_unknown => q|(F) Unknown modification to %s behavior: -%s|,
+  debug_template_builder => qq|(Q) Template interpretation for %s:\n%s|.
+      qq|\n---------\n%s\n---------\n|,
+  debug_template => q|(Q) Parsed template '%s': %s|,
+  debug_eval_builder => q|(Q) Compiling behavior builder '%s':| . qq|\n%s|,
+  make_behavior_mod => q|(F) Can't apply modifiers (%s) to code behavior %s|,
+  behavior_eval => q|(I) Class::MakeMethods behavior compilation error: %s| . 
+      qq|\n  (There's probably a syntax error in the below code.)\n%s|,
+  tmpl_unkown => q|(F) Can't interpret meta-method template: unknown template name '%s'|,
+  tmpl_empty => q|(F) Can't interpret meta-method template: argument is empty or undefined|,
+  tmpl_unsupported => q|(F) Can't interpret meta-method template: unsupported template type '%s'|,
+) }
 
 1;
 
@@ -377,6 +406,8 @@ the details presented below.
 This module addresses a problem encountered in object-oriented
 development wherein numerous methods are defined which differ only
 slightly from each other.
+
+=head2 A Contrived Example
 
 Object-oriented Perl code is widespread -- you've probably seen code like the below a million times:
 
@@ -457,9 +488,13 @@ This is the basic purpose of Class::MakeMethods: The "boring" pieces
 of code have been replaced by succinct declarations, placing the
 focus on the "unique" or "custom" pieces.
 
+=head2 There's Many Ways To Do It
+
 The remaining complexity described in this document basically boils
 down to figuring out which arguments to pass to generate the specific
 methods you want.
+
+This is not a trivial task, as there are dozens of different types of methods that can be generated, each with a variety of options, and several alternative ways to write each method declaration. You may prefer to start by just finding a few examples that you can modify to accomplish your immediate needs, and defer investigating all of the extras until you're ready to take a closer look.
 
 
 =head1 ARCHITECTURE
@@ -1247,14 +1282,14 @@ demonstrate how the various methods work together.
 
 =head2 Perl Docs
 
-See L<perlboot> for a quick introduction to objects for beginners. See L<perltoot>, and L<perltootc> for an extensive discussion of various approaches to class construction.
+See L<perlboot> for a quick introduction to objects for beginners. For an extensive discussion of various approaches to class construction, see L<perltoot> and L<perltootc> (called L<perltootc> in the most recent versions of Perl).
 
 See L<perlref/"Making References">, point 4 for more information on closures. (FWIW, I think there's a big opportunity for a "perltfun" podfile bundled with Perl in the tradition of "perlboot" and "perltoot", exploring the utility of function references, callbacks, closures, and continuations... There are a bunch of useful references out there, but not a good overview of how they all interact in a Perlish way.)
 
 
 =head1 VERSION
 
-This is Class::MakeMethods v1.003.
+This is Class::MakeMethods v1.005.
 
 
 =head1 CREDITS AND COPYRIGHT
@@ -1283,6 +1318,7 @@ Thanks to:
   Ron Savage
   Jay Lawrence
   Adam Spiers
+  Malcolm Cook
 
 =head2 Copyright
 
