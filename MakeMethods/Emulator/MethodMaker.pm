@@ -1320,7 +1320,9 @@ This module aims to provide a 100% compatible drop-in replacement for Class::Met
 
 There are no known incompatibilities at this time.
 
-The test suite from Class::MethodMaker version 1.02 is included with this package. The tests are unchanged except for the a direct substitution of C<Class::MakeMethods::Emulator::MethodMaker> in the place of C<Class::MethodMaker>.
+The test suite from Class::MethodMaker version 1.02 is included with this package, with all file names prepended with "7_MethodMaker_". The tests are unchanged except for the a direct substitution of C<Class::MakeMethods::Emulator::MethodMaker> in the place of C<Class::MethodMaker>.
+
+Note that there was a subtle test error in hash_of_lists.t that only affected some platforms where a hash's keys are returned in an unusual order (ex. Perl 5.7 on Mac OS X); this has been corrected in the included tests and reported to the maintainer of Class::MethodMaker.
 
 =head2 Earlier Versions
 
@@ -1332,7 +1334,6 @@ later behavior. To avoid "use of undefined value" warnings from
 the 0.92 version of get_concat.t, that test has been modified by
 appending a new flag after the name, C<'get_concat --noundef'>,
 which restores the earlier behavior.)
-
 
 =head1 SEE ALSO
 

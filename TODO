@@ -32,8 +32,8 @@ GENERAL ISSUES
         bounds-checking interface to approve or reject (with an exception)
         new values that were passed in.
 
-        As pointed out by Terrence Monroe Brannon, the right interface to
-        adopt is probably that of Attribute::Types:
+        As pointed out by Terrence Brannon, the right interface to adopt is
+        probably that of Attribute::Types:
 
           use Class::MakeMethods::Standard::Hash (
             'scalar' => [ 'count' => { TYPE => 'INTEGER' } ],

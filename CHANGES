@@ -4,6 +4,19 @@ NAME
 DESCRIPTION
     Revision history for Class::MakeMethods:
 
+    v1.0.16 - 2002/01/20
+        Adjusted the hash and array methods in the Standard::* and
+        Composite::* packages to properly accept a set-contents call with a
+        single reference argument, and to return contents rather than ref in
+        list context.
+
+    v1.0.16 - 2002/01/14
+        Fixed a subtle bug in a test script inherited from
+        Class::MethodMaker: 4_Template_hash_hash_array.t and
+        7_MethodMaker_hash_of_lists.t both relied on "keys %hash" returning
+        the keys in a particular order, which *almost* always worked, but
+        caused failures on one or more Perl version/platform combinations.
+
     v1.0.15 - 2002/01/12
         Renamed Basic::Static to Basic::Global for consistency with Standard
         and Composite. Hopefully, there aren't many users of this module

@@ -206,20 +206,23 @@ The value for each instance will be a reference to an array (or undef).
 
 =item *
 
-If called without any arguments, returns the current array-ref value (or undef).
-
-
-=item *
-
-If called with a single non-ref argument, uses that argument as an index to retrieve from the referenced array, and returns that value (or undef).
+If called without any arguments, returns the contents of the array in list context, or an array reference in scalar context (or undef).
 
 =item *
 
-If called with a single array ref argument, uses that list to return a slice of the referenced array.
+If called with a single array ref argument, sets the contents of the array to match the contents of the provided one.
 
 =item *
 
-If called with a list of argument pairs, each with a non-ref index and an associated value, stores the value at the given index in the referenced array. If the instance's value was previously undefined, a new array is autovivified. The current value in each position will be overwritten, and later arguments with the same index will override earlier ones. Returns the current array-ref value.
+If called with a single numeric argument, uses that argument as an index to retrieve from the referenced array, and returns that value (or undef).
+
+=item *
+
+If called with a two arguments, the first undefined and the second an array ref argument, uses that array's contents as a list of indexes to return a slice of the referenced array.
+
+=item *
+
+If called with a list of argument pairs, each with a numeric index and an associated value, stores the value at the given index in the referenced array. If the instance's value was previously undefined, a new array is autovivified. The current value in each position will be overwritten, and later arguments with the same index will override earlier ones. Returns the current array-ref value.
 
 =item *
 
@@ -245,6 +248,9 @@ Sample declaration and usage:
   );
   ...
   
+  # Clear and set contents of list
+  print $obj->bar([ 'Spume', 'Frost' ] );  
+  
   # Set values by position
   $obj->bar(0 => 'Foozle', 1 => 'Bang!');
   
@@ -260,7 +266,7 @@ Sample declaration and usage:
 There are also calling conventions for slice and splice operations:
 
   # Retrieve slice of values by position
-  print join(', ', $obj->bar( [0, 2] ) );
+  print join(', ', $obj->bar( undef, [0, 2] ) );
   
   # Insert an item at position in the array
   $obj->bar([3], 'Potatoes' );  
@@ -270,9 +276,6 @@ There are also calling conventions for slice and splice operations:
   
   # Set a new value at position 2, and return the old value 
   print $obj->bar([2, 1], 'Froth' );
-  
-  # Use of undef allows you to clear and set contents of list
-  print $obj->bar([undef, undef], [ 'Spume', 'Frost' ] );  
 
 =cut
 
@@ -286,9 +289,11 @@ sub array {
       if ( scalar(@_) == 0 ) {
 	if ( $init and ! defined $self->{$hash_key} ) {
 	  $self->{$hash_key} = [];
-	} else {
-	  $self->{$hash_key};
 	}
+	wantarray ? @{ $self->{$hash_key} } : $self->{$hash_key}
+      } elsif ( scalar(@_) == 1 and ref $_[0] eq 'ARRAY' ) {
+	$self->{$hash_key} = [ @{ $_[0] } ];
+	wantarray ? @{ $self->{$hash_key} } : $self->{$hash_key}
       } else {
 	$self->{$hash_key} ||= [];
 	return array_splicer( $self->{$hash_key}, @_ );
@@ -320,15 +325,23 @@ The value for each instance will be a reference to a hash (or undef).
 
 =item *
 
-If called without any arguments, returns the current hash-ref value (or undef).
+If called without any arguments, returns the contents of the hash in list context, or a hash reference in scalar context (or undef).
 
 =item *
 
-If called with one argument, uses that argument as an index to retrieve from the referenced hash, and returns that value (or undef). If the single argument is an array ref, then a slice of the referenced hash is returned.
+If called with one non-ref argument, uses that argument as an index to retrieve from the referenced hash, and returns that value (or undef).
 
 =item *
 
-If called with a list of key-value pairs, stores the value under the given key in the referenced hash. If the instance's value was previously undefined, a new hash is autovivified. The current value under each key will be overwritten, and later arguments with the same key will override earlier ones. Returns the current hash-ref value.
+If called with one array-ref argument, uses the contents of that array to retrieve a slice of the referenced hash.
+
+=item *
+
+If called with one hash-ref argument, sets the contents of the referenced hash to match that provided.
+
+=item *
+
+If called with a list of key-value pairs, stores the value under the given key in the referenced hash. If the instance's value was previously undefined, a new hash is autovivified. The current value under each key will be overwritten, and later arguments with the same key will override earlier ones. Returns the contents of the hash in list context, or a hash reference in scalar context.
 
 =back
 
@@ -370,13 +383,16 @@ sub hash {
       if ( scalar(@_) == 0 ) {
 	if ( $init and ! defined $self->{$hash_key} ) {
 	  $self->{$hash_key} = {};
-	} else {
-	  $self->{$hash_key};
 	}
+	wantarray ? %{ $self->{$hash_key} } : $self->{$hash_key};
       } elsif ( scalar(@_) == 1 ) {
-	my $index = shift;
-	ref($index) ? @{$self->{$hash_key}}{ @$index } 
-		    : $self->{$hash_key}->{ $index };
+	if ( ref($_[0]) eq 'HASH' ) {
+	  %{$self->{$hash_key}} = %{$_[0]};
+	} elsif ( ref($_[0]) eq 'ARRAY' ) {
+	  return @{$self->{$hash_key}}{ @{$_[0]} }
+	} else {
+	  return $self->{$hash_key}->{ $_[0] }
+	}
       } elsif ( scalar(@_) % 2 ) {
 	Carp::croak "Odd number of items in assigment to $name";
       } else {

@@ -2,8 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Class::MakeMethods',
     'VERSION_FROM'	=> 'MakeMethods.pm', 
-    'PREREQ_PM'		=> {
-    }, 
+    'PREREQ_PM'		=> {}, 
     ($] >= 5.005 ? (
       ABSTRACT_FROM => 'MakeMethods.pm', 
       AUTHOR     => 'Matthew Simon Cavalletto <simonm@cavalletto.org>',
@@ -11,7 +10,7 @@ WriteMakefile(
 );
 sub MY::postamble { q{
 
-docs : README CHANGES TODO
+docs : README CHANGES TODO GUIDE
 
 README: MakeMethods/ReadMe.pod
 	pod2text MakeMethods/ReadMe.pod > README

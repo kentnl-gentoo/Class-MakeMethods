@@ -87,7 +87,7 @@ TEST {
       and ($o->c ('c'))[0] eq 'd'
 };
 TEST {
-  my @k = $o->c_keys;
+  my @k = sort $o->c_keys;
   my $ok = (@k == @keys);
   for (0..$#k) {
     $ok &&= ( $k[$_] eq $keys[$_] );

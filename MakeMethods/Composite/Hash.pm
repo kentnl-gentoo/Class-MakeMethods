@@ -449,6 +449,9 @@ Sample declaration and usage:
   );
   ...
   
+  # Clear and set contents of list
+  print $obj->bar([ 'Spume', 'Frost' ] );  
+  
   # Set values by position
   $obj->bar(0 => 'Foozle', 1 => 'Bang!');
   
@@ -464,7 +467,7 @@ Sample declaration and usage:
 There are also calling conventions for slice and splice operations:
 
   # Retrieve slice of values by position
-  print join(', ', $obj->bar( [0, 2] ) );
+  print join(', ', $obj->bar( undef, [0, 2] ) );
   
   # Insert an item at position in the array
   $obj->bar([3], 'Potatoes' );  
@@ -474,9 +477,6 @@ There are also calling conventions for slice and splice operations:
   
   # Set a new value at position 2, and return the old value 
   print $obj->bar([2, 1], 'Froth' );
-  
-  # Use of undef allows you to clear and set contents of list
-  print $obj->bar([undef, undef], [ 'Spume', 'Frost' ] );  
 
 =cut
 
@@ -500,9 +500,11 @@ sub array {
 	  if ( $method->{auto_init} and 
 			! defined $self->{$method->{hash_key}} ) {
 	    $self->{$method->{hash_key}} = [];
-	  } else {
-	    $self->{$method->{hash_key}};
 	  }
+	  wantarray ? @{ $self->{$method->{hash_key}} } : $self->{$method->{hash_key}};
+	} elsif ( scalar(@_) == 1 and ref $_[0] eq 'ARRAY' ) {
+	  $self->{$method->{hash_key}} = [ @{ $_[0] } ];
+	  wantarray ? @{ $self->{$method->{hash_key}} } : $self->{$method->{hash_key}};
 	} else {
 	  $self->{$method->{hash_key}} ||= [];
 	  array_splicer( $self->{$method->{hash_key}}, @$args );
@@ -534,15 +536,23 @@ The value for each instance will be a reference to a hash (or undef).
 
 =item *
 
-If called without any arguments, returns the current hash-ref value (or undef).
+If called without any arguments, returns the contents of the hash in list context, or a hash reference in scalar context (or undef).
 
 =item *
 
-If called with one argument, uses that argument as an index to retrieve from the referenced hash, and returns that value (or undef). If the single argument is an array ref, then a slice of the referenced hash is returned.
+If called with one non-ref argument, uses that argument as an index to retrieve from the referenced hash, and returns that value (or undef).
 
 =item *
 
-If called with a list of key-value pairs, stores the value under the given key in the referenced hash. If the instance's value was previously undefined, a new hash is autovivified. The current value under each key will be overwritten, and later arguments with the same key will override earlier ones. Returns the current hash-ref value.
+If called with one array-ref argument, uses the contents of that array to retrieve a slice of the referenced hash.
+
+=item *
+
+If called with one hash-ref argument, sets the contents of the referenced hash to match that provided.
+
+=item *
+
+If called with a list of key-value pairs, stores the value under the given key in the referenced hash. If the instance's value was previously undefined, a new hash is autovivified. The current value under each key will be overwritten, and later arguments with the same key will override earlier ones. Returns the contents of the hash in list context, or a hash reference in scalar context.
 
 =back
 
@@ -593,13 +603,16 @@ sub hash {
 	if ( scalar(@$args) == 0 ) {
 	  if ( $method->{auto_init} and ! defined $self->{$method->{hash_key}} ) {
 	    $self->{$method->{hash_key}} = {};
-	  } else {
-	    $self->{$method->{hash_key}};
 	  }
+	  wantarray ? %{ $self->{$method->{hash_key}} } : $self->{$method->{hash_key}};
 	} elsif ( scalar(@$args) == 1 ) {
-	  my $index = shift;
-	  ref($index) ? @{$self->{$method->{hash_key}}}{ @$index } 
-		      :   $self->{$method->{hash_key}}->{ $index };
+	  if ( ref($_[0]) eq 'HASH' ) {
+	    %{$self->{$method->{hash_key}}} = %{$_[0]};
+	  } elsif ( ref($_[0]) eq 'ARRAY' ) {
+	    return @{$self->{$method->{hash_key}}}{ @{$_[0]} }
+	  } else {
+	    return $self->{$method->{hash_key}}->{ $_[0] }
+	  }
 	} elsif ( scalar(@$args) % 2 ) {
 	  croak "Odd number of items in assigment to $method->{name}";
 	} else {
@@ -607,7 +620,7 @@ sub hash {
 	    my $key = shift @$args;
 	    $self->{$method->{hash_key}}->{ $key} = shift @$args;
 	  }
-	  $self->{$method->{hash_key}};
+	  wantarray ? %{ $self->{$method->{hash_key}} } : $self->{$method->{hash_key}};
 	}
       },
   ],

@@ -278,6 +278,9 @@ Sample declaration and usage:
   );
   ...
   
+  # Clear and set contents of list
+  print MyClass->bar([ 'Spume', 'Frost' ] );  
+  
   # Set values by position
   MyClass->bar(0 => 'Foozle', 1 => 'Bang!');
   
@@ -293,7 +296,7 @@ Sample declaration and usage:
 There are also calling conventions for slice and splice operations:
 
   # Retrieve slice of values by position
-  print join(', ', MyClass->bar( [0, 2] ) );
+  print join(', ', MyClass->bar( undef, [0, 2] ) );
   
   # Insert an item at position in the array
   MyClass->bar([3], 'Potatoes' );  
@@ -303,9 +306,6 @@ There are also calling conventions for slice and splice operations:
   
   # Set a new value at position 2, and return the old value 
   print MyClass->bar([2, 1], 'Froth' );
-  
-  # Use of undef allows you to clear and set contents of list
-  print MyClass->bar([undef, undef], [ 'Spume', 'Frost' ] );  
 
 B<NOTE: THIS METHOD GENERATOR HAS NOT BEEN WRITTEN YET.> 
 
@@ -331,15 +331,23 @@ The class value will be a reference to a hash (or undef).
 
 =item *
 
-If called without any arguments returns the current hash-ref value for the callee. If the callee has not had a value defined for this method, searches up from instance to class, and from class to superclass, until a callee with a value is located.
+If called without any arguments returns the contents of the hash in list context, or a hash reference in scalar context for the callee. If the callee has not had a value defined for this method, searches up from instance to class, and from class to superclass, until a callee with a value is located.
 
 =item *
 
-If called with one argument, uses that argument as an index to retrieve from the callee's hash-ref, and returns that value (or undef). If the callee has not had a value defined for this method, searches up from instance to class, and from class to superclass, until a callee with a value is located. If the single argument is an array ref, then a slice of the referenced hash is returned.
+If called with one non-ref argument, uses that argument as an index to retrieve from the referenced hash, and returns that value (or undef). If the callee has not had a value defined for this method, searches up from instance to class, and from class to superclass, until a callee with a value is located. 
 
 =item *
 
-If called with a list of key-value pairs, stores the value under the given key in the hash associated with the callee, whether instance or class. If the callee did not previously have a hash-ref value associated with it, searches up instance to class, and from class to superclass, until a callee with a value is located, and copies that hash before making the assignments. The current value under each key will be overwritten, and later arguments with the same key will override earlier ones. Returns the current hash-ref value.
+If called with one array-ref argument, uses the contents of that array to retrieve a slice of the referenced hash. If the callee has not had a value defined for this method, searches up from instance to class, and from class to superclass, until a callee with a value is located. 
+
+=item *
+
+If called with one hash-ref argument, sets the contents of the referenced hash to match that provided.
+
+=item *
+
+If called with a list of key-value pairs, stores the value under the given key in the hash associated with the callee, whether instance or class. If the callee did not previously have a hash-ref value associated with it, searches up instance to class, and from class to superclass, until a callee with a value is located, and copies that hash before making the assignments. The current value under each key will be overwritten, and later arguments with the same key will override earlier ones. Returns the contents of the hash in list context, or a hash reference in scalar context.
 
 =back
 
@@ -384,6 +392,7 @@ sub hash {
     '+init' => sub {
 	my ($method) = @_;
 	$method->{hash_key} ||= $_->{name};
+	$method->{data} ||= {};
       },
     'do' => sub {
 	my $method = pop @_;
@@ -392,28 +401,32 @@ sub hash {
 	if ( scalar(@_) == 0 ) {
 	  my $value = get_vvalue($method->{data}, $self);
 	  if ( $method->{auto_init} and ! $value ) {
-	    set_vvalue( $method->{data}, $self, {} );
-	  } else {
-	    $value;
+	    $value = set_vvalue( $method->{data}, $self, {} );
 	  }
+	  wantarray ? %$value : $value;
 	} elsif ( scalar(@_) == 1 ) {
-	  my $v_self = find_vself($method->{data}, $self);
-	  return unless $v_self;
-	  my $index = shift;
-	  ref($index) ? @{$method->{data}{$v_self}}{ @$index } 
-		      :   $method->{data}{$v_self}->{ $index };
+	  if ( ref($_[0]) eq 'HASH' ) {
+	    %{$method->{data}{$self}} = %{$_[0]};
+	  } elsif ( ref($_[0]) eq 'ARRAY' ) {
+	    my $v_self = find_vself($method->{data}, $self) or return;
+	    return @{ $method->{data}{$v_self} }{ @{$_[0]} }
+	  } else {
+	    my $v_self = find_vself($method->{data}, $self) or return;
+	    return $method->{data}{$v_self}{ $_[0] }
+	  }
+
 	} elsif ( scalar(@_) % 2 ) {
 	  Carp::croak "Odd number of items in assigment to $method->{name}";
 	} else {
 	  if ( ! exists $method->{data}{$self} ) {
 	    my $v_self = find_vself($method->{data}, $self);
-	    $method->{data}{$self} = { $v_self ? %$v_self : () };
+	    $method->{data}{$self} = { $v_self ? %{ $method->{data}{$v_self} } : () };
 	  }
 	  while ( scalar(@_) ) {
 	    my $key = shift();
 	    $method->{data}{$self}->{ $key } = shift();
 	  }
-	  return $method->{data}{$self};
+	  wantarray ? %{$method->{data}{$self}} : $method->{data}{$self};
 	}
       },
   ],

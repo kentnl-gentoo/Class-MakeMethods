@@ -8,7 +8,7 @@ use strict;
 require 5.00307; # for the UNIVERSAL::isa method.
 
 use vars qw( $VERSION );
-$VERSION = 1.000_015;
+$VERSION = 1.000_016;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 

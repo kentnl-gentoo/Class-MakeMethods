@@ -142,26 +142,18 @@ PREREQUISITES
       http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
 
 VERSION
-    This is version 1.0.14 of Class::MakeMethods.
+    This is version 1.000.016 of Class::MakeMethods.
 
   Distribution Summary
 
-    This is the first release of Class::MakeMethods to be uploaded to CPAN.
+    This module's summary in the CPAN DSLIP is intended to read:
 
-    This module's summary in the CPAN DSLI is intended to read:
-
-      Name            DSLI  Description
-      --------------  ----  ---------------------------------------------
+      Name            DSLIP  Description
+      --------------  -----  ---------------------------------------------
       Class::
-      ::MakeMethods   bdpO  Generate common types of methods
+      ::MakeMethods   bdpOp  Generate common types of methods
 
   Beta Release
-
-    Although earlier versions of this module were widely used and considered
-    quite stable, numerous changes and additions have been made in recent
-    months, and this package must be viewed as "pre-release quality" until
-    those changes have been tested in a more thorough and widespread
-    fashion.
 
     While numerous additional features have been outlined for future
     development, the intent is support these by adding more options to the
@@ -221,6 +213,7 @@ CREDITS AND COPYRIGHT
       Ron Savage
       Jay Lawrence
       Adam Spiers
+      Terrence Brannon
 
   Copyright
 
