@@ -110,7 +110,7 @@ By including the reserved parameter C<'name'>, you create a self-contained decla
 
 =back
 
-Simple declarations, as described above, are given an empty parameter hash.
+Simple declarations, as shown in the prior section, are treated as if they had an empty parameter hash.
 
 
 =cut
@@ -276,93 +276,6 @@ scalar: get and set scalar values for each instance or class
 =back
 
 =cut
-
-########################################################################
-
-=head2 Supporting functions for array methods
-
-There are also constants symbols for some for some common combinations of splicing arguments:
-
-  # Reset the array contents to empty
-  $obj->bar( array_clear );
-  
-  # Set the array contents to provided values
-  $obj->bar( array_set, [ 'Foozle', 'Bazzle' ] );
-  
-  # Unshift an item onto the front of the list
-  $obj->bar( array_unshift, 'Bubbles' );
-  
-  # Shift it back off again
-  print $obj->bar( array_shift );
-  
-  # Push an item onto the end of the list
-  $obj->bar( array_push, 'Bubbles' );
-  
-  # Pop it back off again
-  print $obj->bar( array_pop );
-
-=cut
-
-use constant array_set => [];
-use constant array_clear => ( [], undef );
-
-use constant array_push => [undef];
-use constant array_pop => ( [undef, 1], undef );
-
-use constant array_unshift => [0];
-use constant array_shift => ( [0, 1], undef );
-
-sub __array_ops {
-  my $value_ref = shift;
-  if ( scalar(@_) == 0 ) {
-    return $value_ref;
-  } elsif ( scalar(@_) == 1 ) {
-    my $index = shift;
-    ref($index) ? @{$value_ref}[ @$index ] : $value_ref->[ $index ];
-  } elsif ( scalar(@_) % 2 ) {
-    Carp::croak 'Odd number of items in assigment to array method';
-  } elsif ( ! ref $_[0] ) {
-    while ( scalar(@_) ) {
-      my $key = shift();
-      $value_ref->[ $key ] = shift();
-    }
-    $value_ref;
-  } elsif ( ref $_[0] eq 'ARRAY' ) {
-    my @results;
-    while ( scalar(@_) ) {
-      my $key = shift();
-      my $value = shift();
-      my @values = ! ( $value ) ? () : ! ref ( $value ) ? $value : @$value;
-      my $key_v = $key->[0];
-      my $key_c = $key->[1];
-      if ( defined $key_v ) {
-	if ( $key_c ) {
-	  # straightforward two-value splice
-	} else {
-	  # insert at position
-	  $key_c = 0;
-	}
-      } else {
-	if ( ! defined $key_c ) {
-	  # target the entire list
-	  $key_v = 0;
-	  $key_c = scalar @$value_ref;
-	} elsif ( $key_c ) {
-	  # take count items off the end
-	  $key_v = - $key_c
-	} else {
-	  # insert at the end
-	  $key_v = scalar @$value_ref;
-	  $key_c = 0;
-	}
-      }
-      push @results, splice @$value_ref, $key_v, $key_c, @values
-    }
-    ( ! wantarray and scalar @results == 1 ) ? $results[0] : @results;
-  } else {
-    Carp::croak 'Unexpected arguments to array accessor method';
-  }
-}
 
 ########################################################################
 

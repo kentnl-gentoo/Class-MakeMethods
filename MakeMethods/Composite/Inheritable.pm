@@ -1,45 +1,53 @@
 =head1 NAME
 
-Class::MakeMethods::Composite::Inheritable - Inheritable data
+Class::MakeMethods::Composite::Inheritable - Overridable data
 
 =head1 SYNOPSIS
 
   package MyClass;
-  use Class::MakeMethods::Composite::Inheritable (
-    scalar => [ 'foo', 'bar' ],
-    array => 'my_list',
-    hash => 'my_index',
-  );
+
+  use Class::MakeMethods( 'Composite::Inheritable:scalar' => 'foo' );
+  # We now have an accessor method for an "inheritable" scalar value
+  
+  MyClass->foo( 'Foozle' );   # Set a class-wide value
+  print MyClass->foo();	      # Retrieve class-wide value
+  
+  my $obj = MyClass->new(...);
+  print $obj->foo();          # All instances "inherit" that value...
+  
+  $obj->foo( 'Foible' );      # until you set a value for an instance.
+  print $obj->foo();          # This now finds object-specific value.
+  ...
   
   package MySubClass;
   @ISA = 'MyClass';
+  
+  print MySubClass->foo();    # Intially same as superclass,
+  MySubClass->foo('Foobar');  # but overridable per subclass,
+  print $subclass_obj->foo(); # and shared by its instances
+  $subclass_obj->foo('Fosil');# until you override them... 
   ...
   
-  MyClass->foo( 'Foozle' );
-  print MyClass->foo();
+  # Similar behaviour for hashes and arrays is currently incomplete
+  package MyClass;
+  use Class::MakeMethods::Composite::Inheritable (
+    array => 'my_list',
+    hash => 'my_index',
+  );
   
   MyClass->my_list(0 => 'Foozle', 1 => 'Bang!');
   print MyClass->my_list(1);
   
   MyClass->my_index('broccoli' => 'Blah!', 'foo' => 'Fiddle');
   print MyClass->my_index('foo');
-  ...
-  
-  my $obj = MyClass->new(...);
-  print $obj->foo();     # all instances default to same value
-  
-  $obj->foo( 'Foible' ); # until you set a value for an instance
-  print $obj->foo();     # it now has its own value
-  
-  print MySubClass->foo();    # intially same as superclass
-  MySubClass->foo('Foobar');  # but overridable per subclass
-  print $subclass_obj->foo(); # and shared by its instances
-  $subclass_obj->foo('Fosil');# until you override them... 
 
 
 =head1 DESCRIPTION
 
-The Composite::Inheritable suclass of MakeMethods provides basic accessors for class-specific data.
+The MakeMethods subclass provides accessor methods that search an inheritance tree to find a value. This allows you to set a shared or default value for a given class, optionally override it in a subclass, and then optionally override it on a per-instance basis. 
+
+Note that all MakeMethods methods are inheritable, in the sense that they work as expected for subclasses. These methods are different in that the I<data> accessed by each method can be inherited or overridden in each subclass or instance. See L< Class::MakeMethods::Utility::Inheritable> for more about this type of "inheritable" or overridable" data.
+
 
 =head2 Class::MakeMethods Calling Interface
 
@@ -47,94 +55,32 @@ When you C<use> this package, the method declarations you provide
 as arguments cause subroutines to be generated and installed in
 your module.
 
-You can also omit the arguments to C<use> and instead make methods
-at runtime by passing the declarations to a subsequent call to
-C<make()>.
+See L<Class::MakeMethods::Standard/"Calling Conventions"> for more information.
 
-You may include any number of declarations in each call to C<use>
-or C<make()>. If methods with the same name already exist, earlier
-calls to C<use> or C<make()> win over later ones, but within each
-call, later declarations superceed earlier ones.
+=head2 Class::MakeMethods::Standard Declaration Syntax
 
-You can install methods in a different package by passing C<-TargetClass =E<gt> I<package>> as your first arguments to C<use> or C<make>. 
-
-See L<Class::MakeMethods> for more details.
-
-=head2 Class::MakeMethods::Basic Declaration Syntax
-
-The following types of Basic declarations are supported:
-
-=over 4
-
-=item *
-
-I<generator_type> => "I<method_name>"
-
-=item *
-
-I<generator_type> => "I<name_1> I<name_2>..."
-
-=item *
-
-I<generator_type> => [ "I<name_1>", "I<name_2>", ...]
-
-=back
+To declare methods, pass in pairs of a method-type name followed
+by one or more method names. 
 
 See the "METHOD GENERATOR TYPES" section below for a list of the supported values of I<generator_type>.
 
-For each method name you provide, a subroutine of the indicated
-type will be generated and installed under that name in your module.
-
-Method names should start with a letter, followed by zero or more
-letters, numbers, or underscores.
-
-=head2 Class::MakeMethods::Composite Declaration Syntax
-
-The Composite syntax also provides several ways to optionally
-associate a hash of additional parameters with a given method
-name. 
-
-=over 4
-
-=item *
-
-I<generator_type> => [ "I<name_1>" => { I<param>=>I<value>... }, ... ]
-
-A hash of parameters to use just for this method name. 
-
-(Note: to prevent confusion with self-contained definition hashes,
-described below, parameter hashes following a method name must not
-contain the key 'name'.)
-
-=item *
-
-I<generator_type> => [ [ "I<name_1>", "I<name_2>", ... ] => { I<param>=>I<value>... } ]
-
-Each of these method names gets a copy of the same set of parameters.
-
-=item *
-
-I<generator_type> => [ { "name"=>"I<name_1>", I<param>=>I<value>... }, ... ]
-
-By including the reserved parameter C<name>, you create a self-contained declaration with that name and any associated hash values.
-
-=back
-
-Basic declarations, as described above, are given an empty parameter hash.
+See L<Class::MakeMethods::Standard/"Declaration Syntax"> and L<Class::MakeMethods::Standard/"Parameter Syntax"> for more information.
 
 =cut
 
 package Class::MakeMethods::Composite::Inheritable;
 
 use strict;
-use Class::MakeMethods::Composite '-isasubclass';
 use Carp;
+
+use Class::MakeMethods::Composite '-isasubclass';
+use Class::MakeMethods::Utility::Inheritable qw(get_vvalue set_vvalue find_vself );
 
 ########################################################################
 
 =head1 METHOD GENERATOR TYPES
 
-=head2 scalar - Class-specific Accessor
+=head2 scalar - Overrideable Accessor
 
 For each method name passed, uses a closure to generate a subroutine with the following characteristics:
 
@@ -174,23 +120,6 @@ Sample declaration and usage:
 
 =cut
 
-sub _inh_find_vself {
-  my $self = shift;
-  my $data = shift;
-
-  return $self if ( exists $data->{$self} );
-   
-  my $v_self;
-  my @isa_search = ( ref($self) || $self );
-  while ( scalar @isa_search ) {
-    $v_self = shift @isa_search;
-    return $v_self if ( exists $data->{$v_self} );
-    no strict 'refs';
-    unshift @isa_search, @{"$v_self\::ISA"};
-  }
-  return;
-}
-
 use vars qw( %ScalarFragments );
 
 sub scalar {
@@ -202,21 +131,16 @@ sub scalar {
     '+init' => sub {
 	my ($method) = @_;
 	$method->{target_class} ||= $Class::MethodMaker::CONTEXT{TargetClass};
+	$method->{data} ||= {};
       },
     'do' => sub {
 	my $method = pop @_;
 	my $self = shift @_;	
 	if ( scalar(@_) == 0 ) {
-	my $v_self = _inh_find_vself($self, $method->{data});
-	  return $v_self ? $method->{data}{$v_self} : ();
+	  return get_vvalue($method->{data}, $self);
 	} else {
 	  my $value = (@_ == 1 ? $_[0] : [@_]);
-	  if ( defined $value ) {
-	    $method->{data}{$self} = $value;
-	  } else {
-	    delete $method->{data}{$self};
-	    undef;
-	  }
+	  set_vvalue($method->{data}, $self, $value);
 	}
       },
   ],
@@ -286,7 +210,7 @@ sub scalar {
     '+pre' => sub {
 	my $method = pop @_;
 	my $self = shift @_;
-	my $v_self = _inh_find_vself($self);
+	my $v_self = find_vself($method->{data}, $self);
 	$method->{scratch}{return_original} = 
 					$v_self ? $method->{data}{$v_self} : ();
       },
@@ -299,7 +223,7 @@ sub scalar {
 
 ########################################################################
 
-=head2 array - Class-specific Ref Accessor
+=head2 array - Overrideable Ref Accessor
 
 For each method name passed, uses a closure to generate a subroutine with the following characteristics:
 
@@ -391,7 +315,7 @@ sub array { };
 
 ########################################################################
 
-=head2 hash - Class-specific Ref Accessor
+=head2 hash - Overrideable Ref Accessor
 
 For each method name passed, uses a closure to generate a subroutine with the following characteristics:
 
@@ -466,15 +390,14 @@ sub hash {
 	my $self = shift @_;
 	
 	if ( scalar(@_) == 0 ) {
-	  my $v_self = _inh_find_vself($self, $method->{data});
-	  my $value = $v_self ? $method->{data}{$v_self} : ();
+	  my $value = get_vvalue($method->{data}, $self);
 	  if ( $method->{auto_init} and ! $value ) {
-	    $method->{data}{$self} = {};
+	    set_vvalue( $method->{data}, $self, {} );
 	  } else {
 	    $value;
 	  }
 	} elsif ( scalar(@_) == 1 ) {
-	  my $v_self = _inh_find_vself($self, $method->{data});
+	  my $v_self = find_vself($method->{data}, $self);
 	  return unless $v_self;
 	  my $index = shift;
 	  ref($index) ? @{$method->{data}{$v_self}}{ @$index } 
@@ -483,7 +406,7 @@ sub hash {
 	  Carp::croak "Odd number of items in assigment to $method->{name}";
 	} else {
 	  if ( ! exists $method->{data}{$self} ) {
-	    my $v_self = _inh_find_vself($self, $method->{data});
+	    my $v_self = find_vself($method->{data}, $self);
 	    $method->{data}{$self} = { $v_self ? %$v_self : () };
 	  }
 	  while ( scalar(@_) ) {
@@ -499,7 +422,7 @@ sub hash {
 
 ########################################################################
 
-=head2 object - Class-specific Ref Accessor
+=head2 object - Overrideable Ref Accessor
 
 For each method name passed, uses a closure to generate a subroutine with the following characteristics:
 

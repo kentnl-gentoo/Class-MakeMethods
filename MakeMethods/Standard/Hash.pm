@@ -53,6 +53,7 @@ package Class::MakeMethods::Standard::Hash;
 
 use strict;
 use Class::MakeMethods::Standard '-isasubclass';
+use Class::MakeMethods::Utility::ArraySplicer 'array_splicer';
 
 ########################################################################
 
@@ -290,7 +291,7 @@ sub array {
 	}
       } else {
 	$self->{$hash_key} ||= [];
-	return Class::MakeMethods::Standard::__array_ops( $self->{$hash_key}, @_ );
+	return array_splicer( $self->{$hash_key}, @_ );
       }
     }
   } (shift)->get_declarations(@_)

@@ -3,7 +3,7 @@ package Class::MakeMethods::Emulator::Inheritable;
 use strict;
 
 use Class::MakeMethods::Template::ClassInherit;
-use Class::MakeMethods::Emulator::TakeName qw( namespace_capture namespace_release );
+use Class::MakeMethods::Utility::TakeName qw( namespace_capture namespace_release );
 
 my $emulation_target = 'Class::Data::Inheritable';
 

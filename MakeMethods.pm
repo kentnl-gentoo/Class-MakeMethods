@@ -8,7 +8,7 @@ use strict;
 require 5.00307; # for the UNIVERSAL::isa method.
 
 use vars qw( $VERSION );
-$VERSION = 1.000_014;
+$VERSION = 1.000_015;
 
 use vars qw( %CONTEXT %DIAGNOSTICS );
 
@@ -320,7 +320,7 @@ __END__
 
 =head1 NAME
 
-B<Class::MakeMethods> - Generate common types of methods
+Class::MakeMethods - Generate common types of methods
 
 
 =head1 SYNOPSIS
@@ -831,6 +831,13 @@ other than than the code ref we expect.
 =back
 
 
+=head1 BUGS 
+
+It does not appear to be possible to assign subroutine names to closures within Perl. As a result, debugging output from Carp and similar sources will show all generated methods as "ANON()" rather than "YourClass::methodname()".
+
+See L<Class::MakeMethods::ToDo> for other outstanding issues.
+
+
 =head1 SEE ALSO
 
 See L<Class::MakeMethods::Guide> for a getting-started guide,
@@ -841,7 +848,7 @@ See L<Class::MakeMethods::ReadMe> for distribution, installation,
 version and support information.
 
 For a brief survey of the numerous modules on CPAN which offer some
-type of  method generation, see L<Class::MakeMethods::RelatedModules>.
+type of method generation, see L<Class::MakeMethods::RelatedModules>.
 
 =head2 Perl Docs
 
@@ -852,18 +859,17 @@ See L<perltoot> and L<perltootc> for an extensive discussion of various approach
 
 =head1 VERSION
 
-This is Class::MakeMethods v1.0.13.
+This is Class::MakeMethods v1.0.015.
 
 
-=head1 AUTHORS
+=head1 CREDITS AND COPYRIGHT
 
-=over 4
+=head2 Developed By
 
-=item Developed by
+  M. Simon Cavalletto, simonm@cavalletto.org
+  Evolution Softworks, www.evoscript.org
 
-  M. Simon Cavalletto, Evolution Online Systems, simonm@evolution.com
-
-=item The Shoulders of Giants
+=head2 The Shoulders of Giants
 
 Inspiration, cool tricks, and blocks of useful code for this module
 were extracted from the following CPAN modules:
@@ -873,25 +879,28 @@ were extracted from the following CPAN modules:
   Class::Contract, by Damian Conway
   Class::SelfMethods, by Toby Everett
 
-=item Feedback and Suggestions 
+=head2 Feedback and Suggestions 
+
+Thanks to:
 
   Martyn J. Pearce
   Scott R. Godin
   Ron Savage
   Jay Lawrence
+  Adam Spiers
 
-=back
+=head2 Copyright
 
-=head1 LICENSE
+Copyright 2002 Matthew Simon Cavalletto. 
 
-This module is free software. It may be used, redistributed and/or
-modified under the same terms as Perl.
+Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
 
-Copyright (c) 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
+Portions copyright 1996 Organic Online.
 
-Portions Copyright (c) 1996 Organic Online
+Portions copyright 2000 Martyn J. Pearce.
 
-Portions Copyright (c) 2000 Martyn J. Pearce.
+=head2 License
+
+You may use, modify, and distribute this software under the same terms as Perl.
 
 =cut
-

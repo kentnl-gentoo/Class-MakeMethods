@@ -2,7 +2,7 @@
 
 package X;
 
-use Class::MakeMethods::Basic::Static
+use Class::MakeMethods::Basic::Global
   scalar => [ qw / a b / ],
   scalar => 'c';
 

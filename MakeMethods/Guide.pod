@@ -6,7 +6,7 @@ B<Class::MakeMethods::Guide> - Getting Started Guide
 =head1 SYNOPSIS
 
   package MyObject;
-  use Class::MakeMethods::Basic::Hash (
+  use Class::MakeMethods::Standard::Hash (
     'new'       => 'new',
     'scalar'    => 'foo',
     'scalar'    => 'bar',
@@ -76,7 +76,7 @@ methods in your package at compile-time.
 Here's the equivalent declaration for that same basic class:
 
   package MyStruct;
-  use Class::MakeMethods::Basic::Hash (
+  use Class::MakeMethods::Standard::Hash (
     'new'       => 'new',
     'scalar'    => 'foo',
     'scalar'    => 'bar',
@@ -96,7 +96,7 @@ down to figuring out which arguments to pass to generate the specific
 methods you want.
 
 
-=head1 CLASS HIERARCHY
+=head1 CLASS ARCHITECTURE
 
 Because there are so many common types of methods one might wish
 to generate, the Class::MakeMethods framework provides an extensible
@@ -107,7 +107,7 @@ standard argument parsing, delegates the construction of the actual
 method to the appropriate subclass, and then installs whatever
 method the subclass returns.
 
-=head2 Role of the Superclass
+=head2 What the Base Class Does
 
 The Class::MakeMethods package defines a superclass for method-generating
 modules, and provides a calling convention and subroutine installation
@@ -117,11 +117,11 @@ The superclass also lets you generate several different types of
 methods in a single call, and will automatically load named subclasses
 the first time they're used.
 
-=head2 Role of the Subclasses
+=head2 What the Subclass Does
 
 The type of method that gets created is controlled by the specific
 subclass and generator-method you request. For example,
-C<Class::MakeMethods::Basic::Hash> has a generator-method C<scalar()>,
+C<Class::MakeMethods::Standard::Hash> has a generator-method C<scalar()>,
 which is responsible for generating simple scalar-accessor methods
 for blessed-hash objects.
 
@@ -129,30 +129,98 @@ Because each subclass defines its own set of method types and
 customization options, a key step is to find your way to the
 appropriate subclasses, which is the subject of the next section.
 
-=head2 Choosing A Subclass
+=head1 CHOOSING A SUBCLASS
 
-Generally you will want to begin with the Basic::Hash subclass, to
+=head2 Standard
+
+Generally you will want to begin with the Standard::Hash subclass, to
 create constructor and accessor methods for working with blessed-hash
-objects (or you might choose the Basic::Array subclass instead).
-The Basic::Static subclass provides methods for class data shared
-by all objects in a class.
+objects (or you might choose the Standard::Array subclass instead).
+The Standard::Global subclass provides methods for class data shared
+by all objects in a class. 
 
-For a wider range of method types, and a greater degree of
-customization options, consider the Standard::* or Composite::*
-subclasses.  
+Each Standard method declaration can optionally include a hash of associated parameters, which allows you to tweak some of the characteristics of the methods. Subroutines are bound as closures to a hash of each method's name and parameters. Standard::Hash and Standard::Array provide object constructor and
+accessors. The Standard::Global provides for static data shared by
+all instances and subclasses, while the data for Standard::Inheritable
+methods trace the inheritance tree to find values, and can be
+overriden for any subclass or instance. 
 
-Finally, see L<Class::MakeMethods::Template>, which provide an
+See L<Class::MakeMethods::Standard> for more. A listing of available
+method types is provided in L<Class::MakeMethods::Standard/"SUBCLASS CATALOG">.
+
+=head2 Basic
+
+The Basic subclasses provide stripped down method generators with no configurable options, for minimal functionality (and minimum overhead). 
+
+Subroutines are bound as closures to the name of each method. Basic::Hash and Basic::Array provide simple object constructors and accessors. Basic::Global provides basic global-data accessors. 
+
+See L<Class::MakeMethods::Basic> for more. A listing of available method types is provided in L<Class::MakeMethods::Basic/"SUBCLASS CATALOG">.
+
+=head2 Composite
+
+For additional customization options, check out the Composite
+subclasses, which allow you to select from a more varied set of
+implementations and which allow you to adjust any specific method
+by adding your own code-refs to be run before or after it.
+
+Subroutines are bound as closures to a hash of each method's name
+and optional additional data, and to one or more subroutine references
+which make up the composite behavior of the method. Composite::Hash
+and Composite::Array provide object constructor and accessors. The
+Composite::Global provides for static data shared by all instances
+and subclasses, while the data for Composite::Inheritable methods
+can be overriden for any subclass or instance.
+
+See L<Class::MakeMethods::Composite> for more. A listing of available method types is provided in  L<Class::MakeMethods::Composite/"SUBCLASS CATALOG">.
+
+=head2 Template
+
+Finally, the Template subclasses provide an
 open-ended structure for objects that assemble Perl code on the
 fly into cachable closure-generating subroutines; if the method
 you need isn't included, you can extend existing methods by
 re-defining just the snippet of code that's different.
 
+Class::MakeMethods::Template extends MakeMethods with a
+text templating system that can assemble Perl code fragments into
+a desired subroutine. The code for generated methods is eval'd once
+for each type, and then repeatedly bound as closures to method-specific
+data for better performance.
+
+Templates for dozens of types of constructor, accessor, and mutator
+methods are included, ranging from from the mundane (constructors
+and value accessors for hash and array slots) to the esoteric
+(inheritable class data and "flyweight" accessors with external
+indexes). 
+
+See L<Class::MakeMethods::Template> for more. A listing is provided in
+L<Class::MakeMethods::Template/"SUBCLASS CATALOG">.
+
+=head2 Emulation Adaptors
+
+In several cases, Class::MakeMethods provides functionality closely
+equivalent to that of an existing module, and it is simple to map
+the existing module's interface to that of Class::MakeMethods.
+
+Emulators are included for Class::MethodMaker, Class::Accessor::Fast,
+Class::Data::Inheritable, Class::Singleton, and Class::Struct, each
+of which passes the original module's test suite, usually requiring
+only a single-line change.
+
+=head2 Extensible
+
 Other subclasses may be available separately, or you can define
-your own for future use. (See L<Class::MakeMethods/"EXTENDING">.)
+your own for future use. (See L<Class::MakeMethods/EXTENDING>.)
+
+
+=head1 USAGE
+
+See L<Class::MakeMethods/"USAGE"> for a guide to the calling
+conventions that apply to all subclasses.
 
 =head2 Naming Convention
 
-When you C<use Class::MakeMethods>, you can refer to the C<scalar()> method provided by the C<Class::MakeMethods::Basic::Hash> class as "Basic::Hash:scalar", and this document will also use that notation.
+When you C<use Class::MakeMethods>, you can refer to the C<scalar()> method provided by the C<Class::MakeMethods::Standard::Hash> class as "Standard::Hash:scalar", and this document will also use that notation.
 
 The names used by the included subclasses and method types reflect three axes of variation, "I<Group>::I<Subclass>:I<MethodType>":
 
@@ -160,7 +228,7 @@ The names used by the included subclasses and method types reflect three axes of
 
 =item Group
 
-Each group shares a similar style of technical implementation and level of complexity. For example, the C<Basic::*> packages are all simple, while the C<Composite::*> packages all support pre- and post-conditions.
+Each group shares a similar style of technical implementation and level of complexity. For example, the C<Standard::*> packages are all simple, while the C<Composite::*> packages all support pre- and post-conditions.
 
 (For a listing of the four main groups of included subclasses, see L<"SUBCLASS GROUPS">, below.)
 
@@ -176,73 +244,16 @@ Each method type produces a similar type of constructor or accessor. For example
 
 Bearing that in mind, you should be able to guess the intent of many of the method types based on their names alone; when you see "Standard::Array:list" you can read it as "a type of method to access a I<list> of data stored in an I<array> object, with a I<standard> implementation style" and know that it's going to call Class::MakeMethods::Standard::Array->list().
 
-=head2 Subclass Groups
+=head2 Mixing Method Types
 
-There are several groups of subclasses included in this distribution.
+In general, you can combine method-generators from different MakeMethods subclasses; the only mixing that's problematic is combinations of methods which depend on different underlying object types, like using *::Hash and *::Array methods together. 
 
-=over 4
+I frequently mix and match various *::Hash methods, with a scattering of Global or Inheritable methods. The "Subclass:method" syntax is useful here, allowing you to mix and match in a single use statement:
 
-=item Basic
-
-The Class::MakeMethods::Basic::* subclasses provide stripped down method generators with no configurable options. Subroutines are bound as closures to the name of each method.
-
-Basic::Hash and Basic::Array provide simple object constructors and accessors. Basic::Static provides basic global-data accessors. A listing of available method types is provided in L<Class::MakeMethods::Basic/"SUBCLASS CATALOG">.
-
-=item Standard
-
-The Class::MakeMethods::Standard::* subclasses provide a more
-flexible set of method generators; each Standard method declaration
-can optionally include a hash of associated parameters, which allows
-you to tweak some of the characteristics of the methods. Subroutines
-are bound as closures to a hash of each method's name and parameters.
-
-Standard::Hash and Standard::Array provide object constructor and
-accessors. The Standard::Global provides for static data shared by
-all instances and subclasses, while the data for Standard::Inheritable
-methods trace the inheritance tree to find values, and can be
-overriden for any subclass or instance. A listing of available
-method types is provided in L<Class::MakeMethods::Standard/"SUBCLASS CATALOG">.
-
-=item Composite 
-
-The Class::MakeMethods::Composite::* subclasses provide an extensible set of method generators that support pre- and post-conditions. Subroutines are bound as closures to a hash of each method's name and optional additional data, and to one or more subroutine references which make up the composite behavior of the method.
-
-Composite::Hash and Composite::Array provide object constructor and accessors. The Composite::Global provides for static data shared by
-all instances and subclasses, while the data for Composite::Inheritable
-methods can be overriden for any subclass or instance. A listing of available method types is provided in  L<Class::MakeMethods::Composite/"SUBCLASS CATALOG">.
-
-=item Template
-
-Class::MakeMethods::Template extends MakeMethods with a
-text templating system that can assemble Perl code fragments into
-a desired subroutine. The code for generated methods is eval'd once
-for each type, and then repeatedly bound as closures to method-specific
-data for better performance.
-
-Templates for dozens of types of constructor, accessor, and mutator
-methods are included, ranging from from the mundane (constructors
-and value accessors for hash and array slots) to the esoteric
-(inheritable class data and "flyweight" accessors with external
-indexes). A listing is provided in
-L<Class::MakeMethods::Template/"SUBCLASS CATALOG">.
-
-=back
-
-=head2 Emulation Adaptors
-
-In several cases, Class::MakeMethods provides functionality closely
-equivalent to that of an existing module, and it is simple to map
-the existing module's interface to that of Class::MakeMethods.
-
-Emulators are included for Class::MethodMaker, Class::Accessor::Fast,
-Class::Data::Inheritable, Class::Singleton, and Class::Struct, each
-of which passes the original module's test suite, usually requiring
-only a single-line change.
-
-=head1 USAGE
-
-See L<Class::MakeMethods/"USAGE"> for a guide to the calling
-conventions that apply to all subclasses.
+  use Class::MakeMethods
+    'Template::Hash:scalar'   => 'foo',
+    'Composite::Hash:scalar'  => [ 'bar' => { post_rules => [] } ],
+    'Standard::Global:scalar' => 'our_shared_baz';
 
 =head2 About Precedence
 
@@ -259,33 +270,33 @@ call, later declarations superceed earlier ones.
 Here are some examples of the results of these precedence rules:
 
   # 1
-  use Class::MakeMethods::Basic::Hash (
+  use Class::MakeMethods::Standard::Hash (
     'scalar'=>['baz'] # baz() not seen yet, so we generate, install
   );
   sub baz { 1 } # Subsequent declaration overwrites it, with warning
   
   # 2
   sub foo { 1 }
-  use Class::MakeMethods::Basic::Hash (
+  use Class::MakeMethods::Standard::Hash (
     'scalar'=>['foo'] # foo() is already declared, so has no effect
   );
   
   # 3
   sub bar { 1 }
-  use Class::MakeMethods::Basic::Hash ( 
+  use Class::MakeMethods::Standard::Hash ( 
       -ForceInstall => 1, # Set flag for following methods...
     'scalar' => ['bar']   # ... now overwrites pre-existing bar()
   );
   
   # 4
-  Class::MakeMethods::Basic::Hash->make(
+  Class::MakeMethods::Standard::Hash->make(
     'scalar'=>['blip'] # blip() is already declared, so has no effect
   );
   sub blip { 1 } # Although lower than make(), this "happens" first
   
   # 5
   sub ping { 1 } 
-  Class::MakeMethods::Basic::Hash->make(
+  Class::MakeMethods::Standard::Hash->make(
       -ForceInstall => 1, # Set flag for following methods...
     'scalar' => ['ping']  # ... now overwrites pre-existing ping()
   );
@@ -294,6 +305,121 @@ Here are some examples of the results of these precedence rules:
 
 The following examples indicate some of the capabilities of
 Class::MakeMethods. 
+
+=head2 Adding Custom Initialization to Constructors
+
+Frequently you'll want to provide some custom code to initialize new objects of your class. Most of the C<*:new> constructor methods provides a way to ensure that this code is consistently called every time a new instance is created.
+
+=over 4
+
+=item Template::Hash:new --and_then_init
+
+Use 'Template::Hash:new --and_then_init', which will first create the object and initialize it with the provided values, and then call an init() method on the new object before returning it.
+
+  package MyClass;
+  use Class::MakeMethods (
+    'Template::Hash:new --and_then_init' => 'new'
+    'Template::Hash:string'  => 'foo'
+  );
+  sub init {
+    my $self = shift;
+    length($self->foo) or $self->foo('FooBar');   # default value
+    warn "Initialized new object '$self'";       
+  }
+  ... 
+  package main;
+  my $self = MyClass->new( foo => 'Foozle' )
+
+=item Template::Hash:new --with_init
+
+If you don't want your constructor to use the default hash-of-method-names style of initialization, use 'Template::Hash:new --with_init', which will create an empty object, pass its arguments to the init() method on the new object, and then return it.
+
+  package MyClass;
+  use Class::MakeMethods (
+    'Template::Hash:new --with_init' => 'new'
+    'Template::Hash:string'  => 'foo'
+  );
+  sub init {
+    my $self = shift;
+    $self->foo( shift || 'FooBar' ); # init with arg or default
+    warn "Initialized new object '$self'";       
+  }
+  ... 
+  package main;
+  my $self = MyClass->new( 'Foozle' )
+
+=item Composite::Hash:new ... post_rules=>[...]
+
+The recently added Composite classes allow you to add pre- and post-operations to any method, so you can pass in a code-ref to be executed after the new() method.
+
+  package MyClass;
+  
+  sub new_post_init {
+    my $self = ${(pop)->{result}}; # get result of original new()
+    length($self->foo) or $self->foo('FooBar');   # default value
+    warn "Initialized new object '$self'";       
+  }
+  
+  use Class::MakeMethods (
+    'Composite::Hash:new' => [
+	'new' => { post_rules=>[\&new_post_init] } 
+    ],
+    'Composite::Hash:scalar' => 'foo;,
+  );
+  ... 
+  package main;
+  my $self = MyClass->new( foo => 'Foozle' )
+
+=back
+
+Some additional notes about these constructors:
+
+=over 4
+
+=item * 
+
+The C<Template::*:new> methods allow you to specify a name for your method other than C<init> by passing the C<init_method> parameter:
+
+  use Class::MakeMethods (
+    'Template::Hash:new --and_then_init' => [ 
+	'new' => { init_method =>  'my_init' } 
+    ],
+  );
+
+=item * 
+
+If you know that you're not going to have a complex class hierarchy, you can reduce resource consumption a bit by changing the above declarations from "*::Hash" to "*::Array" so your objects end up as blessed arrays rather than blessed hashes.
+
+=back
+
+=head2 Mixing Object and Global Methods
+
+Here's a package declaration using two of the included subclasses, C<Standard::Hash>, for creating and accessing hash-based objects, and C<Basic::Global>, for simple global-value accessors:
+
+  package MyQueueItem;
+  
+  use Class::MakeMethods::Standard::Hash (
+    new => { name => 'new', defaults=>{ foo => 'Foozle' } },
+    scalar => [ 'foo', 'bar' ],
+    hash => 'history'
+  );
+  
+  use Class::MakeMethods::Basic::Global (
+    scalar => 'Debug',
+    array  => 'InQueue',
+  );
+  
+  sub AddQueueItem {
+    my $class = shift;
+    my $instance = shift;
+    $instance->history('AddQueueItem' => time());
+    $class->InQueue([0, 0], $instance);    
+  }
+  
+  sub GetQueueItem {
+    my $class = shift;
+    $class->InQueue([0, 1], []) or $class->new
+  }
 
 =head2 Access Control Example
 
@@ -311,6 +437,10 @@ Similar functionality is also available as:
 (See L<Class::MakeMethods::Template::Universal> for information
 about the C<private> modifier.)
 
+
+=head1 TEMPLATE EXAMPLES
+
+The examples in this section all use Class::MakeMethods::Template subclasses.
 
 =head2 String and Numeric Accessors
 
@@ -486,36 +616,6 @@ Here's a sample of how the above classes could be used in a program.
     print $data->value();
   }
 
-=head2 Mixing Object and Global Methods
-
-Here's a package declaration using two of the included subclasses, C<Standard::Hash>, for creating and accessing hash-based objects, and C<Basic::Static>, for simple global-value accessors:
-
-  package MyQueueItem;
-  
-  use Class::MakeMethods::Standard::Hash (
-    new => { name => 'new', defaults=>{ foo => 'Foozle' } },
-    scalar => [ 'foo', 'bar' ],
-    hash => 'history'
-  );
-  
-  use Class::MakeMethods::Basic::Static (
-    scalar => 'Debug',
-    array  => 'InQueue',
-  );
-  
-  sub AddQueueItem {
-    my $class = shift;
-    my $instance = shift;
-    $instance->history('AddQueueItem' => time());
-    $class->InQueue([0, 0], $instance);    
-  }
-  
-  sub GetQueueItem {
-    my $class = shift;
-    $class->InQueue([0, 1], []) or $class->new
-  }
-
-
 =head2 Changing Method Names
 
 The Template subclasses allow you to control the names assigned to
@@ -584,7 +684,7 @@ first call a user-provided init_* method and save its value.
   my $other_widget = MyWidget->new( foo => 'bar', count => 2 );
   print $widget->result; # output: barbar  
 
-(See L<Class::MakeMethods::Generic> for more information about
+(See L<Class::MakeMethods::Template::Generic> for more information about
 C<init_and_get>. This interface is also supported by all of Generic's
 subclasses, so you can add lazy-init methods for global data, class
 data, array objects, etc. Unfortunately, to date it is only supported

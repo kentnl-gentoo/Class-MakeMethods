@@ -1,16 +1,16 @@
 package Class::MakeMethods::Emulator::Singleton;
 
 use strict;
-require Class::MakeMethods::Emulator::TakeName;
+require Class::MakeMethods::Utility::TakeName;
 
 my $emulation_target = 'Class::Singleton';
 
 sub import {
   my $mm_class = shift;
   if ( scalar @_ and $_[0] =~ /^-take_namespace/ and shift) {
-    Class::MakeMethods::Emulator::TakeName::namespace_capture(__PACKAGE__, $emulation_target);
+    Class::MakeMethods::Utility::TakeName::namespace_capture(__PACKAGE__, $emulation_target);
   } elsif ( scalar @_ and $_[0] =~ /^-release_namespace/ and shift) {
-    Class::MakeMethods::Emulator::TakeName::namespace_release(__PACKAGE__, $emulation_target);
+    Class::MakeMethods::Utility::TakeName::namespace_release(__PACKAGE__, $emulation_target);
   }
   # The fallback should really be to NEXT::import.
   $mm_class->SUPER::import( @_ );

@@ -1,13 +1,3 @@
-package Class::MakeMethods::Template::Generic;
-
-use Class::MakeMethods::Template '-isasubclass';
-
-use strict;
-use Carp;
-
-# use AutoLoader 'AUTOLOAD';
-
-
 =head1 NAME
 
 B<Class::MakeMethods::Template::Generic> - Templates for common meta-method types
@@ -16,9 +6,9 @@ B<Class::MakeMethods::Template::Generic> - Templates for common meta-method type
 
   package MyObject;
   use Class::MakeMethods (
-    'Hash:new'       => [ 'new' ],
-    'Hash:scalar'    => [ 'foo' ]
-    'Static:scalar'  => [ 'bar' ]
+    'Template::Hash:new'       => [ 'new' ],
+    'Template::Hash:scalar'    => [ 'foo' ]
+    'Template::Static:scalar'  => [ 'bar' ]
   );
   
   package main;
@@ -46,6 +36,19 @@ mechanism.)
 
 =cut
 
+########################################################################
+
+package Class::MakeMethods::Template::Generic;
+
+use Class::MakeMethods::Template '-isasubclass';
+
+use strict;
+use Carp;
+
+# use AutoLoader 'AUTOLOAD';
+
+########################################################################
+
 sub generic {
   {
     'params' => {
@@ -67,9 +70,16 @@ sub generic {
 
 sub _array_offset {
   my ($array, $value) = (shift, shift);
-  foreach ( 0..$#$array ) { return $_ if ( $array->[$_] eq $value ) }
-  push @$array, $value; return $#$array;
+  foreach ( 0..$#$array ) { 
+    return $_ if ( $array->[$_] eq $value ) 
+  }
+  push @$array, $value; 
+  return $#$array;
 }
+
+# 1;
+
+# __END__
 
 ########################################################################
 
@@ -268,13 +278,13 @@ sub new {
 	  return $self;
         },
       'copy_with_values' => q{ 
-	  local @_ = ( %$self, @_ );
+	  @_ = ( %$self, @_ );
 	  $self = _EMPTY_NEW_INSTANCE_;
 	  _SET_VALUES_FROM_HASH_
 	  return $self;
 	},
       'copy_with_methods' => q{ 
-	  local @_ = ( %$self, @_ );
+	  @_ = ( %$self, @_ );
 	  $self = _EMPTY_NEW_INSTANCE_;
 	  _CALL_METHODS_FROM_HASH_
 	  return $self;
@@ -1118,6 +1128,14 @@ Provides the get_set_items for I<*>.
 
 Provides get_push behavior for I<*>, and I<*>_I<verb> methods for the non-get behaviors below.
 
+=item get_set_ref
+
+Provides the get_set_ref for I<*>.
+
+=item get_set_ref_help
+
+Provides the get_set_ref for I<*>, and I<verb>_I<*> methods for the non-get behaviors below.
+
 =back
 
 B<Behaviors>: The following types of accessor methods are available.
@@ -1136,7 +1154,15 @@ pairs and adds them to the array.
 
 =item get_push
 
-If arguments are passed, these values are pushed on to the list.
+If arguments are passed, these values are pushed on to the list; if a single array ref is passed, its values are used as the arguments.
+
+This method returns the list of values stored in the slot. In an array
+context it returns them as an array and in a scalar context as a
+reference to the array.
+
+=item get_set_ref
+
+If arguments are passed, these values are placed on the list, replacing the current contents; if a single array ref is passed, its values are used as the arguments.
 
 This method returns the list of values stored in the slot. In an array
 context it returns them as an array and in a scalar context as a
@@ -1149,6 +1175,7 @@ If arguments are passed, these values are placed on the list, replacing the curr
 This method returns the list of values stored in the slot. In an array
 context it returns them as an array and in a scalar context as a
 reference to the array.
+
 
 =item push
 
@@ -1197,6 +1224,8 @@ sub array {
 	'*'=>'get_set', 
 	map( ('*_'.$_ => $_ ), qw(pop push unshift shift splice clear count ref index )),
       },
+      get_set_ref => { '*'=>'get_set_ref' },
+      get_set_ref_help => { '*'=>'get_set_ref', '-base'=>'default' },
     },
     'modifier' => {
       '-all' => [ q{ _ENSURE_REF_VALUE_; * } ],
@@ -1207,6 +1236,10 @@ sub array {
     'behavior' => {
       'get_set' => q{
 	  @{_REF_VALUE_} = @_ if ( scalar @_ );
+ 	  return wantarray ? @{_GET_VALUE_} : _REF_VALUE_;
+	},
+      'get_set_ref' => q{
+	  @{_REF_VALUE_} = ( ( scalar(@_) == 1 and ref($_[0]) eq 'ARRAY' ) ? @{$_[0]} : @_ ) if ( scalar @_ );
  	  return wantarray ? @{_GET_VALUE_} : _REF_VALUE_;
 	},
       'get_push' => q{
@@ -1389,8 +1422,9 @@ sub hash {
 	  return _HASH_GET_ if (scalar @_ == 0);
 	  
 	  # If called with a hash ref, act as if contents of hash were passed
-	  local @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
-	
+	  # local @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
+	  @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
+	  
 	  # If called with an index, get that value, or a slice for array refs
           return _HASH_GET_VALUE_ if (scalar @_ == 1 );
 	
@@ -1404,7 +1438,8 @@ sub hash {
 	  return _HASH_GET_ if (scalar @_ == 0);
 	  
 	  # If called with a hash ref, act as if contents of hash were passed
-	  local @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
+	  # local @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
+	  @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
 	
 	  # If called with an index, get that value, or a slice for array refs
           return _HASH_GET_VALUE_ if (scalar @_ == 1 );
@@ -1430,7 +1465,8 @@ sub hash {
       'set' => q{ _HASH_SET_ },
       'push' => q{ 
 	  # If called with a hash ref, act as if contents of hash were passed
-	  local @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
+	  # local @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
+	  @_ = %{ $_[0] } if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
 
 	  _HASH_PUSH_ 
 	},
@@ -1598,7 +1634,7 @@ indices beyond range.
 
 Takes a key, and a list of indices.  Removes each corresponding item
 from the named list.  The indices are effectively looked up at the point
-of call --- thus removing indices 3, 1 from list (a, b, c, d) will
+of call -- thus removing indices 3, 1 from list (a, b, c, d) will
 remove (d) and (b).
 
 =item sift
@@ -2077,7 +2113,7 @@ sub array_of_objects {
     'code_expr' => {
       '_BLESS_ARGS_' => q{
 	  my $new_method = _ATTR_REQUIRED_{'new_method'};
-	  local @_ = map {
+	  @_ = map {
 	    (ref $_ and UNIVERSAL::isa($_, _ATTR_REQUIRED_{class})) ? $_ 
 			  : _ATTR_{'class'}->$new_method($_)
 	  } @_;

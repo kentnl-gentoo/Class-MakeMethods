@@ -2,7 +2,7 @@
 
 use Test;
 BEGIN {
-  eval q{ use Attribute::Handlers; 1 };
+  eval q{ local $SIG{__DIE__}; require Attribute::Handlers; 1 };
   if ( $@ ) {
     plan( tests => 1 );
     print "Skipping test on this platform (no Attribute::Handlers).\n";

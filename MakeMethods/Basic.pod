@@ -126,9 +126,9 @@ hash: get and set values in a hash refered to in each instance
 
 =back
 
-=head2 Basic::Static (Global)
+=head2 Basic::Global (Global)
 
-Static methods are not instance-dependent; calling them by class
+Global methods are not instance-dependent; calling them by class
 name or from any instance or subclass will consistently access the
 same value.
 

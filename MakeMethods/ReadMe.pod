@@ -10,7 +10,7 @@ Class::MakeMethods::ReadMe - About This Module
   
   # Generates methods for your object when you "use" it.
   package MyObject;
-  use Class::MakeMethods::Basic::Hash (
+  use Class::MakeMethods::Standard::Hash (
     'new'     => [ 'new' ],
     'scalar'  => [ 'foo', 'bar' ]
   );
@@ -109,7 +109,7 @@ you may also retrieve the current distribution from the below
 address and use the standard unpack, "perl Makefile.PL", "make
 test", "make install" sequence:
 
-  http://work.evolution.com/dist/
+  http://www.evoscript.org/Class-MakeMethods/
 
 =head2 Getting Started
 
@@ -140,10 +140,11 @@ The C<:MakeMethod> subroutine attribute requires Perl version 5.6 and the Attrib
 
 This release has been tested succesfully on the following platforms:
 
-  5.005_02 on Rhapsody
+  5.6.1 on darwin
 
 Earlier releases have also tested on the following platforms:
 
+  5.005_02 on Rhapsody
   5.005_03 on sun4-solaris: PASS as of 1.0.13
   v5.6.0 on sun4-solaris: PASS as of 1.0.13
   v5.6.1 on WinNT: PASS as of 1.0.14.a (was TEST FAILURE as of 1.0.13)
@@ -152,8 +153,9 @@ Earlier releases have also tested on the following platforms:
   5.004 on MacOS (MacPerl 520r4): PASS as of 1.0.6
   5.005 on WinNT (ActivePerl 618): PASS as of 1.0.6
 
-(Once this module has been on CPAN for a while, I'll replace this information with a link to the CPAN-Testers results.)
+You may also review the current test results from CPAN-Testers:
 
+  http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
 
 =head1 VERSION
 
@@ -198,9 +200,9 @@ dependencies, as well as general feedback and suggested additions.
 
 For an overview of this package, see L<Class::MakeMethods>.
 
-If you're just getting started, see L<Class::MakeMethods::Basic> for a listing of basic method generators.
+If you're just getting started, see L<Class::MakeMethods::Standard> for a listing of common method generators.
 
-If you need a bit more flexibility, see L<Class::MakeMethods::Standard> for a listing of enhanced method generators.
+If you need a bit more flexibility, see L<Class::MakeMethods::Composite> for method generators which offer more customization options.
 
 For the largest collection of methods and options, see L<Class::MakeMethods::Template>.
 
@@ -209,16 +211,14 @@ similarities. Backward compatibility and conversion documentation
 is provded in L<Class::MakeMethods::Emulator::MethodMaker>.
 
 
-=head1 AUTHORS
+=head1 CREDITS AND COPYRIGHT
 
-=over 4
+=head2 Developed By
 
-=item Developed by
+  M. Simon Cavalletto, simonm@cavalletto.org
+  Evolution Softworks, www.evoscript.org
 
-  M. Simon Cavalletto, simonm@evolution.com
-  Evolution Online Systems, http://www.evolution.com
-
-=item The Shoulders of Giants
+=head2 The Shoulders of Giants
 
 Inspiration, cool tricks, and blocks of useful code for this module
 were extracted from the following CPAN modules:
@@ -228,28 +228,28 @@ were extracted from the following CPAN modules:
   Class::Contract, by Damian Conway
   Class::SelfMethods, by Toby Everett
 
-=item Contributors
+=head2 Feedback and Suggestions 
 
-Thank you for your feedback and suggestions.
+Thanks to:
 
   Martyn J. Pearce
   Scott R. Godin
   Ron Savage
   Jay Lawrence
+  Adam Spiers
 
-=back
+=head2 Copyright
 
+Copyright 2002 Matthew Simon Cavalletto. 
 
-=head1 LICENSE
+Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
 
-This module is free software. It may be used, redistributed and/or
-modified under the same terms as Perl.
+Portions copyright 1996 Organic Online.
 
-Copyright (c) 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
+Portions copyright 2000 Martyn J. Pearce.
 
-Portions Copyright (c) 1996 Organic Online
+=head2 License
 
-Portions Copyright (c) 2000 Martyn J. Pearce.
+You may use, modify, and distribute this software under the same terms as Perl.
 
 =cut
-

@@ -12,23 +12,6 @@ There are lots of things that could be done to improve this module.
 
 Issues about the distribution and supporting files, rather than the code:
 
-=head2 Package Name
-
-To date, this module has been circulated under several provisional names: it was originally floated as a possible version-2 rewrite of Class::MethodMaker, then renamed to Class::Methods when it forked from that project, and then briefly to Class::MethodGenerator. 
-
-It can be surprisingly difficult to comply with both of these L<perlmodlib> guidelines:
-
-  To be portable each component of a module name should be limited
-  to 11 characters.
-  
-  Always try to use two or more whole words. 
-
-A few minutes with a thesaurus, and an inquiry on comp.lang.perl.modules, produced the following candidates: Class::MethodGen, Class::MetaMethods, Class::AutoMethods, Class::DeclareSubs, Class::SubMaker, Class::CodeLibrary, Class::MethodKit, Class::MethodMill, Class::MethodSmith.
-
-For now, I've selected Class::MakeMethods, as it is two whole words, and is reminiscent of Class::MethodMaker without being confusing. (I hope!) 
-
-Other suggestions or approaches to this problem would be welcome.
-
 =head2 Documentation
 
 =over 4
@@ -54,7 +37,7 @@ Assemble annotated examples and tutorials, and either link to or distribute them
 
 =item *
 
-Expunge old custom Test module in favor of standard version, except for emulation compatibility tests, which should remain untouched.
+Expunge old custom Test module in favor of standard version (except for emulation compatibility tests, which should remain untouched).
 
 =item *
 
@@ -64,20 +47,20 @@ cases.
 =back
 
 
-=head1 ISSUES FOR ALL SUBCLASSES
+=head1 GENERAL ISSUES
 
 =over 4
 
 =item *
 
-For scalar methods (and perhaps others) it would be nice to have
-a simple bounds-checking interface to approve or reject new values
-that were passed in.
+For scalar methods (and others) it would be nice to have a simple
+bounds-checking interface to approve or reject (with an exception)
+new values that were passed in.
 
 As pointed out by Terrence Monroe Brannon, the right interface to
-adopt is that of Attribute::Types:
+adopt is probably that of Attribute::Types:
 
-  use Class::MakeMethods::Template::Hash (
+  use Class::MakeMethods::Standard::Hash (
     'scalar' => [ 'count' => { TYPE => 'INTEGER' } ],
     'scalar' => [ 'name' => { TYPE => qr/^[A-Z]\w*$/ } ],
     'scalar' => [ 'account' => { TYPE => &checksum_account_number } ]
@@ -101,21 +84,12 @@ built for them when they use them.
 =item *
 
 Figure out which modules, if any, should actually be using AutoLoader.
-Perhaps just Template::Generic?
+Probably just Template::Generic?
 
 =item *
 
 Improve use of _diagnostic hooks for debugging. Add various "(Q)"
-diagnostics.
-
-=item x
-
-Can we compile the various closure generators as named subroutines,
-and then get a reference to them or call them by name, such that
-debugging output shows something more helpful than ANON? 
-
-No -- It doesn't look like there's a way to do this. Naming the
-closure-generator doesn't provide a name to the closure.
+warning diagnostics.
 
 =back
 
@@ -132,8 +106,6 @@ Finish tests for Standard modules.
 
 Finish building Inheritable array and object accessors.
 
-Factor out common code from Standard::Inheritable and Composite::Inheritable. 
-
 =item *
 
 Finish building and testing of Composite::* packages.
@@ -146,10 +118,6 @@ Resolve DESTROY-time issues with Standard::Inheritable, Composite::Inheritable, 
 
 Add slice and splice functionality to Standard::*:hash and Composite::*:hash.
 
-=item *
-
-Rename Basic::Static to Basic::Global, or rename other ::Global module to Static.
-
 =back
 
 
@@ -158,7 +126,7 @@ Rename Basic::Static to Basic::Global, or rename other ::Global module to Static
 The following issues apply to Class::MakeMethods::Template and
 its subclasses.
 
-B<Most important>: Need to fix initialization behavior to properly search up the inheritance hierarchy, so that you don't have to redclare methods in each Generic subclass to get your class expressions.
+B<Most important>: Need to fix method-definition initialization behavior to properly search up the inheritance hierarchy, so that you don't have to redclare methods in each Generic subclass to get your class expressions.
 
 =head2 Documentation
 

@@ -1,6 +1,6 @@
-package Class::MakeMethods::Emulator::TakeName;
+package Class::MakeMethods::Utility::TakeName;
 
-$VERSION = 1.000_001;
+$VERSION = 1.002;
 
 @EXPORT_OK = qw( namespace_capture namespace_release );
 sub import { require Exporter and goto &Exporter::import } # lazy Exporter

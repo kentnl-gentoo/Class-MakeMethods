@@ -8,6 +8,27 @@ Revision history for Class::MakeMethods:
 
 =over 4
 
+=item v1.0.15 - 2002/01/12
+
+Renamed Basic::Static to Basic::Global for consistency with Standard and Composite. Hopefully, there aren't many users of this module yet; please accept my apologies if this breaks your code.
+
+Eliminated "local @_ = ...", which appears to cause a scoping problem on Perl 5.6. Thanks to Adam Spiers for a thorough bug report. (See http://www.perlmonks.org/index.pl?node_id=138370 for details.)
+
+Extended Template::Generic to support "array --get_set_ref" method style requested by Adam Spiers.
+
+Various documentation tweaks, including feedback from Adam Spiers: Adjusted documentation to downplay Basic::* modules as a starting point, in favor of Standard::* ones. Trimmed out some duplicated documentation in favor of more "See LE<lt>...E<gt>" links. Adjusted documentation of *::Inheritable packages in an attempt to clarify the way in which the inheritance tree is searched for a value. 
+
+Factored out common code from Standard::Inheritable and Composite::Inheritable to new module, Utility::Inheritable. Factored out common code from Standard::Hash and Standard::Array to new module, Utility::ArraySplicer. Factored out common code from Template::Universal to new module, Utility::Ref. Renamed Emulator::TakeName to Utility::TakeName (this is internal use only, so there should be no public impact).
+
+
+=item v1.0.15 - 2001/12/01
+
+Adjusted Template::Universal's code for _CALL_METHODS_FROM_HASH_, to ensure that method/arg pairs are called in order they were passed in.
+
+=item v1.0.15 - 2001/07/04, 2001/07/19
+
+Minor additions to documentation of various method types.
+
 
 =item v1.0.14 - 2001/06/25, 2001/06/29, 2001/07/01
 
@@ -24,7 +45,17 @@ Minor touch-ups to ReadMe and Guide documentation.
 
 =item v1.0.13 - 2001/05/16, 2001/05/18, 2001/05/20, 2001/06/02, 2001/06/22, 2001/06/24
 
-Renamed module to Class::MakeMethods. 
+To date, this module has been circulated under several provisional
+names: it was originally floated as a possible version-2 rewrite
+of Class::MethodMaker, then renamed to Class::Methods when it forked
+from that project, and then briefly to Class::MethodGenerator.
+(Note that it can be surprisingly difficult to comply with both of
+these L<perlmodlib> guidelines: "To be portable each component of
+a module name should be limited   to 11 characters. [...] Always
+try to use two or more whole words.") In the end, I selected
+Class::MakeMethods, as it is two whole words, and is reminiscent
+of Class::MethodMaker without being confusing (I hope!), and I
+believe this issue is now settled.
 
 Standardized syntax for global options; renamed -implementation to -MakerClass and -target_class to -TargetClass. Moved $TargetClass and other context information into %CONTEXT with _context accessor. Added ForceInstall.
 

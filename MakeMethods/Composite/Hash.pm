@@ -191,7 +191,8 @@ sub new {
 		if ( scalar @_ == 1 and ref $_[0] eq 'HASH' );
 	while ( scalar @_ ) {
 	  my $method = shift @_;
-	  $obj->$method( shift @_ );
+	  my $value = shift @_;
+	  $obj->$method( $value );
 	}
 	$obj;
       },
@@ -504,8 +505,7 @@ sub array {
 	  }
 	} else {
 	  $self->{$method->{hash_key}} ||= [];
-	  Class::MakeMethods::Composite::__array_ops( 
-		$self->{$method->{hash_key}}, @$args );
+	  array_splicer( $self->{$method->{hash_key}}, @$args );
 	}
       },
   ],

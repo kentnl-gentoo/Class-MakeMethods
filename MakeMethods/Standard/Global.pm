@@ -53,6 +53,7 @@ package Class::MakeMethods::Standard::Global;
 
 use strict;
 use Class::MakeMethods::Standard '-isasubclass';
+use Class::MakeMethods::Utility::ArraySplicer 'array_splicer';
 
 ########################################################################
 
@@ -212,7 +213,7 @@ sub array {
 	}
       } else {
 	$data ||= [];
-	return Class::MakeMethods::Standard::__array_ops( $data, @_ );
+	return array_splicer( $data, @_ );
       }
     }
   } (shift)->get_declarations(@_)

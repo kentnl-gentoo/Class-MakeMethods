@@ -1,22 +1,29 @@
 =head1 NAME
 
-B<Class::MakeMethods::Template::ClassInherit> - Associate information with a package
+B<Class::MakeMethods::Template::ClassInherit> - Overridable class data
 
 =head1 SYNOPSIS
 
-  package MyObject;
-  use Class::MakeMethods::Template::ClassInherit (
-    scalar          => [ 'foo' ]
-  );
+  package MyClass;
+
+  use Class::MakeMethods( 'Template::ClassInherit:scalar' => 'foo' );
+  # We now have an accessor method for an "inheritable" scalar value
   
   package main;
   
-  MyObject->foo('bar')
-  print MyObject->foo();
+  MyClass->foo( 'Foozle' );   # Set a class-wide value
+  print MyClass->foo();	      # Retrieve class-wide value
+  ...
+  
+  package MySubClass;
+  @ISA = 'MyClass';
+  
+  print MySubClass->foo();    # Intially same as superclass,
+  MySubClass->foo('Foobar');  # but overridable per subclass/
 
 =head1 DESCRIPTION
 
-These meta-methods provide access to class-specific values. They are similar to Static, except that each subclass has separate values.
+The MakeMethods subclass provides accessor methods that search an inheritance tree to find a value. This allows you to set a shared or default value for a given class, and optionally override it in a subclass.
 
 =cut
 

@@ -8,36 +8,11 @@ DISTRIBUTION ISSUES
     Issues about the distribution and supporting files, rather than the
     code:
 
-  Package Name
-
-    To date, this module has been circulated under several provisional
-    names: it was originally floated as a possible version-2 rewrite of
-    Class::MethodMaker, then renamed to Class::Methods when it forked from
-    that project, and then briefly to Class::MethodGenerator.
-
-    It can be surprisingly difficult to comply with both of these the
-    perlmodlib manpage guidelines:
-
-      To be portable each component of a module name should be limited
-      to 11 characters.
-      
-      Always try to use two or more whole words. 
-
-    A few minutes with a thesaurus, and an inquiry on
-    comp.lang.perl.modules, produced the following candidates:
-    Class::MethodGen, Class::MetaMethods, Class::AutoMethods,
-    Class::DeclareSubs, Class::SubMaker, Class::CodeLibrary,
-    Class::MethodKit, Class::MethodMill, Class::MethodSmith.
-
-    For now, I've selected Class::MakeMethods, as it is two whole words, and
-    is reminiscent of Class::MethodMaker without being confusing. (I hope!)
-
-    Other suggestions or approaches to this problem would be welcome.
-
   Documentation
 
-    *   Make sure that the documentation is broken up into appropriately-sized
-        chunks, and that people will know which section to look at.
+    *   Make sure that the documentation is broken up into
+        appropriately-sized chunks, and that people will know which section
+        to look at.
 
     *   As user questions arrive, add them to a FAQ section in the Guide.
 
@@ -46,27 +21,28 @@ DISTRIBUTION ISSUES
 
   Tests
 
-    *   Expunge old custom Test module in favor of standard version, except for
-        emulation compatibility tests, which should remain untouched.
+    *   Expunge old custom Test module in favor of standard version (except
+        for emulation compatibility tests, which should remain untouched).
 
-    *   Use Devel::Coverage to measure test coverage, and fill in missing cases.
+    *   Use Devel::Coverage to measure test coverage, and fill in missing
+        cases.
 
-ISSUES FOR ALL SUBCLASSES
-    *   For scalar methods (and perhaps others) it would be nice to have a
-        simple bounds-checking interface to approve or reject new values
-        that were passed in.
+GENERAL ISSUES
+    *   For scalar methods (and others) it would be nice to have a simple
+        bounds-checking interface to approve or reject (with an exception)
+        new values that were passed in.
 
         As pointed out by Terrence Monroe Brannon, the right interface to
-        adopt is that of Attribute::Types:
+        adopt is probably that of Attribute::Types:
 
-          use Class::MakeMethods::Template::Hash (
+          use Class::MakeMethods::Standard::Hash (
             'scalar' => [ 'count' => { TYPE => 'INTEGER' } ],
             'scalar' => [ 'name' => { TYPE => qr/^[A-Z]\w*$/ } ],
             'scalar' => [ 'account' => { TYPE => &checksum_account_number } ]
           );
 
-    *   Add AUTOLOAD support for clients who wish to have accessors lazily built
-        for them when they use them.
+    *   Add AUTOLOAD support for clients who wish to have accessors lazily
+        built for them when they use them.
 
           sub AUTOLOAD {
             (my $func = $AUTOLOAD) =~ s/^.*::(_?)//;
@@ -78,26 +54,16 @@ ISSUES FOR ALL SUBCLASSES
             }
           }
 
-    *   Figure out which modules, if any, should actually be using AutoLoader.
-        Perhaps just Template::Generic?
+    *   Figure out which modules, if any, should actually be using
+        AutoLoader. Probably just Template::Generic?
 
     *   Improve use of _diagnostic hooks for debugging. Add various "(Q)"
-        diagnostics.
-
-    x   Can we compile the various closure generators as named subroutines, and
-        then get a reference to them or call them by name, such that
-        debugging output shows something more helpful than ANON?
-
-        No -- It doesn't look like there's a way to do this. Naming the
-        closure-generator doesn't provide a name to the closure.
+        warning diagnostics.
 
 STANDARD AND COMPOSITE CLASSES
     *   Finish tests for Standard modules.
 
     *   Finish building Inheritable array and object accessors.
-
-        Factor out common code from Standard::Inheritable and
-        Composite::Inheritable.
 
     *   Finish building and testing of Composite::* packages.
 
@@ -107,16 +73,13 @@ STANDARD AND COMPOSITE CLASSES
     *   Add slice and splice functionality to Standard::*:hash and
         Composite::*:hash.
 
-    *   Rename Basic::Static to Basic::Global, or rename other ::Global module
-        to Static.
-
 TEMPLATE CLASSES
     The following issues apply to Class::MakeMethods::Template and its
     subclasses.
 
-    Most important: Need to fix initialization behavior to properly search
-    up the inheritance hierarchy, so that you don't have to redclare methods
-    in each Generic subclass to get your class expressions.
+    Most important: Need to fix method-definition initialization behavior to
+    properly search up the inheritance hierarchy, so that you don't have to
+    redclare methods in each Generic subclass to get your class expressions.
 
   Documentation
 
@@ -126,14 +89,14 @@ TEMPLATE CLASSES
 
     *   Template Internals: Finish documenting the Template mechanism.
 
-    *   Template Internals: Finish documenting disk-based meta-method code-
-        caching.
+    *   Template Internals: Finish documenting disk-based meta-method
+        code-caching.
 
   Template::Generic
 
     *   Make instance a template of object.
 
-    *   Allow untyped object accesors if `class' attribute is not set.
+    *   Allow untyped object accesors if "class" attribute is not set.
         (Suggested in Jan-01 NY Perl Seminar discussion.)
 
     *   Standardize naming templates for array, hash, other method types.
@@ -144,21 +107,22 @@ TEMPLATE CLASSES
         Make list methods consistent with hash_of_lists methods, in action,
         and in name (x_verb). Also for others (e.g., set_ clear_ boolean)
 
-    *   Should default object template provide auto-create behavior on ->get()?
+    *   Should default object template provide auto-create behavior on
+        ->get()?
 
     *   Figure out how to standardize the "Generic:scalar -init_and_get"
         interface to support memoizing values for other types.
 
-    *   Consider adding hash each and array iterator methods, using a closure to
-        provide iteration.
+    *   Consider adding hash each and array iterator methods, using a
+        closure to provide iteration.
 
     !   Add support for tied arrays & scalars, a la tiedhash
 
     *   Add string_multiple_index.
 
-    *   Extend index methods to support weak indexes with WeakRef. Perhaps just
-        have it accept a hash ref to use as the index, and then allow people
-        to pass in tied hashes?
+    *   Extend index methods to support weak indexes with WeakRef. Perhaps
+        just have it accept a hash ref to use as the index, and then allow
+        people to pass in tied hashes?
 
     *?  Provide lvalue subs as alternative to get_set:
 
@@ -223,9 +187,9 @@ TEMPLATE CLASSES
 
           package Foo::Bar;
           Class::MakeMethods::Hash->import(-codecache=>'auto', scalar=>'foo');
-          
+  
         We should be able to write out the following file:
-          
+
           cat 'auto/Foo/Bar/methods-line-2.pl'
           # NOTE: Generated for Foo::Bar by the Class::MakeMethods module.
           # Changes made here will be lost when Foo::Bar is modified.
@@ -244,22 +208,22 @@ TEMPLATE CLASSES
 
         To do this, we need to:
 
-    -       Provide an option to select this if desired; maybe ... import('-
-            cache' => 'auto/', ...)?
+        -   Provide an option to select this if desired; maybe ...
+            import('-cache' => 'auto/', ...)?
 
-    -       Figure out which directory we can/should write into.
+        -   Figure out which directory we can/should write into.
 
-    -       Re-evaluate the textual code templates, without generating the
+        -   Re-evaluate the textual code templates, without generating the
             closures. Substitute in any _STATIC_ATTR_ values. Make other
             _ATTR_ values point to some public lookup table or package
             scalar.
 
-    -       Notice if the source file (or Class::MakeMethods modules) has been
-            updated more recently than the generated file.
+        -   Notice if the source file (or Class::MakeMethods modules) has
+            been updated more recently than the generated file.
 
 SEE ALSO
-    See the Class::MakeMethods manpage for an overview of the method-
-    generation framework.
+    See the Class::MakeMethods manpage for an overview of the
+    method-generation framework.
 
     See the Class::MakeMethods::Guide manpage for a getting-started guide,
     annotated examples of usage, and a listing of the method generation

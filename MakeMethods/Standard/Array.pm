@@ -54,6 +54,7 @@ package Class::MakeMethods::Standard::Array;
 
 use strict;
 use Class::MakeMethods::Standard '-isasubclass';
+use Class::MakeMethods::Utility::ArraySplicer 'array_splicer';
 
 ########################################################################
 
@@ -344,7 +345,7 @@ sub array {
 	}
       } else {
 	$self->[$index] ||= [];
-	Class::MakeMethods::Standard::__array_ops( $self->[$index], @_ );
+	array_splicer( $self->[$index], @_ );
       }
     }
   } $class->get_declarations(@_)

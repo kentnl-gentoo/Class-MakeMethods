@@ -4,14 +4,14 @@ NAME
 SYNOPSIS
       # Follow your standard download, test and install sequence
       perl -MCPAN -e 'install Class::MakeMethods'
-      
+  
       # Generates methods for your object when you "use" it.
       package MyObject;
-      use Class::MakeMethods::Basic::Hash (
+      use Class::MakeMethods::Standard::Hash (
         'new'     => [ 'new' ],
         'scalar'  => [ 'foo', 'bar' ]
       );
-      
+  
       # The resulting methods can be called exactly as normal ones
       package main;   
       my $obj = MyObject->new( foo => "Foozle", bar => "Bozzle" );
@@ -39,15 +39,15 @@ MOTIVATION
 
 DESCRIPTION
     The Class::MakeMethods framework allows Perl class developers to quickly
-    define common types of methods. When a module `use's a subclass of
+    define common types of methods. When a module "use"s a subclass of
     Class::MakeMethods, it can select from the supported method types, and
     specify a name for each method desired. The methods are dynamically
     generated and installed in the calling package.
 
   Extensible Architecture
 
-    The Class::MakeMethods package defines a superclass for method-
-    generating modules, and provides a calling convention, on-the-fly
+    The Class::MakeMethods package defines a superclass for
+    method-generating modules, and provides a calling convention, on-the-fly
     subclass loading, and subroutine installation that will be shared by all
     subclasses.
 
@@ -99,7 +99,7 @@ INSTALLATION
     use the standard unpack, "perl Makefile.PL", "make test", "make install"
     sequence:
 
-      http://work.evolution.com/dist/
+      http://www.evoscript.org/Class-MakeMethods/
 
   Getting Started
 
@@ -117,17 +117,18 @@ PREREQUISITES
 
     *   Class::MakeMethods::Attribute
 
-        The `:MakeMethod' subroutine attribute requires Perl version 5.6 and
+        The ":MakeMethod" subroutine attribute requires Perl version 5.6 and
         the Attribute::Handlers module (CPAN).
 
   Tested Platforms
 
     This release has been tested succesfully on the following platforms:
 
-      5.005_02 on Rhapsody
+      5.6.1 on darwin
 
     Earlier releases have also tested on the following platforms:
 
+      5.005_02 on Rhapsody
       5.005_03 on sun4-solaris: PASS as of 1.0.13
       v5.6.0 on sun4-solaris: PASS as of 1.0.13
       v5.6.1 on WinNT: PASS as of 1.0.14.a (was TEST FAILURE as of 1.0.13)
@@ -136,8 +137,9 @@ PREREQUISITES
       5.004 on MacOS (MacPerl 520r4): PASS as of 1.0.6
       5.005 on WinNT (ActivePerl 618): PASS as of 1.0.6
 
-    (Once this module has been on CPAN for a while, I'll replace this
-    information with a link to the CPAN-Testers results.)
+    You may also review the current test results from CPAN-Testers:
+
+      http://testers.cpan.org/search?request=dist&dist=Class-MakeMethods
 
 VERSION
     This is version 1.0.14 of Class::MakeMethods.
@@ -180,11 +182,12 @@ VERSION
 SEE ALSO
     For an overview of this package, see the Class::MakeMethods manpage.
 
-    If you're just getting started, see the Class::MakeMethods::Basic
-    manpage for a listing of basic method generators.
+    If you're just getting started, see the Class::MakeMethods::Standard
+    manpage for a listing of common method generators.
 
-    If you need a bit more flexibility, see the Class::MakeMethods::Standard
-    manpage for a listing of enhanced method generators.
+    If you need a bit more flexibility, see the
+    Class::MakeMethods::Composite manpage for method generators which offer
+    more customization options.
 
     For the largest collection of methods and options, see the
     Class::MakeMethods::Template manpage.
@@ -193,35 +196,44 @@ SEE ALSO
     similarities. Backward compatibility and conversion documentation is
     provded in the Class::MakeMethods::Emulator::MethodMaker manpage.
 
-AUTHORS
-    Developed by
-          M. Simon Cavalletto, simonm@evolution.com
-          Evolution Online Systems, http://www.evolution.com
+CREDITS AND COPYRIGHT
+  Developed By
 
-    The Shoulders of Giants
-        Inspiration, cool tricks, and blocks of useful code for this module
-        were extracted from the following CPAN modules:
+      M. Simon Cavalletto, simonm@cavalletto.org
+      Evolution Softworks, www.evoscript.org
 
-          Class::MethodMaker, by Peter Seibel.
-          Class::Accessor, by Michael G Schwern 
-          Class::Contract, by Damian Conway
-          Class::SelfMethods, by Toby Everett
+  The Shoulders of Giants
 
-    Contributors
-        Thank you for your feedback and suggestions.
+    Inspiration, cool tricks, and blocks of useful code for this module were
+    extracted from the following CPAN modules:
 
-          Martyn J. Pearce
-          Scott R. Godin
-          Ron Savage
-          Jay Lawrence
+      Class::MethodMaker, by Peter Seibel.
+      Class::Accessor, by Michael G Schwern 
+      Class::Contract, by Damian Conway
+      Class::SelfMethods, by Toby Everett
 
-LICENSE
-    This module is free software. It may be used, redistributed and/or
-    modified under the same terms as Perl.
+  Feedback and Suggestions
 
-    Copyright (c) 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
+    Thanks to:
 
-    Portions Copyright (c) 1996 Organic Online
+      Martyn J. Pearce
+      Scott R. Godin
+      Ron Savage
+      Jay Lawrence
+      Adam Spiers
 
-    Portions Copyright (c) 2000 Martyn J. Pearce.
+  Copyright
+
+    Copyright 2002 Matthew Simon Cavalletto.
+
+    Portions copyright 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
+
+    Portions copyright 1996 Organic Online.
+
+    Portions copyright 2000 Martyn J. Pearce.
+
+  License
+
+    You may use, modify, and distribute this software under the same terms
+    as Perl.
 

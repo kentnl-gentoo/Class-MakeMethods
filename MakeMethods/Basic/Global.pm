@@ -1,11 +1,11 @@
 =head1 NAME
 
-Class::MakeMethods::Basic::Static - Basic shared methods
+Class::MakeMethods::Basic::Global - Basic shared methods
 
 =head1 SYNOPSIS
 
   package MyObject;
-  use Class::MakeMethods::Basic::Static (
+  use Class::MakeMethods::Basic::Global (
     scalar => [ 'foo', 'bar' ],
     array => 'my_list',
     hash => 'my_index',
@@ -31,11 +31,7 @@ Class::MakeMethods::Basic::Static - Basic shared methods
 
 =head1 DESCRIPTION
 
-The Basic::Static subclass of MakeMethods provides basic
-accessors for data shared by an entire class.
-
-(For what it's worth, I believe the use of the term "static" to
-refer to shared class data derives from C++.)
+The Basic::Global subclass of MakeMethods provides basic accessors for data shared by an entire class, sometimes called "static" or "class data."
 
 =head2 Calling Conventions
 
@@ -56,7 +52,7 @@ syntax information.
 
 =cut
 
-package Class::MakeMethods::Basic::Static;
+package Class::MakeMethods::Basic::Global;
 
 use Class::MakeMethods '-isasubclass';
 

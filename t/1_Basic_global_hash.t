@@ -5,7 +5,7 @@ package X;
 use lib qw ( ./t );
 use Test;
 
-use Class::MakeMethods::Basic::Static ( hash => [ 'a', 'c' ] );
+use Class::MakeMethods::Basic::Global ( hash => [ 'a', 'c' ] );
 
 sub new { bless {}, shift; }
 my $o = new X;

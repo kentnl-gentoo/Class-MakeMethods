@@ -176,6 +176,51 @@ Provides a polymorph() method that is similar to Class::Method's "ClassName:clas
 =back
 
 
+=head2 Class::Constructor
+
+=over 4
+
+=item Distribution
+
+CPAN. Last update 11/01.
+
+=item Usage
+
+Inherit and call function with declaration arguments 
+
+=item Mechanism
+
+Generates and installs closures
+
+=item Instance Type
+
+Hash.
+
+=item Subclasses Cleanly
+
+Cleanly.
+
+=item Standard Methods
+
+Hash constructor, with bells.
+
+=item Extensible
+
+No.
+
+=item Emulator
+
+No, but possible.
+
+=item Example
+
+  package MyObject;
+  @ISA = qw(Class::Constructor);
+  MyObject->mk_constructor( Name => 'new' );
+
+=back
+
+
 =head2 Class::Classgen
 
 =over 4
@@ -320,6 +365,28 @@ Yes, Class::MakeMethods::Emulator::Inheritable, passes original test suite.
 =back
 
 
+=head2 Class::Delegate
+
+=item Distribution
+
+CPAN. Uploaded 12/0.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=head2 Class::Delegation
+
+=item Distribution
+
+CPAN. Uploaded 12/01.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+
+
 =head2 Class::Generate
 
 =over 4
@@ -369,6 +436,46 @@ Usage is similar to Class::Struct:
     mapping => '%',
     obj_ref => 'FooObject' 
   ]; 
+
+=back
+
+=head2 Class::Hook
+
+=item Distribution
+
+CPAN. Uploaded 12/01.
+
+=item Comments
+
+I have not yet reviewed this module in detail.
+
+=head2 Class::Holon
+
+=over 4
+
+=item Distribution
+
+CPAN. Experimental/Alpha release 07/2001. 
+
+=item Instance Type
+
+Hash, array, or flyweight-index.
+
+=item Subclasses Cleanly
+
+No. (I think.)
+
+=item Standard Methods
+
+Constructor and scalar accessors; flywieght objects also get scalar mutator methods.
+
+=item Extensible
+
+No. (I think.)
+
+=item Comments
+
+I'm not sure I understand the intent of this module; perhaps future versions will make this clearer....
 
 =back
 

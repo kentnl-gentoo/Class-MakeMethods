@@ -1,7 +1,7 @@
 package Class::MakeMethods::Emulator::MethodMaker;
 
 use Class::MakeMethods '-isasubclass';
-require Class::MakeMethods::Emulator::TakeName;
+require Class::MakeMethods::Utility::TakeName;
 
 use strict;
 
@@ -86,13 +86,13 @@ sub import {
   my $mm_class = shift;
   
   if ( scalar @_ and $_[0] =~ /^-take_namespace/ and shift ) {
-    Class::MakeMethods::Emulator::TakeName::namespace_capture(__PACKAGE__, $emulation_target);
+    Class::MakeMethods::Utility::TakeName::namespace_capture(__PACKAGE__, $emulation_target);
   } elsif ( scalar @_ and $_[0] =~ /^-release_namespace/ and shift ) {
-    Class::MakeMethods::Emulator::TakeName::namespace_release(__PACKAGE__, $emulation_target);
+    Class::MakeMethods::Utility::TakeName::namespace_release(__PACKAGE__, $emulation_target);
   }
   
   if ( scalar @_ and $_[0] eq '-sugar' and shift ) {
-    Class::MakeMethods::Emulator::TakeName::namespace_capture(__PACKAGE__, "methods");
+    Class::MakeMethods::Utility::TakeName::namespace_capture(__PACKAGE__, "methods");
   }
   
   $mm_class->make( @_ ) if ( scalar @_ );

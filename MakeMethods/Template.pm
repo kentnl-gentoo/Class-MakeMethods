@@ -1430,14 +1430,14 @@ with the '-' character which are interpreted as follows:
 
 =item *
 
-C<-params => I<hash_ref>>
+C<-params =E<gt> I<hash_ref>>
 
 Interfaces may include a '-params' key and associated reference
 to a hash of default parameters for that interface.
 
 =item *
 
-C<-base => I<interface_name>>
+C<-base =E<gt> I<interface_name>>
 
 Interfaces can be based on previously existing ones by including
 a -base specification in the the hash. The base value should contain

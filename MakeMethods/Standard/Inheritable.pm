@@ -1,45 +1,53 @@
 =head1 NAME
 
-Class::MakeMethods::Standard::Inheritable - Inheritable data
+Class::MakeMethods::Standard::Inheritable - Overridable data
 
 =head1 SYNOPSIS
 
   package MyClass;
-  use Class::MakeMethods::Standard::Inheritable (
-    scalar => [ 'foo', 'bar' ],
-    array => 'my_list',
-    hash => 'my_index',
-  );
+
+  use Class::MakeMethods( 'Standard::Inheritable:scalar' => 'foo' );
+  # We now have an accessor method for an "inheritable" scalar value
+  
+  MyClass->foo( 'Foozle' );   # Set a class-wide value
+  print MyClass->foo();	      # Retrieve class-wide value
+  
+  my $obj = MyClass->new(...);
+  print $obj->foo();          # All instances "inherit" that value...
+  
+  $obj->foo( 'Foible' );      # until you set a value for an instance.
+  print $obj->foo();          # This now finds object-specific value.
+  ...
   
   package MySubClass;
   @ISA = 'MyClass';
+  
+  print MySubClass->foo();    # Intially same as superclass,
+  MySubClass->foo('Foobar');  # but overridable per subclass,
+  print $subclass_obj->foo(); # and shared by its instances
+  $subclass_obj->foo('Fosil');# until you override them... 
   ...
   
-  MyClass->foo( 'Foozle' );
-  print MyClass->foo();
+  # Similar behaviour for hashes and arrays is currently incomplete
+  package MyClass;
+  use Class::MakeMethods::Standard::Inheritable (
+    array => 'my_list',
+    hash => 'my_index',
+  );
   
   MyClass->my_list(0 => 'Foozle', 1 => 'Bang!');
   print MyClass->my_list(1);
   
   MyClass->my_index('broccoli' => 'Blah!', 'foo' => 'Fiddle');
   print MyClass->my_index('foo');
-  ...
-  
-  my $obj = MyClass->new(...);
-  print $obj->foo();     # all instances default to same value
-  
-  $obj->foo( 'Foible' ); # until you set a value for an instance
-  print $obj->foo();     # it now has its own value
-  
-  print MySubClass->foo();    # intially same as superclass
-  MySubClass->foo('Foobar');  # but overridable per subclass
-  print $subclass_obj->foo(); # and shared by its instances
-  $subclass_obj->foo('Fosil');# until you override them... 
 
 
 =head1 DESCRIPTION
 
-The Standard::Inheritable suclass of MakeMethods provides basic accessors for class-specific data.
+The MakeMethods subclass provides accessor methods that search an inheritance tree to find a value. This allows you to set a shared or default value for a given class, optionally override it in a subclass, and then optionally override it on a per-instance basis. 
+
+Note that all MakeMethods methods are inheritable, in the sense that they work as expected for subclasses. These methods are different in that the I<data> accessed by each method can be inherited or overridden in each subclass or instance. See L< Class::MakeMethods::Utility::Inheritable> for more about this type of "inheritable" or overridable" data.
+
 
 =head2 Calling Conventions
 
@@ -64,7 +72,9 @@ See L<Class::MakeMethods::Standard/"Declaration Syntax"> and L<Class::MakeMethod
 package Class::MakeMethods::Standard::Inheritable;
 
 use strict;
+
 use Class::MakeMethods::Standard '-isasubclass';
+use Class::MakeMethods::Utility::Inheritable qw(get_vvalue set_vvalue find_vself);
 
 ########################################################################
 
@@ -106,41 +116,19 @@ Sample declaration and usage:
 
 =cut
 
-sub _inh_find_vself {
-  my $self = shift;
-  my $data = shift;
-
-  return $self if ( exists $data->{$self} );
-   
-  my $v_self;
-  my @isa_search = ( ref($self) || $self );
-  while ( scalar @isa_search ) {
-    $v_self = shift @isa_search;
-    return $v_self if ( exists $data->{$v_self} );
-    no strict 'refs';
-    unshift @isa_search, @{"$v_self\::ISA"};
-  }
-  return;
-}
-
 sub scalar {
   my $class = shift;
   map { 
     my $method = $_;
     my $name = $method->{name};
+    $method->{data} ||= {};
     $name => sub {
       my $self = shift;
       if ( scalar(@_) == 0 ) {
-	my $v_self = _inh_find_vself($self, $method->{data});
-	return $v_self ? $method->{data}{$v_self} : ();
+	get_vvalue($method->{data}, $self);
       } else {
 	my $value = shift;
-	if ( defined $value ) {
-	  $method->{data}{$self} = $value;
-	} else {
-	  delete $method->{data}{$self};
-	  undef;
-	}
+	set_vvalue($method->{data}, $self, $value);
       }
     }
   } $class->get_declarations(@_)
@@ -306,7 +294,7 @@ sub hash {
     $name => sub {
       my $self = shift;
       if ( scalar(@_) == 0 ) {
-	my $v_self = _inh_find_vself($self, $method->{data});
+	my $v_self = find_vself($method->{data}, $self);
 	my $value = $v_self ? $method->{data}{$v_self} : ();
 	if ( $method->{auto_init} and ! $value ) {
 	  $method->{data}{$self} = {};
@@ -314,7 +302,7 @@ sub hash {
 	  $value;
 	}
       } elsif ( scalar(@_) == 1 ) {
-	my $v_self = _inh_find_vself($self, $method->{data});
+	my $v_self = find_vself($method->{data}, $self);
 	return unless $v_self;
 	my $index = shift;
 	ref($index) ? @{$method->{data}{$v_self}}{ @$index } 
@@ -323,7 +311,7 @@ sub hash {
 	Carp::croak "Odd number of items in assigment to $method->{name}";
       } else {
 	if ( ! exists $method->{data}{$self} ) {
-	  my $v_self = _inh_find_vself($self, $method->{data});
+	  my $v_self = find_vself($method->{data}, $self);
 	  $method->{data}{$self} = { $v_self ? %$v_self : () };
 	}
 	while ( scalar(@_) ) {

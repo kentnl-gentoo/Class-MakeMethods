@@ -123,8 +123,8 @@ sub universal {
 
       '_CALL_METHODS_FROM_HASH_' => q{
 	  # Accept key-value attr list, or reference to unblessed hash of attrs
-	  my %args = (scalar @_ == 1 and ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-	  foreach (keys %args) { $self->$_($args{$_}) }
+	  my @args = (scalar @_ == 1 and ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	  while ( scalar @args ) { local $_ = shift(@args); $self->$_( shift(@args) ) }
       },
       
     },
@@ -203,6 +203,14 @@ For each meta-method, creates a method which will croak if called.
 
 This is intended to support the use of abstract methods, that must
 be overidden in a useful subclass.
+
+If each subclass is expected to provide an implementation of a given method, using this abstract method will replace the generic error message below with the clearer, more explicit error message that follows it:
+
+  Can't locate object method "foo" via package "My::Subclass"
+  The "foo" method is abstract and can not be called on My::Subclass
+
+However, note that the existence of this method will be detected by UNIVERSAL::can(), so it is not suitable for use in optional interfaces, for which you may wish to be able to detect whether the method is supported or not.
+
 
 The -unsupported and -prohibited interfaces provide alternate error
 messages, or a custom error message can be provided using the
