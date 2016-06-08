@@ -48,7 +48,7 @@ sub COUNT_TESTS {
   open(IN, $file) or die "Can't open $file: $!";
   while (<IN>) {
     /^\s*#/ and next;
-    $c += s/(TEST\s{)/$1/g;
+    $c += s/(TEST\s\{)/$1/g;
   }
   $c;
 }
